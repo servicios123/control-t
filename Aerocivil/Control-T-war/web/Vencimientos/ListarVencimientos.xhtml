@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+            <ui:define name="titulo">
+                <h:outputText value="#{msg.verVencimiento}" />
+            </ui:define>
+            <ui:define name="contenido">
+                <br></br>
+                <h:form>
+                    <table class="tablaVencimientos" width="400px">
+                        <tr>
+                            <td>
+                                    <h:outputText value="#{msg.evaluacionesVencer}" styleClass="fontBig"/>
+                                    <br/>
+                                    <h:outputLabel value="#{vencimientosBBean.evaluacionesCnt}" styleClass="fontBigRed" />
+                                    <br/><br/>
+                                    <h:commandButton value="#{msg.consultar}"
+                                                     action="#{vencimientosBBean.enviarVencimientoEvaluacion}"/>
+                                    <br/><br/><br/><br/><br/><br/>
+                            </td>
+                            <td>
+                                    <h:outputText value="#{msg.cursosVencer}" styleClass="fontBig" />
+                                    <br/>
+                                    <h:outputLabel value="#{vencimientosBBean.cursosCnt}"
+                                                   styleClass="fontBigRed"  />
+                                    <br/><br/>
+                                    <h:commandButton value="#{msg.consultar}"
+                                                     action="#{vencimientosBBean.enviarVencimientoCurso}" />
+                                    <br/><br/><br/><br/><br/><br/>
+
+                            </td>
+                        </tr>                        
+                        <tr>
+                            <td>
+
+                                    <h:outputText styleClass="fontBig" 
+                                                  value="#{msg.certMedicosVencer}"/>
+                                    <br/>
+                                    <h:outputLabel value="#{vencimientosBBean.certMedicosCnt}" styleClass="fontBigRed" /> 
+                                    <br/><br/>
+                                    <h:commandButton value="#{msg.consultar}"
+                                                     action="#{vencimientosBBean.enviarCertMedico}" />
+
+                            </td>
+                            <td>
+
+                                    <h:outputText styleClass="fontBig" 
+                                                  value="#{msg.posicionesVencer}"/>
+                                    <br/>
+                                    <h:outputLabel value="#{vencimientosBBean.posicionesCnt}" styleClass="fontBigRed" />
+                                    
+                                    <br/><br/>
+                                    <h:commandButton value="#{msg.consultar}"
+                                                     action="#{vencimientosBBean.enviarVencimientosPosicionHabilitadas}" />
+
+                            </td>
+                        </tr>                        
+                    </table>
+                    <h:panelGrid columns="2" style="width:400px" styleClass="tablaVencimientos">
+
+                    </h:panelGrid>
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.inactivarPosicionesCalendario}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                <h:form id="mainform">  
+                    
+                    <p:growl id="messages" showDetail="true" />  
+                    <h:commandLink value="#{msg.Previous} - " action="#{posicionInactivaBBean.nextPrevious}">
+                        <f:setPropertyActionListener target="#{posicionInactivaBBean.moveValue}" value="-1"/>
+                    </h:commandLink>
+
+                    <h:commandLink value=" #{msg.Next}" action="#{posicionInactivaBBean.nextPrevious}">
+                        <f:setPropertyActionListener target="#{posicionInactivaBBean.moveValue}" value="1"/>
+                    </h:commandLink>
+                    <!--actionListener="{calendar.calendarListForm.nextPrevious}"-->
+                    
+                    <p:schedule id="schedule" value="#{posicionInactivaBBean.eventModel}"  
+                                editable="true" widgetVar="myschedule" 
+                                resizable="true" draggable="false" leftHeaderTemplate=""
+                                rightHeaderTemplate="" transient="true" 
+                                initialDate="#{posicionInactivaBBean.iniDate}" >
+                        <p:ajax event="dateSelect" listener="#{posicionInactivaBBean.onDateSelect}" 
+                                update="eventDetails,popupEvent" oncomplete="myschedule.update();" />
+                        <p:ajax event="eventSelect" listener="#{posicionInactivaBBean.onEventSelect}" 
+                                update="eventDetails,popupEvent" oncomplete="myschedule.update();" />
+                    </p:schedule>  
+                    <!--p:dataGrid value="{posicionInactivaBBean.diasPosiciones}" var="item" columns="7"
+                                rows="6">
+                        <p:column>
+                            
+                        </p:column>
+                    </p:dataGrid-->
+
+                    <p:dialog widgetVar="eventDialog" header="#{posicionInactivaBBean.titlePopUp}" 
+                              id="popupEvent" showEffect="clip" hideEffect="clip" height="400">  
+                        <h:panelGrid id="eventDetails" >  
+                            
+                            <xf:selectManyCheckbox  value="#{posicionInactivaBBean.arrayInactivas}" >  
+                                <f:selectItems value="#{posicionInactivaBBean.posJornadas}" var="regi" itemValue="#{regi.pjId}" itemLabel="#{regi.pjAlias}" />  
+                            </xf:selectManyCheckbox> 
+                            
+                            <p:commandButton value="#{msg.guardar}"  
+                                             oncomplete="myschedule.update();eventDialog.hide();"  
+                                             actionListener="#{posicionInactivaBBean.registrarPosiciones}" />  
+                        </h:panelGrid>  
+                    </p:dialog>
+                    <script>
+                        $(function(){
+                            for(i=0;42>i;i++){
+                                $(".fc-day"+i).css("background-color","white"); 
+                            }
+                            <c:forEach items="#{posicionInactivaBBean.festivos}" var="it">                            
+                                $(".fc-day#{it-1}").css("background-color","lightBlue"); 
+                            </c:forEach>
+                        });
+                    </script>
+                </h:form> 
+                
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

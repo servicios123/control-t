@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:p="http://primefaces.org/ui"
+     xmlns:xf="http://www.xfaces.com/jsf">
+<body>
+<ui:composition template="../template_interior.xhtml">
+
+  <ui:define name="titulo">
+      
+      <h:outputText value="#{msg.listar} #{msg.posiciones}" ></h:outputText>
+       
+  </ui:define>
+
+  <ui:define name="contenido">
+       
+        <h:form>
+           
+            <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
+                <f:facet name="header" ><h:outputText value="#{msg.filtros}" ></h:outputText></f:facet>
+
+                <xf:inputText entity="#{posicionBBean.posicionFiltro}" fieldName="posAlias" />                    
+
+                <xf:selectOneMenu  entity="#{posicionBBean.posicionFiltro.sector}"  fieldName="secId">  
+                    <f:selectItems value="#{posicionBBean.listSector}" var="regi" itemValue="#{regi.secId}" itemLabel="#{regi.secNombre}" />  
+                </xf:selectOneMenu> 
+
+                <xf:selectOneMenu  entity="#{posicionBBean.posicionFiltro.funcion}"  fieldName="fuId">  
+                    <f:selectItems value="#{posicionBBean.listFuncion}" var="fu" itemValue="#{fu.fuId}" itemLabel="#{fu.fuNombre}" />  
+                </xf:selectOneMenu> 
+                <xf:selectOneMenu entity="#{posicionBBean.posicionFiltro}" fieldName="posEstado" >  
+                    <f:selectItem itemLabel="Activo" itemValue="Activo" />  
+                    <f:selectItem itemLabel="Inactivo" itemValue="Inactivo" /> 
+                </xf:selectOneMenu>
+                <f:facet name="footer">
+                    <h:commandButton  action="#{posicionBBean.filtrar}" value="#{msg.buscar}"  />            
+                </f:facet>
+
+           </h:panelGrid>
+        </h:form>
+        <br></br>
+        <h:form>
+            <p:dataTable value="#{posicionBBean.lista}" var="item" styleClass="tabla_lista"
+                         paginator="true" paginatorPosition="bottom" rows="15"  
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                         currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                         rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
+                         sortBy="#{item.posicionNacional.pnAlias}"
+                         emptyMessage="#{msg.emptyList}">
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.editar}"/>
+                    </f:facet>
+                    <h:commandLink value="#{msg.editar}" action="#{posicionBBean.editar}">
+                        <f:setPropertyActionListener value="#{item}" target="#{posicionBBean.posicion}"/>
+                    </h:commandLink>
+                </p:column>
+                <p:column sortBy="#{item.posicionNacional.pnAlias}" >
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.posicion}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.posicionNacional.pnAlias}"/>
+                </p:column>
+                <p:column sortBy="#{item.posTiempoVence}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.posTiempoVence}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.posTiempoVence}"/>
+                </p:column>
+                <p:column sortBy="#{item.sector.secNombre}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.sector}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.sector.secNombre}"/>
+                </p:column>
+                <p:column sortBy="#{item.funcion.fuNombre}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.funcion}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.funcion.fuNombre}"/>
+                </p:column>
+                <p:column sortBy="#{item.posAlias}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.posAlias}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.posAlias}"/>
+                </p:column>
+                <p:column sortBy="#{item.posEstado}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.posEstado}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.posEstado}"/>
+                </p:column>
+            </p:dataTable>
+            <h:commandButton action="#{posicionBBean.crear}" value="#{msg.crear}"  />
+            
+        </h:form>
+
+  </ui:define>
+  
+</ui:composition>
+</body>
+</html>

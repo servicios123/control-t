@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.configurarFestivos}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                <h:form>  
+
+                    <p:growl id="messages" showDetail="true" />  
+
+                    <p:schedule value="#{scheduleController.eventModel}"  
+                                editable="true" widgetVar="myschedule" 
+                                resizable="false" draggable="false" 
+                                rightHeaderTemplate="" 
+                                >
+                        <p:ajax event="dateSelect" listener="#{scheduleController.onDateSelect}" update="eventDetails" oncomplete="myschedule.update();" />
+                        <p:ajax event="eventSelect" listener="#{scheduleController.onEventSelect}" update="eventDetails" oncomplete="myschedule.update();" />                        
+                    </p:schedule>  
+
+                    <p:dialog widgetVar="eventDialog" header="Event Details" showEffect="clip" hideEffect="clip">  
+                        <h:panelGrid id="eventDetails" columns="2">  
+                            <h:outputLabel for="title" value="Title:" />  
+                            <p:inputText id="title" value="#{scheduleController.event.title}" />  
+
+                            <h:outputLabel for="from" value="From:" />  
+                            <p:inputMask id="from" mask="99/99/9999"  
+                                         value="#{scheduleController.event.startDate}" >  
+                                <f:convertDateTime pattern="dd/MM/yyyy" />  
+                            </p:inputMask>  
+
+                            <h:outputLabel for="to" value="To:" />  
+                            <p:inputMask id="to" mask="99/99/9999"  
+                                         value="#{scheduleController.event.endDate}" >  
+                                <f:convertDateTime pattern="dd/MM/yyyy" />  
+                            </p:inputMask>  
+
+                            <h:outputLabel for="allDay" value="All Day:" />  
+                            <h:selectBooleanCheckbox id="allDay"  
+                                                     value="#{scheduleController.event.allDay}" />  
+
+                            <p:commandButton type="reset" value="Reset" />  
+                            <p:commandButton value="Save"  
+                                             oncomplete="myschedule.update();eventDialog.hide();"  
+                                             actionListener="#{scheduleController.addEvent}" />  
+                        </h:panelGrid>  
+                    </p:dialog>  
+                    <h:commandButton action="#{scheduleController.guardarFestivos}" value="#{msg.guardar}"/>
+                </h:form> 
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf"> 
+    <body>
+         <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.consultarSolicitudesCambio}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+
+                <h:form>
+
+                    <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
+                        <f:facet name="header" ><h:outputText value="#{msg.filtros}" ></h:outputText></f:facet>
+                        <xf:inputText entity="#{solicitudBBean.solicitudFiltro.funcionario_sol}" fieldName="funId" />
+                        <xf:inputText entity="#{solicitudBBean.solicitudFiltro.funcionario_sol}" fieldName="funAlias"  />
+                        <xf:calendar entity="#{solicitudBBean.solicitudFiltro}" fieldName="solFechaCambio" required="false"></xf:calendar>
+                        <xf:calendar entity="#{solicitudBBean.solicitudFiltro}" fieldName="solFechaRegistro" required="false"></xf:calendar>
+                         <xf:selectOneMenu entity="#{solicitudBBean.solicitudFiltro}" fieldName="solTipo" required="false" >
+                            <f:selectItem itemValue="Cambio de Posicion" itemLabel="Cambio de Posicion"/>
+                            <f:selectItem itemValue="Cambio de Secuencia" itemLabel="Cambio de Secuencia"/>
+                            <f:selectItem itemValue="Cambio de Turno" itemLabel="Cambio de Turno"/>
+                            
+                        </xf:selectOneMenu>
+                         <xf:selectOneMenu  entity="#{solicitudBBean.solicitudFiltro.dependencia.aeropuerto.regional}"  
+                                           fieldName="regId" rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel}">  
+                            <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
+                            <p:ajax update="aeId,depId,pjId"  
+                                    listener="#{solicitudBBean.cargarAeropuertoListado}"  />  
+                        </xf:selectOneMenu> 
+                        
+                        
+                        <xf:selectOneMenu entity="#{solicitudBBean.solicitudFiltro.dependencia.aeropuerto}" fieldName="aeId"
+                                         rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}"  >  
+                            <f:selectItems value="#{solicitudBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
+                            <p:ajax update="depId,pjId"  
+                                    listener="#{solicitudBBean.cargarDependenciaListado}" /> 
+                        </xf:selectOneMenu> 
+                        
+                        <xf:selectOneMenu entity="#{solicitudBBean.solicitudFiltro.dependencia}" 
+                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}" fieldName="depId">
+                            <f:selectItems value="#{solicitudBBean.listDependencia}" var="reg" itemValue="#{reg.depId}" itemLabel="#{reg.depNombre}"/>
+                            <p:ajax update="pjId"  
+                                    listener="#{solicitudBBean.cargarPosicionJornadaLista}" /> 
+                        </xf:selectOneMenu>
+                        <xf:selectOneMenu entity="#{solicitudBBean.solicitudFiltro.turno}" fieldName="pjId" required="false" >
+                            <f:selectItems value="#{solicitudBBean.listTurno}" var="turno" itemValue="#{turno.pjId}" itemLabel="#{turno.pjAlias}"/>
+                            
+                        </xf:selectOneMenu>
+                        <xf:selectOneMenu entity="#{solicitudBBean.solicitudFiltro}" fieldName="solEstado" >  
+                            <f:selectItem itemLabel="Pendiente" itemValue="Pendiente" />  
+                            <f:selectItem itemLabel="Aprobado Funcionario" itemValue="Aprobado Funcionario" /> 
+                            <f:selectItem itemLabel="Negado Funcionario" itemValue="Negado Funcionario" /> 
+                            <f:selectItem itemLabel="Aprobado" itemValue="Aprobado" /> 
+                            <f:selectItem itemLabel="Negado" itemValue="Negado" />
+                        </xf:selectOneMenu>
+                         
+                        <h:commandButton  action="#{solicitudBBean.filtrar}" value="#{msg.buscar}"  />          
+
+                    </h:panelGrid>
+                </h:form>
+                <br></br>
+                <h:form>
+                    <div class="divOverFlow">
+                    <p:dataTable value="#{solicitudBBean.lista}" var="item" styleClass="tabla_lista"
+                                 paginator="true" paginatorPosition="bottom" rows="15"  
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                 rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
+                                 sortBy="#{item.solId}" paginatorAlwaysVisible="false"
+                                 emptyMessage="#{msg.emptyList}">
+                      
+                         <p:column rendered="#{loginBBean.funNivel == 3 or loginBBean.funNivel == 4}">
+                            <f:facet name="header" >
+                                <h:outputText value="#{msg.editar}"/>
+                            </f:facet>
+                            <h:commandLink value="#{msg.editar}" action="#{solicitudBBean.editar}" >
+                                <f:setPropertyActionListener value="#{item}" target="#{solicitudBBean.solicitud}"/>
+                            </h:commandLink>
+                        </p:column>
+                        <p:column sortBy="#{item.solFechaCambio}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.solFechaCambio}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                                </h:outputText>
+                            </f:facet>
+                            <h:outputText value="#{item.solFechaCambio}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                            </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{item.turno.pjAlias}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.turno}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.turno.pjAlias}"/>
+                        </p:column>
+                        
+                       
+                        
+                        <p:column sortBy="#{item.funcionario_sol.funNombre}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.solFuncionarioSol}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funcionario_sol.funNombre}" />
+                        </p:column>
+                        
+                     
+                        
+                        <p:column sortBy="#{item.funcionario_reem.funNombre}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.solFuncionarioReem}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funcionario_reem.funNombre}" />
+                        </p:column>
+                        
+                        
+                        
+                    <p:column sortBy="#{item.solFechaRegistro}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.solFechaRegistro}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.solFechaRegistro}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                            </h:outputText>
+                        </p:column>
+                        
+                       
+                        
+                        <p:column sortBy="#{item.solEstado}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.solEstado}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.solEstado}"/>
+                        </p:column>
+
+                    </p:dataTable>
+                    </div>
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"      
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.editar} #{msg.secuencia}" rendered="#{secuenciaBBean.secuencia.secuId!=null}" ></h:outputText>
+                <h:outputText value="#{msg.crear} #{msg.secuencia}" rendered="#{secuenciaBBean.secuencia.secuId==null}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                <h:form id="form">
+                    
+                    <p:panel header="Agregar Jornadas a la Secuencia">  
+                        <h:panelGrid columns="2" id="grid"> 
+                            
+                            <xf:inputText entity="#{secuenciaBBean.detSecuencia}" fieldName="dsOrden" required="true"  ></xf:inputText>
+                            
+                            <xf:selectOneMenu  entity="#{secuenciaBBean.detSecuencia.jornada}"  
+                                               fieldName="joId" required="true" >  
+                                <f:selectItems value="#{secuenciaBBean.listJornada}" var="jor" itemValue="#{jor.joId}" itemLabel="#{jor.joAlias}" />  
+                              
+                            </xf:selectOneMenu>
+
+                            
+                            <p:commandButton id="btn_add" value="Agregar" update=":form2:detSecuencias @parent"  
+                                             action="#{secuenciaBBean.reinit}" >  
+                                
+                            </p:commandButton>
+                            <p:commandButton value="Borrar" type="reset"/>  
+                        </h:panelGrid>  
+                    </p:panel> 
+                </h:form>
+                    <h:form id="form2">
+                        
+                     <p:outputPanel id="detSecuencias">  
+                         <p:dataTable id="secuenciasTable" value="#{secuenciaBBean.detSecuencias}" var="detsec" emptyMessage="#{msg.emptyList}">  
+
+                            <p:column>  
+                                <f:facet name="header">  
+                                    <h:outputText value="Orden" />  
+                                </f:facet>  
+                                <h:outputText value="#{detsec.dsOrden}" />  
+                            </p:column>  
+
+                            <p:column>  
+                                <f:facet name="header">  
+                                    <h:outputText value="Jornada" />  
+                                </f:facet>  
+                                <h:outputText value="#{detsec.jornada.joAlias}" />  
+                            </p:column>  
+
+                            <p:column>  
+                                <f:facet name="header">  
+                                    <h:outputText value="Acciones" />  
+                                </f:facet>  
+                                <p:commandLink value="Quitar" update=":form2:detSecuencias" process=":form2:detSecuencias">  
+                                    <p:collector value="#{detsec}"  
+                                                 removeFrom="#{secuenciaBBean.detSecuencias}" />  
+                                </p:commandLink>  
+                            </p:column>  
+
+                        </p:dataTable>  
+                        
+                        
+                    </p:outputPanel> 
+                        <p:panel>
+                            <p:column>
+                                 <xf:selectOneMenu entity="#{secuenciaBBean.secuencia}" fieldName="secuEstado"  required="true">  
+                            <f:selectItem itemLabel="Activo" itemValue="Activo" />  
+                            <f:selectItem itemLabel="Inactivo" itemValue="Inactivo" /> 
+                        </xf:selectOneMenu>
+                            </p:column>
+                        </p:panel>
+                         <h:commandButton  action="#{secuenciaBBean.guardar}" value="#{msg.guardar}"  />
+                        <h:commandButton  action="#{secuenciaBBean.filtrar}" value="#{msg.cancelar}" immediate="true" />
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

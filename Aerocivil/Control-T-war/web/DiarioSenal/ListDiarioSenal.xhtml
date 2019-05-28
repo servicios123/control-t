@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <head>
+        <style>
+            .ui-selectonemenu-label{
+                width: 120% !important;
+            }  
+            .ui-selectonemenu{
+                width: 120% !important;
+            }
+        </style>
+    </head>
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.configurarDiarioSenales}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                
+                <h:form>
+
+                    <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0" style="width: 60%;">
+                        <f:facet name="header" ><h:outputText value="#{msg.filtros}" ></h:outputText></f:facet>
+                        <xf:selectOneMenu entity="#{diarioSenalBBean.diarioSenalFiltro.dependencia.depcategoria}" label="depCategoria"  fieldName="dcId"
+                                          rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel == 1 or loginBBean.funcionarioTO.funcionario.fuNivel == 8}">  
+                            <f:selectItems value="#{listadosBBean.listaDepCategoria}" var="dc" itemValue="#{dc.dcId}" itemLabel="#{dc.dcNombre}"/> 
+                        </xf:selectOneMenu> 
+                        
+                        <xf:selectOneMenu  entity="#{diarioSenalBBean.diarioSenalFiltro.dependencia.aeropuerto.regional}"  
+                                           fieldName="regId" rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}">  
+                            <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
+                            <p:ajax update="aeId,depId"  
+                                    listener="#{diarioSenalBBean.cargarAeropuertoListado}"  />  
+                        </xf:selectOneMenu> 
+
+                        <xf:selectOneMenu entity="#{diarioSenalBBean.diarioSenalFiltro.dependencia.aeropuerto}" fieldName="aeId"
+                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}"  >  
+                            <f:selectItems value="#{diarioSenalBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
+                            <p:ajax update="depId"  
+                                    listener="#{diarioSenalBBean.cargarDependenciaListado}" /> 
+                        </xf:selectOneMenu> 
+
+                        <xf:selectOneMenu entity="#{diarioSenalBBean.diarioSenalFiltro.dependencia}" 
+                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}" fieldName="depId">
+                            <f:selectItems value="#{diarioSenalBBean.listDependencia}" var="reg" itemValue="#{reg.depId}" itemLabel="#{reg.depNombre}"/>
+                        </xf:selectOneMenu>
+                        
+                        <xf:selectOneMenu entity="#{diarioSenalBBean.diarioSenalFiltro.dsTipo}" 
+                                          fieldName="dstId" rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>3 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}">
+                            <f:selectItems value="#{diarioSenalBBean.listDsTipo}" var="tp" itemValue="#{tp.dstId}" itemLabel="#{tp.dstNombre}"/>
+                        </xf:selectOneMenu>
+                        <h:outputText value="#{msg.lugarSuceso}" rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>3 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}"/>
+
+                        <h:panelGroup rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>3 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}">
+                            <p:selectOneMenu id="depId2" value="#{diarioSenalBBean.dependenciaFiltro}" required="false" style="width:100%;">
+                                <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}"/>
+                                <f:selectItems value="#{diarioSenalBBean.dependenciaList}" var="ts" itemValue="#{ts.value}" itemLabel="#{ts.label}"/>
+                            </p:selectOneMenu>
+                            <br/>
+                            <h:message id="depId2Message" 
+                                       styleClass="error" 
+                                       for="depId2" />
+                        </h:panelGroup>
+                   
+                         </h:panelGrid> 
+                          <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
+                            <xf:calendar  entity="#{diarioSenalBBean.diarioSenalFiltro}" fieldName="dsenFechaSuceso" label="#{msg.dsenFechaSucesoEntre}"/> 
+                            <xf:calendar  entity="#{diarioSenalBBean.diarioSenalFiltro}" fieldName="dsenFechaSucesoFinal"/> 
+
+                            <xf:calendar  entity="#{diarioSenalBBean.diarioSenalFiltro}" fieldName="dsenFechaRegistro" label="#{msg.dsenFechaRegistroEntre}"/> 
+                            <xf:calendar  entity="#{diarioSenalBBean.diarioSenalFiltro}" fieldName="dsenFechaRegistroFinal"/> 
+
+                            <h:commandButton  action="#{diarioSenalBBean.filtrar}" value="#{msg.buscar}"  />
+                            <h:commandButton  rendered="#{(loginBBean.funcionarioTO.funcionario.fuNivel==2 or loginBBean.funcionarioTO.funcionario.fuNivel==3) and loginBBean.funcionarioTO.funcionario.dependencia.depcategoria.dcId==4}"  action="#{diarioSenalBBean.diarioespecial}" value="Diario Publicaciones"  />
+                        </h:panelGrid> 
+                       
+                    
+
+                   
+                </h:form>
+                <br></br>
+                <h:form>
+                    <p:dataTable value="#{diarioSenalBBean.lista}" var="item" styleClass="tablaColapsa"
+                                 paginator="true" paginatorPosition="bottom" rows="15"  
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                 rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
+                                 emptyMessage="#{msg.emptyList}" 
+                                 rowStyleClass="#{item.resaltar?'destacado':null}"
+                                >
+                        
+                        <p:column sortBy="#{item.dsenId}" style="text-align:left; width:5%;">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dsenId}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dsenId}"/>
+                        </p:column>
+
+                        <p:column sortBy="#{item.dsTipo.dstNombre}" style="text-align:left; width:12%;">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dsenTipo}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dsTipo.dstNombre}"/>
+                        </p:column>
+
+                        <p:column sortBy="#{item.dsenFechaSuceso}" style="text-align:left; width:15%;">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dsenFechaSuceso}"/>
+                            </f:facet>
+
+                            <h:outputText value="#{item.dsenFechaSuceso}" >
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="GMT-5"/>
+                            </h:outputText>
+                        </p:column>                      
+
+                        <p:column sortBy="#{item.dsenFechaRegistro}" style="text-align:left; width:15%;">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dsenFechaRegistro}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dsenFechaRegistro}">
+                                <f:converter converterId="extendedDateTimeConverter" />
+                            </h:outputText>
+                        </p:column>
+                        <!--p:column sortBy="{item.dsenLugarSuceso}">
+                            <f:facet name="header">
+                                <h:outputText value="{msg.dsenLugarSuceso}"/>
+                            </f:facet>
+                            <h:outputText value="{item.dsenLugarSuceso}"/>
+                        </p:column-->
+                        <p:column sortBy="#{item.dsenDescripcion}" style="text-align:left; width:40%;">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dsenDescripcion}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dsenDescripcion}" />
+                        </p:column>
+                        <p:column sortBy="#{item.funcionario.funAlias}" style="text-align:left; width:5%;">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.funcionario}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funcionario.funAlias}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dsenLugarSuceso}" style="text-align:left; width:8%;" rendered="#{diarioSenalBBean.dependencia eq null}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dsenLugarSuceso}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dsenLugarSuceso}"/>
+                        </p:column>
+
+                    </p:dataTable>
+                    
+                    <h:commandButton action="#{diarioSenalBBean.exportPDF}" value="Generar Reporte PDF"
+                                     rendered="#{not empty diarioSenalBBean.lista}"/>
+                    <h:commandButton  value="Generar Reporte XLS">
+                        <p:dataExporter type="xls" target="carTable" fileName="diario_senal" encoding="ISO-8859-1"/>
+                    </h:commandButton>
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

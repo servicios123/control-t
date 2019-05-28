@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+    <body>
+        <f:view>
+            <h:form>
+
+                <p:dataTable value="#{tempVerProgramacionBBean.dynamicCars}" var="item" styleClass="tabla_lista"
+                             paginator="true" paginatorPosition="bottom" rows="15"  
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                             currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                             rowsPerPageTemplate="10,15,20" id="pdfTable" draggableColumns="true"
+                             sortBy="#{item.funcionario.funAlias}"
+                             emptyMessage="#{msg.emptyList}" >
+                    <p:columnGroup type="header">  
+                        <p:row>  
+                            <p:column headerText="Funcionario"  />  
+                            <c:forEach items="#{tempVerProgramacionBBean.columnsFecha}" var="fechaVar"  >  
+                                <p:column colspan="2">  
+                                    <f:facet name="header"> 
+                                        <h:outputLabel value="#{fechaVar.header}">
+
+                                        </h:outputLabel>
+                                    </f:facet>  
+                                </p:column> 
+                            </c:forEach>
+                        </p:row>  
+                    </p:columnGroup>  
+
+                    <p:column>
+                        <h:outputText value="#{item[0]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[1]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[2]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[3]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[4]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[5]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[6]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[7]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[8]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[9]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[10]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[11]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[12]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[13]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[14]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[15]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[16]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[17]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[18]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[19]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[20]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[21]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[22]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[23]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[24]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[25]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[26]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[27]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[28]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[29]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[30]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[31]}"/> 
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[32]}"/> 
+                    </p:column>
+
+                </p:dataTable>
+                <h:outputText value="#{tempVerProgramacionBBean.excludedColumns}"/>
+                <h:commandLink >  
+                    <p:graphicImage value="/resources/img/pdf.png" />  
+                    <p:dataExporter type="pdf" target="pdfTable" fileName="programacion"
+                                    excludeColumns="#{tempVerProgramacionBBean.excludedColumns}"
+                                    preProcessor="#{tempVerProgramacionBBean.preProcessPDF}"/>  
+
+                </h:commandLink>  
+            </h:form>
+        </f:view>
+    </body>
+</html>

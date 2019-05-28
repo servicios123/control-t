@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"      
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <head>
+        <style>
+            .ui-selectonemenu-label{
+                width: 300% !important;
+            }  
+            .ui-selectonemenu{
+                width: 300% !important;
+            }
+        </style>
+    </head>
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.editar} #{msg.turnoEspecial}" rendered="#{turnoEspFuncionarioBBean.turnoEspFuncionario.tefId !=null}" ></h:outputText>
+                <h:outputText value="#{msg.asignar} #{msg.turnoEspecial}" rendered="#{turnoEspFuncionarioBBean.turnoEspFuncionario.tefId==null}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                <h:form id="myForm">
+                    <h:panelGrid >
+                        <h:panelGrid columns="2" id="basic"
+                                     styleClass="tabla_formulario" style="width: 150%;">
+                            <h:outputText value="Usuario" />
+
+                            <h:panelGroup>
+                                <h:outputLabel value="#{turnoEspFuncionarioBBean.turnoEspFuncionario.funcionario.funNombre} (#{turnoEspFuncionarioBBean.turnoEspFuncionario.funcionario.funAlias})" rendered="#{turnoEspFuncionarioBBean.ver}" />
+                                <p:selectOneMenu required="true" value="#{turnoEspFuncionarioBBean.turnoEspFuncionario.funcionario.funId}" 
+                                                 style="width: 100%;" rendered="#{!turnoEspFuncionarioBBean.ver}" >
+                                    <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}" rendered="${renderNull}"/>
+                                    <f:selectItems value="#{turnoEspFuncionarioBBean.listaFuncionario}" var="te" itemValue="#{te.funId}" 
+                                                   itemLabel="#{te.funNombre}"/>
+                                    <p:ajax event="change" listener="#{turnoEspFuncionarioBBean.updateListaTurnos}" update="tefTable2 basic"/>
+                                </p:selectOneMenu>
+                                <br/>
+                                <h:message id="${id}Message" 
+                                           styleClass="error" 
+                                           for="#{id}" />
+                            </h:panelGroup>
+                            
+                            <h:outputText value="Turno Especial" />
+
+                            <h:panelGroup>
+                                <h:outputLabel value="#{turnoEspFuncionarioBBean.turnoEspFuncionario.turnoEspecial.teNombre} - #{turnoEspFuncionarioBBean.turnoEspFuncionario.turnoEspecial.teSigla}" rendered="#{turnoEspFuncionarioBBean.ver}" />
+                                <p:selectOneMenu required="true" value="#{turnoEspFuncionarioBBean.turnoEspFuncionario.turnoEspecial.teId}" 
+                                                 style="width: 100%;" rendered="#{!turnoEspFuncionarioBBean.ver}" >
+                                    <p:ajax event="change" update="dependencia" 
+                                            listener="#{turnoEspFuncionarioBBean.activarDependencia}"/>
+                                    <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}" rendered="${renderNull}"/>
+                                    <f:selectItems value="#{turnoEspFuncionarioBBean.listTurnoEspecial}" var="te" itemValue="#{te.teId}" 
+                                                   itemLabel="#{te.teSigla} #{te.teHinicio}:#{te.teMinicio} - #{te.teHfin}:#{te.teMfin}"/>
+                                </p:selectOneMenu>
+                                <br/>
+                               
+                            </h:panelGroup>
+
+                           
+
+                            <xf:calendar required="true" entity="#{turnoEspFuncionarioBBean.turnoEspFuncionario}" 
+                                         fieldName="tefFini"
+                                         readonly="#{!turnoEspFuncionarioBBean.editable}"
+                                         >
+                                <p:ajax update="tefFfin" event="dateSelect"
+                                        listener="#{turnoEspFuncionarioBBean.listenerFIni}" />  
+                            </xf:calendar>
+                            <xf:calendar required="true" entity="#{turnoEspFuncionarioBBean.turnoEspFuncionario}" 
+
+                                         fieldName="tefFfin" readonly="#{!turnoEspFuncionarioBBean.editable}"/>
+
+                            <xf:selectOneMenu entity="#{turnoEspFuncionarioBBean.turnoEspFuncionario}" fieldName="tefEstado" 
+                                              rendered="#{turnoEspFuncionarioBBean.editando}"
+                                              label="tefEstado">
+                                <!--readonly="{!turnoEspFuncionarioBBean.editable or !turnoEspFuncionarioBBean.visibleEstado}"-->
+                                <f:selectItem itemLabel="Anulado" itemValue="Anulado" /> 
+                                <!--f:selectItem itemLabel="Para Programar" itemValue="Para Programar" /-->  
+                                <f:selectItem itemLabel="Programado" itemValue="Programado" /> 
+
+                            </xf:selectOneMenu>
+                        </h:panelGrid>
+
+                        <h:panelGrid id="dependencia" cellpadding="0" cellspacing="0">
+                            <h:panelGrid columns="2" border="0" 
+                                         styleClass="tabla_formulario"
+                                         rendered="#{turnoEspFuncionarioBBean.dependenciaVisible}" >
+                                <f:facet name="header">
+                                    <h:outputLabel value="#{msg.informacionAdicionalComision}"/>
+                                </f:facet>
+                                <xf:calendar entity="#{turnoEspFuncionarioBBean.comision}" 
+                                             fieldName="comFechaInicial" required="true" 
+                                             readonly="#{!turnoEspFuncionarioBBean.editable}"/>
+                                <xf:timeSelector entity="#{turnoEspFuncionarioBBean.comision}" fieldName="comHIni" minFieldName="comMIni" required="true" />
+                                <xf:calendar entity="#{turnoEspFuncionarioBBean.comision}" 
+                                             fieldName="comFechaFinal" required="true" 
+                                             readonly="#{!turnoEspFuncionarioBBean.editable}"/>
+
+                                <xf:timeSelector entity="#{turnoEspFuncionarioBBean.comision}" fieldName="comHFin" minFieldName="comMFin" required="true" />
+
+                                <xf:selectOneMenu entity="#{turnoEspFuncionarioBBean.comision.dependencia.aeropuerto.regional}" 
+                                                  fieldName="regId" readonly="#{!turnoEspFuncionarioBBean.editable}"
+                                                  label="regNombre"
+                                                  >  
+                                    <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
+                                    <p:ajax update="aeId,depId"  
+                                            listener="#{turnoEspFuncionarioBBean.cargarAeropuertoComision}" />  
+                                </xf:selectOneMenu> 
+
+
+                                <xf:selectOneMenu entity="#{turnoEspFuncionarioBBean.comision.dependencia.aeropuerto}" 
+                                                  fieldName="aeId" readonly="#{!turnoEspFuncionarioBBean.editable}"
+                                                  label="aeNombre">
+
+                                    <f:selectItems value="#{turnoEspFuncionarioBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
+                                    <p:ajax update="depId"  
+                                            listener="#{turnoEspFuncionarioBBean.cargarDependenciaComision}" /> 
+                                </xf:selectOneMenu> 
+
+                                <xf:selectOneMenu required="true" fieldName="depId" label="depNombre"
+                                                  entity="#{turnoEspFuncionarioBBean.comision.dependencia}"  
+                                                  readonly="#{!turnoEspFuncionarioBBean.editable}">
+                                    <f:selectItems value="#{turnoEspFuncionarioBBean.listDependencia}" var="res" itemValue="#{res.depId}" itemLabel="#{res.depNombre}"/>
+                                </xf:selectOneMenu>
+
+
+                            </h:panelGrid>
+                        </h:panelGrid>  
+
+                        <f:facet name="footer">
+
+                            <h:commandButton  action="#{turnoEspFuncionarioBBean.guardar}" value="#{msg.guardar}"
+                                              rendered="#{!turnoEspFuncionarioBBean.ver}" >
+                                <f:ajax execute="@form" render="tefTable2 basic " />
+                            </h:commandButton>
+
+
+
+                        </f:facet>
+                    </h:panelGrid>
+                    <div class="divOverFlow">
+
+                        <p:dataTable value="#{turnoEspFuncionarioBBean.turnos}" var="item" styleClass="tabla_lista"
+                                     paginator="true" paginatorPosition="bottom" rows="15"  
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                     currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                     rowsPerPageTemplate="10,15,20" id="tefTable2" draggableColumns="true"
+                                     emptyMessage="#{msg.emptyList}" paginatorAlwaysVisible="false" 
+                                     rendered="#{!turnoEspFuncionarioBBean.ver}">
+
+                            <p:column sortBy="#{item.turnoEspecial.teSigla}">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.sigla}"/>
+                                </f:facet>
+                                <h:outputText value="#{item.turnoEspecial.teSigla}"/>
+                            </p:column>
+
+                            <p:column sortBy="#{item.turnoEspecial.teNombre}">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.nombre}"/>
+                                </f:facet>
+                                <h:outputText value="#{item.turnoEspecial.teNombre}"/>
+                            </p:column>
+                            <p:column sortBy="#{item.tefFini}">
+                                <f:facet name="header">
+                                    <h:outputText value="Fecha inicio"/>
+                                </f:facet>
+                                <h:outputText value="#{item.tefFini}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-5"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column sortBy="#{item.tefFfin}">
+                                <f:facet name="header">
+                                    <h:outputText value="Fecha fin"/>
+                                </f:facet>
+                                <h:outputText value="#{item.tefFfin}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-5"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header" >
+                                    <h:outputText value="#{msg.eliminar}" />
+                                </f:facet>
+
+                                <h:commandLink  value="#{msg.eliminar}" action="#{turnoEspFuncionarioBBean.eliminar}" immediate="true" rendered="#{item.editable}">
+                                    <f:setPropertyActionListener value="#{item}" target="#{turnoEspFuncionarioBBean.turnoEspFuncionario}"/>
+                                </h:commandLink>
+                            </p:column>
+                        </p:dataTable>
+                        
+                        <h:commandButton  action="#{turnoEspFuncionarioBBean.limpiar}" 
+                                          value="#{msg.asignarOtro}" immediate="true" 
+                                          rendered="#{!turnoEspFuncionarioBBean.ver and !turnoEspFuncionarioBBean.editando}">
+                            <f:ajax execute="myForm" render="tefTable2 basic" />
+                        </h:commandButton>
+                        <h:commandButton  action="#{turnoEspFuncionarioBBean.listar}" 
+                                          value="#{msg.terminar}" immediate="true" >
+                            <f:ajax execute="myForm" render="tefTable2 basic" />
+                        </h:commandButton>
+                        <br></br>
+                        <h:commandButton  action="#{turnoEspFuncionarioBBean.irAsignarTrop}" 
+                                          value="Asignar Trop" immediate="true"
+                                          rendered="#{loginBBean.funcionarioTO.funcionario.dependencia.depcategoria.dcId == 1}">
+                        </h:commandButton>
+                    </div>
+
+                </h:form>
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf"> 
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.consultar} #{msg.PosicionesHabilitadas}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+
+                <h:form>
+
+                    <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
+                        <f:facet name="header" ><h:outputText value="#{msg.filtros}" ></h:outputText></f:facet>
+                        <xf:inputText entity="#{posicionHabilitadaBBean.posicionHabilitadaFiltro.posicion.posicionNacional}" 
+                                      fieldName="pnAlias" required="false" label="#{msg.siglaPosicion}" />
+
+                        <xf:inputText entity="#{posicionHabilitadaBBean.posicionHabilitadaFiltro.funcionario}" 
+                                      fieldName="funId" required="false" />
+                        <xf:inputText entity="#{posicionHabilitadaBBean.posicionHabilitadaFiltro.funcionario}" 
+                                      fieldName="funAlias" required="false" label="#{msg.siglaFuncionario}" />
+                        <xf:inputText entity="#{posicionHabilitadaBBean.posicionHabilitadaFiltro.funcionario}" 
+                                      fieldName="funNombre" required="false" label="#{msg.nombreFuncionario}" />
+
+                        <xf:selectOneMenu  entity="#{posicionHabilitadaBBean.posicionHabilitadaFiltro.posicion.dependencia.aeropuerto.regional}"  
+                                           fieldName="regId" rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel}">  
+                            <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
+                            <p:ajax update="aeId,depId"  
+                                    listener="#{posicionHabilitadaBBean.cargarAeropuertoListado}"  />  
+                        </xf:selectOneMenu> 
+
+                        <xf:selectOneMenu entity="#{posicionHabilitadaBBean.posicionHabilitadaFiltro.posicion.dependencia.aeropuerto}" fieldName="aeId"
+                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}"  >  
+                            <f:selectItems value="#{posicionHabilitadaBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
+                            <p:ajax update="depId"  
+                                    listener="#{posicionHabilitadaBBean.cargarDependenciaListado}" /> 
+                        </xf:selectOneMenu> 
+
+                        <xf:selectOneMenu entity="#{posicionHabilitadaBBean.posicionHabilitadaFiltro.posicion.dependencia}" 
+                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}" fieldName="depId">
+                            <f:selectItems value="#{posicionHabilitadaBBean.listDependencia}" var="reg" itemValue="#{reg.depId}" itemLabel="#{reg.depNombre}"/>
+                        </xf:selectOneMenu>
+
+                        <xf:selectOneMenu entity="#{posicionHabilitadaBBean.posicionHabilitadaFiltro.posicion.dependencia.depcategoria}" label="depCategoria"  fieldName="dcId"
+                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}">
+                            <f:selectItems value="#{listadosBBean.listaDepCategoria}" var="dc" itemValue="#{dc.dcId}" itemLabel="#{dc.dcNombre}"/> 
+                        </xf:selectOneMenu> 
+
+
+
+                        <h:commandButton  action="#{posicionHabilitadaBBean.filtrar}" value="#{msg.buscar}"  />          
+
+                    </h:panelGrid>
+                </h:form>
+                <br></br>
+                <h:form>
+                    <p:dataTable value="#{posicionHabilitadaBBean.lista}" var="item" styleClass="tabla_lista"
+                                 paginator="true" paginatorPosition="bottom" rows="15"  
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                 rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
+                                 sortBy="#{item.phId}" paginatorAlwaysVisible="false"
+                                 emptyMessage="#{msg.emptyList}">
+
+                        <p:column sortBy="#{item.funcionario.funId}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.funId}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funcionario.funId}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.funcionario.funAlias}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.funAlias}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funcionario.funAlias}" />
+                        </p:column>
+                        <p:column sortBy="#{item.funcionario.funNombre}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.funNombre}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funcionario.funNombre}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item.posicion.posicionNacional.pnAlias}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.posicion}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.posicion.posicionNacional.pnAlias}"/>
+                        </p:column>
+
+
+                        <p:column sortBy="#{item.posicion.dependencia.aeropuerto.regional.regNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.regional}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.posicion.dependencia.aeropuerto.regional.regNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.posicion.dependencia.aeropuerto.aeNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.aeropuerto}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.posicion.dependencia.aeropuerto.aeNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.posicion.dependencia.depNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dependencia}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.posicion.dependencia.depNombre}"/>
+                        </p:column>
+                    </p:dataTable>
+                    <h:commandButton  value="Generar reporte" rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}">
+                        <p:dataExporter type="xls" target="carTable" fileName="PosicionesFuncionarios" encoding="ISO-8859-1"/>
+                    </h:commandButton>
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

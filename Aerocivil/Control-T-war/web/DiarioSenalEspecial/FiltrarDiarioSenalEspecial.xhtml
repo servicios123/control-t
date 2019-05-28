@@ -1,0 +1,340 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">   
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="../template_interior.xhtml">
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.dseConsultarDiarioSenalesEspeciales}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                <style>
+                    .ui-widget-header
+                    { 
+                        color: #fff !important;
+                        background: #253979 !important;
+                    }
+                    .tabla_coloreada tbody tr:nth-child(odd)
+                    {
+                        background:#eee; 
+                    }                
+                </style>
+                <h:form rendered="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseId==null}">
+                    <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
+                        <f:facet name="header" ><h:outputText value="#{msg.filtros}" ></h:outputText></f:facet>
+                        <xf:calendar entity="#{diarioSenalEspecialBBean.diarioSenalEspecialFiltro}" fieldName="dseFecha" label="#{msg.fechaInicial}"/> 
+                        <xf:calendar entity="#{diarioSenalEspecialBBean.diarioSenalEspecialFiltro}" fieldName="dseFechaFinal" label="#{msg.fechaFinal}"/> 
+                        <xf:selectOneMenu entity="#{diarioSenalEspecialBBean.diarioSenalEspecialFiltro}" fieldName="dseJornadaOp" >
+                            <f:converter converterId="JornadaConverter" binding="#{JornadaConverter}"/>
+                            <f:selectItems value="#{diarioSenalEspecialBBean.jornadas}" var="ts" itemValue="#{ts}" itemLabel="#{ts.joAlias}"/>
+                        </xf:selectOneMenu>  
+                        <xf:selectOneMenu rendered="false" entity="#{diarioSenalEspecialBBean.diarioSenalEspecialFiltro}" fieldName="dseEstado" >  
+                            <f:selectItem itemLabel="ABIERTO" itemValue="ABIERTO" />  
+                            <f:selectItem itemLabel="CERRADO" itemValue="CERRADO" /> 
+                        </xf:selectOneMenu>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+                        <p:commandButton ajax="false"   action="#{diarioSenalEspecialBBean.filtrar}" value="#{msg.buscar}"  />
+                        <p:commandButton ajax="false"   action="#{diarioSenalEspecialBBean.diariosOtrasDependencias}" value="Diarios Otras Dependencias"  />
+                    </h:panelGrid>
+
+                </h:form>
+                <h:form  rendered="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseId==null}">
+                    <p:dataTable value="#{diarioSenalEspecialBBean.lista}" var="item" styleClass="tablaColapsa marginTop"
+                                 paginator="true" paginatorPosition="bottom" rows="15"  
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                 rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
+                                 emptyMessage="#{msg.emptyList}" 
+                                 >
+
+
+
+                        <p:column sortBy="#{item.dseId}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.ver}"/>
+                            </f:facet>
+                            <h:commandLink value="#{msg.ver}" action="#{diarioSenalEspecialBBean.ver}" >
+                                <f:setPropertyActionListener value="#{item}" target="#{diarioSenalEspecialBBean.verDiarioSenalEspecial}"/>
+                            </h:commandLink>
+                        </p:column>
+
+
+                        <p:column sortBy="#{item.dseJornadaOp.joAlias}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.jornada}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dseJornadaOp.joAlias}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dseFecha}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dseFecha}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dseFecha}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+
+
+                        <p:column sortBy="#{item.dseHoraCreado}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dseHoraCreado}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dseHoraCreado}"/>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+                <p:panel header="#{msg.dseInfoBasica}" styleClass="marginTop" rendered="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseId != null}" >
+                    <h:panelGrid columns="4" styleClass="tabla_coloreada tabla_formulario">
+
+                        <h:outputText value="#{msg.dseFecha}"/>
+                        <h:outputText value="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseFecha}">
+                            <f:convertDateTime dateStyle="full" type="date" pattern="dd/MM/yyyy"/>
+                        </h:outputText>
+
+                        <h:outputText value="#{msg.dseDependencia}"/>
+                        <h:outputText value="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseDependencia.depNombre}"/>
+
+
+                        <h:outputText value="#{msg.dseEstado}" rendered="false"/>
+                        <h:outputText value="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseEstado}"  rendered="false"/>
+
+                        <h:outputText value="#{msg.dseJornada}"/>
+                        <h:outputText value="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseJornadaOp.joAlias}"/>
+
+                        <h:outputText value="#{msg.dseHoraCreado}"/>
+                        <h:outputText value="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseHoraCreado}"/>
+
+                        <h:outputText value="#{msg.dseHoraCerrado}" rendered="false"/>
+                        <h:outputText value="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseHoraCerrado}"/>
+
+
+                        <h:outputText value="#{msg.dseFuncionarioCierra}" rendered="false"/>
+                        <h:outputText value="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseFuncionarioCierra.funAlias}"/>                 
+
+
+
+                    </h:panelGrid>
+                    <br/>
+                    <h:form>
+                        <p:commandButton value="#{msg.dseCerrar}" oncomplete="confirmation_cerrar_dse.show()"  rendered="false"  />                 
+                    </h:form>
+                </p:panel>
+                
+                <p:dialog widgetVar="confirmation_cerrar_dse" resizable="false" header="#{msg.dsiConfirmaCerrar}" id="dseCerrar" showEffect="fade" hideEffect="explode" modal="true">
+                    <h:form>
+                         <p:dataTable   styleClass="marginTop" value="#{diarioSenalEspecialBBean.funcionarios}" var="dsf" rendered="#{diarioSenalEspecialBBean.diarioSenalEspecial.dseId!= null}">
+                            <f:facet name="header">
+                                <h:outputText style="color:#fff;" value="#{msg.dseFuncionariosFaltantes}"/>
+                            </f:facet>
+                            <p:column headerText="#{msg.dsfFuncionario}" >                                         
+                                <h:outputText value="#{dsf.dsfFuncionario.funAlias}" />
+                             </p:column>
+                            <p:column headerText="#{msg.dsfPosicion}" >                                         
+                                <h:outputText value="#{dsf.dsfPosicion.posicionNacional.pnAlias}" />
+                             </p:column>
+                        </p:dataTable>
+                        <h:panelGrid styleClass="marginTop" columns="2">                           
+                               
+                            
+                            <p:commandButton value="#{msg.dsiConfirmar}" action="#{diarioSenalEspecialBBean.cerrarDseConsulta}" ajax="false" />                                    
+                            <p:commandButton value="#{msg.cancelar}" onclick="confirmation_cerrar_dse.hide()"/>
+
+
+                        </h:panelGrid>
+                    </h:form> 
+                </p:dialog>    
+
+
+                <p:dataTable   styleClass="marginTop" value="#{diarioSenalEspecialBBean.verFuncionarios}" var="dsf" rendered="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseId!=null}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.dsfFuncionarios}"/>
+                    </f:facet>
+                    <p:column headerText="#{msg.dsfFuncionario}" >                                         
+                        <h:outputText value="#{dsf.dsfFuncionario.funAlias}" />
+                    </p:column>
+                    <p:column headerText="#{msg.dsfPosicion}" >                                         
+                        <h:outputText value="#{dsf.dsfPosicion.posicionNacional.pnAlias}" />
+                    </p:column>
+                    <p:column headerText="#{msg.dsfHoraIngreso}" >                                         
+                        <h:outputText value="#{dsf.dsfHoraEntrada}" />
+                    </p:column>
+                    
+                               
+                </p:dataTable>
+
+                <p:dataTable   styleClass="marginTop" value="#{diarioSenalEspecialBBean.verDsiPorDti1}" var="info" rendered="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseId!=null}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.dst1}"/>
+                    </f:facet>                                
+                    <p:column headerText="#{msg.dsfFuncionario}" >                                         
+                        <h:outputText value="#{info.dsiDiarioSenalFuncionario.dsfFuncionario.funAlias}" />
+                    </p:column>
+                    <p:column headerText="#{msg.dsiLocalizacion}">                                         
+                        <h:outputText value="#{info.dsiLocalizacion.dslAlias}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiSerie}" >                                         
+                        <h:outputText value="#{info.dsiSerie}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiCodigo}">                                         
+                        <h:outputText value="#{info.dsiCodigo}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiObservacion}">                                         
+                        <h:outputText value="#{info.dsiObservacion}" />                                        
+                    </p:column>
+                </p:dataTable>
+
+                <p:dataTable  styleClass="marginTop"  value="#{diarioSenalEspecialBBean.verDsiPorDti2}" var="info" rendered="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseId!=null}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.dst2}"/>
+                    </f:facet>
+
+                    <p:column headerText="#{msg.dsfFuncionario}" >                                         
+                        <h:outputText value="#{info.dsiDiarioSenalFuncionario.dsfFuncionario.funAlias}" />
+                    </p:column>
+                    <p:column headerText="#{msg.dsiLocalizacion}" >                                         
+                        <h:outputText value="#{info.dsiLocalizacion.dslAlias}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiSerie}" >                                         
+                        <h:outputText value="#{info.dsiSerie}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiCodigo}" >                                         
+                        <h:outputText value="#{info.dsiCodigo}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiErroresInternos}">                                         
+                        <h:outputText value="#{info.dsiErroresInternos}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiErroresExternos}">                                         
+                        <h:outputText value="#{info.dsiErroresExternos}" />                                        
+                    </p:column>
+                </p:dataTable>           
+
+
+
+                <p:dataTable  styleClass="marginTop" value="#{diarioSenalEspecialBBean.verDsiPorDti3}" var="info" rendered="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseId!=null}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.dst3}"/>
+                    </f:facet>
+
+                    <p:column headerText="#{msg.dsfFuncionario}" >                                         
+                        <h:outputText value="#{info.dsiDiarioSenalFuncionario.dsfFuncionario.funAlias}" />
+                    </p:column>
+                    <p:column headerText="#{msg.dsiPosicionTrabajo}" >                                         
+                        <h:outputText value="#{info.dsiPosicionTrabajo}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiActividad}" >                                         
+                        <h:outputText value="#{info.dsiActividad}" />                                        
+                    </p:column>
+                </p:dataTable>
+
+
+                <p:dataTable  styleClass="marginTop"  value="#{diarioSenalEspecialBBean.verDsiPorDti4}" var="info" rendered="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseId!=null}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.dst4}"/>
+                    </f:facet>
+
+                    <p:column headerText="#{msg.dsfFuncionario}" >                                         
+                        <h:outputText value="#{info.dsiDiarioSenalFuncionario.dsfFuncionario.funAlias}" />
+                    </p:column>
+                    <p:column headerText="#{msg.dsiLocalizacion}" >                                         
+                        <h:outputText value="#{info.dsiLocalizacion.dslAlias}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiDocumento}" >                                         
+                        <h:outputText value="#{info.dsiDocumento}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiObservacion}">                                         
+                        <h:outputText value="#{info.dsiObservacion}" />                                        
+                    </p:column>
+                </p:dataTable>
+
+
+                <p:dataTable  styleClass="marginTop"  value="#{diarioSenalEspecialBBean.verDsiPorDti5}" var="info" rendered="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseId!=null}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.dst5}"/>
+                    </f:facet>
+
+                    <p:column headerText="#{msg.dsfFuncionario}" >                                         
+                        <h:outputText value="#{info.dsiDiarioSenalFuncionario.dsfFuncionario.funAlias}" />
+                    </p:column>
+                    <p:column headerText="#{msg.dsiEquipoSoftware}" >                                         
+                        <h:outputText value="#{info.dsiEquipoSoftware}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiHoraUtc}" >                                         
+                        <h:outputText value="#{info.dsiHoraUtc}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiFalla}" >                                         
+                        <h:outputText value="#{info.dsiFalla}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiObservacion}">                                         
+                        <h:outputText value="#{info.dsiObservacion}" />                                        
+                    </p:column>
+                </p:dataTable>
+
+
+                <p:dataTable styleClass="marginTop" value="#{diarioSenalEspecialBBean.verDsiPorDti6}" var="info" rendered="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseId!=null}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.dst6}"/>
+                    </f:facet>
+
+                    <p:column headerText="#{msg.dsfFuncionario}" >                                         
+                        <h:outputText value="#{info.dsiDiarioSenalFuncionario.dsfFuncionario.funAlias}" />
+                    </p:column>
+                    <p:column headerText="#{msg.dsiHoraUtc}" >                                         
+                        <h:outputText value="#{info.dsiHoraUtc}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiObservacion}" >                                         
+                        <h:outputText value="#{info.dsiObservacion}" />                                        
+                    </p:column>
+                </p:dataTable>
+
+
+
+
+                <p:dataTable styleClass="marginTop" value="#{diarioSenalEspecialBBean.verListaCierreTurno}" var="info" rendered="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseId!=null}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.dst7}"/>
+                    </f:facet>
+
+                    <p:column headerText="#{msg.dsiProducto}" >                                         
+                        <h:outputText value="#{info[1]}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiSerie}">                                         
+                        <h:outputText value="#{info[2]}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiCantidadPublicados}" >                                         
+                        <h:outputText value="#{info[3]}" />                                        
+                    </p:column>
+
+                    <p:column headerText="#{msg.dsiCantErrInternos}">                                         
+                        <h:outputText value="#{info[4]}" />                                        
+                    </p:column>
+                    <p:column headerText="#{msg.dsiCantErrExterno}" >                                         
+                        <h:outputText value="#{info[5]}" />                                        
+                    </p:column>
+                </p:dataTable>
+
+                <br/>
+                <br/>
+                <h:form  rendered="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseId!=null}">          
+
+                    <p:commandButton ajax="false"  value="#{msg.generarReporte}" action="#{diarioSenalEspecialBBean.exportPDF}"/>                 
+                    <p:commandButton ajax="false"  value="#{msg.volver}" action="#{diarioSenalEspecialBBean.listar}"/>                 
+                </h:form>
+
+
+            </ui:define>
+        </ui:composition>   
+    </h:body>
+</html>
+
