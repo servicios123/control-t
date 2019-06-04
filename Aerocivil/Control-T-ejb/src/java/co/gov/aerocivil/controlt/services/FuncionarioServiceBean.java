@@ -335,6 +335,11 @@ public class FuncionarioServiceBean implements FuncionarioService {
             condiciones.add("f.funEstado = :estado ");
             params.put("estado", funcionario.getFunEstado());
         }
+        
+        if(funcionario.getFunFvCertmedico()!=null){
+            condiciones.add("f.funFvCertmedico = :fvCertmedico");
+            params.put("fvCertmedico", funcionario.getFunFvCertmedico());
+        }
 
         StringBuilder strQry = new StringBuilder();
 

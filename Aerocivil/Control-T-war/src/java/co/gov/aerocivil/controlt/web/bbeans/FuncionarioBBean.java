@@ -37,9 +37,11 @@ import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.event.ValueChangeEvent;
+import org.primefaces.component.datatable.DataTable;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.DualListModel;
 import org.primefaces.component.selectonemenu.SelectOneMenu;
+import org.primefaces.event.RowEditEvent;
 
 /**
  *
@@ -64,6 +66,7 @@ public class FuncionarioBBean {
     private JornadaService jornadaService;
     private DependenciaService dependenciaService;
     private Funcionario funcionario;
+    private Funcionario funcionarioSeleccionado;
     private Funcionario funcionarioFiltro;
     private LazyDataModel<Funcionario> lazyList;
     private List<Aeropuerto> listAeropuerto;
@@ -80,6 +83,7 @@ public class FuncionarioBBean {
     private boolean editando;
     private Long[] jornadas;
     private List<Jornada> listJornada;
+    private DataTable table;
 
     public String crear() {
         funcionario = new Funcionario();
@@ -223,7 +227,7 @@ public class FuncionarioBBean {
 
     public String guardarCertMedico() {
         try {
-            funcionarioService.guardar(funcionario,
+            funcionarioService.guardar(funcionarioSeleccionado,
                     JsfUtil.getFuncionarioSesion());
             JsfUtil.addSuccessMessage("genericSingleSaveSuccess");
             return listarCertMedico();
@@ -272,6 +276,7 @@ public class FuncionarioBBean {
     }
 
     public String listarCertMedico() {
+        funcionarioSeleccionado = new Funcionario();
         funcionarioFiltro = new Funcionario();
         funcionarioFiltro.setDependencia(getDependenciaXNivelUsuario());
         funcionarioFiltro.getDependencia().setDepcategoria(new DepCategoria());
@@ -580,6 +585,24 @@ public class FuncionarioBBean {
         }
         return filtrar();
     }
+    
+    public void onEditEvent(RowEditEvent event){
+        try {
+            funcionarioService.guardar((Funcionario)event.getObject(),
+                    JsfUtil.getFuncionarioSesion());
+        } catch (SQLIntegrityConstraintViolationException ex) {
+            Logger.getLogger(FuncionarioBBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void onCancel(RowEditEvent event){
+        this.funcionarioSeleccionado = new Funcionario();
+        JsfUtil.addManualSuccessMessage("Operacion Cancelada");
+    }
+
+    public void cargarFuncionario() {
+        this.funcionarioSeleccionado = (Funcionario) this.table.getRowData();
+    }
 
     public List<Posicion> getListPosicion() {
         return listPosicion;
@@ -684,5 +707,21 @@ public class FuncionarioBBean {
 
     public void setListJornada(List<Jornada> listJornada) {
         this.listJornada = listJornada;
+    }
+
+    public DataTable getTable() {
+        return table;
+    }
+
+    public void setTable(DataTable table) {
+        this.table = table;
+    }
+
+    public Funcionario getFuncionarioSeleccionado() {
+        return funcionarioSeleccionado;
+    }
+
+    public void setFuncionarioSeleccionado(Funcionario funcionarioSeleccionado) {
+        this.funcionarioSeleccionado = funcionarioSeleccionado;
     }
 }

@@ -18,7 +18,7 @@
             <ui:define name="contenido">
 
                 <br></br>
-                <h:form>
+                <h:form id="formp">
                     <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
                         <f:facet name="header" >
                             <h:outputText value="#{msg.filtros}" />
@@ -52,6 +52,9 @@
                             <f:selectItems value="#{funcionarioBBean.listDependencia}" var="res" itemValue="#{res.depId}" itemLabel="#{res.depNombre}"/>
                         </xf:selectOneMenu>
 
+                        <xf:calendar entity="#{funcionarioBBean.funcionarioFiltro}" 
+                                     fieldName="funFvCertmedico" /> 
+
                         <f:facet name="footer" >
                             <h:commandButton action="#{funcionarioBBean.filtrar_Cert_Medico}" value="#{msg.buscar}"  />
                         </f:facet>
@@ -65,22 +68,13 @@
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
                                  emptyMessage="#{msg.emptyList}" paginatorAlwaysVisible="false"
-                                 >
-                        <!--p:column rendered="{funcionarioBBean.columns[0]}">
-                            <f:facet name="header" >
-                                <h:outputText value="{msg.seleccionar}"/>
-                            </f:facet>
-                            <h:commandLink value="{msg.seleccionar}" action="{funcionarioBBean.retornar}" >
-                                <f:setPropertyActionListener value="{item}" target="{funcionarioBBean.funcionario}"/>
-                            </h:commandLink>
-                        </p:column-->
+                                 rowKey="#{item.funId}"
+                                 editable="true" selectionMode="single" selection="#{funcionarioBBean.funcionarioSeleccionado}">
+
+                        <p:ajax event="rowEdit" listener="#{funcionarioBBean.onEditEvent}"></p:ajax>
+
                         <p:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.actualizar}"/>
-                            </f:facet>
-                            <h:commandLink value="#{msg.actualizar}" action="#{funcionarioBBean.actCertMedico}">
-                                <f:setPropertyActionListener value="#{item}" target="#{funcionarioBBean.funcionario}"/>
-                            </h:commandLink>
+                            <p:rowEditor/>
                         </p:column>
                         <p:column sortBy="#{item.funNombre}">
                             <f:facet name="header">
@@ -94,33 +88,42 @@
                             </f:facet>
                             <h:outputText value="#{item.funAlias}"/>
                         </p:column>
-                        <p:column sortBy="#{item.dependencia.aeropuerto.regional.regNombre}">
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.regNombre}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.dependencia.aeropuerto.regional.regNombre}"/>
-                        </p:column>
-                        <p:column sortBy="#{item.dependencia.aeropuerto.aeNombre}">
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.aeNombre}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.dependencia.aeropuerto.aeNombre}"/>
-                        </p:column>
-                        <p:column sortBy="#{item.dependencia.depNombre}">
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.dependencia}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.dependencia.depNombre}"/>
-                        </p:column>
                         <p:column sortBy="#{item.funEstado}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.funEstado}"/>
                             </f:facet>
                             <h:outputText value="#{item.funEstado}"/>
                         </p:column>
+                        <p:column sortBy="#{item.funCertMedico}">
+                            <f:facet name="header">
+                                <h:outputText value="Certificado"/>
+                            </f:facet>
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <h:outputText value="#{item.funCertMedico}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputText id="inputCertificado" value="#{item.funCertMedico}"/>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column sortBy="#{item.funFvCertmedico}">
+                            <f:facet name="header">
+                                <h:outputText value="Fecha vencimiento"/>
+                            </f:facet>
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <h:outputText value="#{item.funFvCertmedico}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                                    </h:outputText>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:calendar value="#{item.funFvCertmedico}"/>
+                                </f:facet>
+                            </p:cellEditor>
 
+                        </p:column>
                     </p:dataTable>
-
 
                 </h:form>
 

@@ -104,6 +104,11 @@ public class JsfUtil {
         addMessage(FacesMessage.SEVERITY_INFO, messageId, params);
         //FacesContext.getCurrentInstance().addMessage("successInfo", facesMsg);
     }
+    
+    public static void addManualSuccessMessage(String messageDescription) {
+        FacesMessage mensaje = new FacesMessage(FacesMessage.SEVERITY_WARN, messageDescription, messageDescription);
+        getFacesContext().addMessage(null, mensaje);
+    }
 
     public static void addWarningMessage(String messageId, String... params) {
         addMessage(FacesMessage.SEVERITY_WARN, messageId, params);
