@@ -8,6 +8,7 @@ import co.gov.aerocivil.controlt.entities.Aeropuerto;
 import co.gov.aerocivil.controlt.entities.CursoRecurrente;
 import co.gov.aerocivil.controlt.entities.DepCategoria;
 import co.gov.aerocivil.controlt.entities.Dependencia;
+import co.gov.aerocivil.controlt.entities.EvaluacionCompetencia;
 import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.entities.Jornada;
 import co.gov.aerocivil.controlt.entities.JornadaNoLaborable;
@@ -41,6 +42,7 @@ import org.primefaces.component.datatable.DataTable;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.DualListModel;
 import org.primefaces.component.selectonemenu.SelectOneMenu;
+import org.primefaces.event.DateSelectEvent;
 import org.primefaces.event.RowEditEvent;
 
 /**
@@ -84,6 +86,10 @@ public class FuncionarioBBean {
     private Long[] jornadas;
     private List<Jornada> listJornada;
     private DataTable table;
+    private Date fechaVenceEvaluacion;
+    private Date fechaRealizaEvaluacion;
+    private String evaluacion;
+    private String resultado;
 
     public String crear() {
         funcionario = new Funcionario();
@@ -445,34 +451,6 @@ public class FuncionarioBBean {
         return "editCursoRecurrente";
     }
 
-    public Funcionario getFuncionario() {
-        return funcionario;
-    }
-
-    public void setFuncionario(Funcionario funcionario) {
-        this.funcionario = funcionario;
-    }
-
-    public Funcionario getFuncionarioFiltro() {
-        return funcionarioFiltro;
-    }
-
-    public void setFuncionarioFiltro(Funcionario funcionarioFiltro) {
-        this.funcionarioFiltro = funcionarioFiltro;
-    }
-
-    public LazyDataModel<Funcionario> getLazyList() {
-        return lazyList;
-    }
-
-    public List<Aeropuerto> getListAeropuerto() {
-        return listAeropuerto;
-    }
-
-    public List<Dependencia> getListDependencia() {
-        return listDependencia;
-    }
-
     public void cargarAeropuerto() {
         cargarAeropuerto(funcionario);
     }
@@ -585,19 +563,54 @@ public class FuncionarioBBean {
         }
         return filtrar();
     }
-    
-    public void onEditEvent(RowEditEvent event){
+
+    public void onEditEvent(RowEditEvent event) {
         try {
-            funcionarioService.guardar((Funcionario)event.getObject(),
+            funcionarioService.guardar((Funcionario) event.getObject(),
                     JsfUtil.getFuncionarioSesion());
         } catch (SQLIntegrityConstraintViolationException ex) {
             Logger.getLogger(FuncionarioBBean.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public void onCancel(RowEditEvent event){
+
+    public void onCancel(RowEditEvent event) {
         this.funcionarioSeleccionado = new Funcionario();
         JsfUtil.addManualSuccessMessage("Operacion Cancelada");
+    }
+
+    //EventoActualiza evaluacion
+    public void onEditEvaluacion(RowEditEvent event) {
+        funcionarioSeleccionado = (Funcionario) event.getObject();
+        EvaluacionCompetenciasBBean evalBbean = (EvaluacionCompetenciasBBean) JsfUtil.getManagedBean(EvaluacionCompetenciasBBean.class);
+        EvaluacionCompetencia ec = new EvaluacionCompetencia();
+        ec.setEvDescripcion(this.funcionarioSeleccionado.getEvaluacionCompetenciaEdicion().getEvDescripcion());
+        ec.setEvFechaRealiza(this.funcionarioSeleccionado.getEvaluacionCompetenciaEdicion().getEvFechaRealiza());
+        ec.setEvFechaVence(this.fechaVenceEvaluacion);
+        ec.setEvResultado(this.funcionarioSeleccionado.getEvaluacionCompetenciaEdicion().getEvResultado());
+        ec.setFuncionario(funcionarioSeleccionado);
+        evalBbean.setEvaluacion(ec);
+        evalBbean.guardarEvaluacion();
+
+        funcionarioSeleccionado.setEvaluacionCompetencia(ec);
+        funcionarioSeleccionado.setEvaluacionCompetenciaEdicion(new EvaluacionCompetencia());
+        this.fechaVenceEvaluacion = null;
+        this.fechaRealizaEvaluacion = null;
+        this.evaluacion = null;
+        this.resultado = null;
+        evalBbean.setEvaluacion(new EvaluacionCompetencia());
+    }
+
+    public void onCancelEvaluacion(RowEditEvent event) {
+        this.funcionarioSeleccionado = new Funcionario();
+        JsfUtil.addManualSuccessMessage("Operacion Cancelada");
+    }
+
+    public void actualiza(DateSelectEvent evento) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(evento.getDate());
+        c.add(Calendar.YEAR, 1);
+        this.fechaVenceEvaluacion = (c.getTime());
+        this.fechaRealizaEvaluacion = evento.getDate();
     }
 
     public void cargarFuncionario() {
@@ -723,5 +736,65 @@ public class FuncionarioBBean {
 
     public void setFuncionarioSeleccionado(Funcionario funcionarioSeleccionado) {
         this.funcionarioSeleccionado = funcionarioSeleccionado;
+    }
+
+    public Funcionario getFuncionario() {
+        return funcionario;
+    }
+
+    public void setFuncionario(Funcionario funcionario) {
+        this.funcionario = funcionario;
+    }
+
+    public Funcionario getFuncionarioFiltro() {
+        return funcionarioFiltro;
+    }
+
+    public void setFuncionarioFiltro(Funcionario funcionarioFiltro) {
+        this.funcionarioFiltro = funcionarioFiltro;
+    }
+
+    public LazyDataModel<Funcionario> getLazyList() {
+        return lazyList;
+    }
+
+    public List<Aeropuerto> getListAeropuerto() {
+        return listAeropuerto;
+    }
+
+    public List<Dependencia> getListDependencia() {
+        return listDependencia;
+    }
+
+    public Date getFechaVenceEvaluacion() {
+        return fechaVenceEvaluacion;
+    }
+
+    public void setFechaVenceEvaluacion(Date fechaVenceEvaluacion) {
+        this.fechaVenceEvaluacion = fechaVenceEvaluacion;
+    }
+
+    public Date getFechaRealizaEvaluacion() {
+        return fechaRealizaEvaluacion;
+    }
+
+    public void setFechaRealizaEvaluacion(Date fechaRealizaEvaluacion) {
+        this.fechaRealizaEvaluacion = fechaRealizaEvaluacion;
+    }
+
+    public String getEvaluacion() {
+        return evaluacion;
+    }
+
+    public void setEvaluacion(String evaluacion) {
+        this.evaluacion = evaluacion;
+    }
+
+    public String getResultado() {
+        return resultado;
+    }
+
+    public void setResultado(String resultado) {
+        this.resultado = resultado;
     }
 }

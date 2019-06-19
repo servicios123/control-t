@@ -146,6 +146,12 @@ public class Funcionario implements Serializable {
     private String funCargo;
     @Transient
     private Long[] roles;
+    @Transient
+    private String color;
+    @Transient
+    private EvaluacionCompetencia evaluacionCompetencia;
+    @Transient
+    private EvaluacionCompetencia evaluacionCompetenciaEdicion;
 
     public Long getIntentosFallidos() {
         return intentosFallidos;
@@ -545,5 +551,63 @@ public class Funcionario implements Serializable {
 
     public void setListaJornadasNoLaborables(List<JornadaNoLaborable> listaJornadasNoLaborables) {
         this.listaJornadasNoLaborables = listaJornadasNoLaborables;
+    }
+
+    public String getColor() {
+        Date today = new Date();
+        long diff = this.funFvCertmedico.getTime() - today.getTime();
+        float days = (diff / (1000 * 60 * 60 * 24));
+        if (this.funFvCertmedico.before(today) || this.funFvCertmedico.equals(today)) {
+            color = "vencido";
+        } else {
+            if (days >= 0 && days < 30) {
+                color = "por-vencer";
+            } else {
+                color = "";
+            }
+        }
+        return color;
+    }
+
+    public String getColorEvaluacion() {
+        if (this.funFvEvaluacion != null) {
+            Date today = new Date();
+            long diff = this.funFvEvaluacion.getTime() - today.getTime();
+            float days = (diff / (1000 * 60 * 60 * 24));
+            if (this.funFvEvaluacion.before(today) || this.funFvEvaluacion.equals(today)) {
+                return "vencido";
+            } else {
+                if (days >= 0 && days < 30) {
+                    return "por-vencer";
+                } else {
+                    return "";
+                }
+            }
+        } else {
+            return "";
+        }
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public EvaluacionCompetencia getEvaluacionCompetencia() {
+        return evaluacionCompetencia;
+    }
+
+    public void setEvaluacionCompetencia(EvaluacionCompetencia evaluacionCompetencia) {
+        this.evaluacionCompetencia = evaluacionCompetencia;
+    }
+
+    public EvaluacionCompetencia getEvaluacionCompetenciaEdicion() {
+        if (evaluacionCompetenciaEdicion == null) {
+            evaluacionCompetenciaEdicion = new EvaluacionCompetencia();
+        }
+        return evaluacionCompetenciaEdicion;
+    }
+
+    public void setEvaluacionCompetenciaEdicion(EvaluacionCompetencia evaluacionCompetenciaEdicion) {
+        this.evaluacionCompetenciaEdicion = evaluacionCompetenciaEdicion;
     }
 }

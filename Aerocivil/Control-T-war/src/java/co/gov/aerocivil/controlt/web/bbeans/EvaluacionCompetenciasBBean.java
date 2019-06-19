@@ -13,6 +13,7 @@ import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -29,7 +30,7 @@ public class EvaluacionCompetenciasBBean {
     
     @EJB
     private EvaluacionCompetenciaService evaluacionService;
-    private EvaluacionCompetencia evaluacion;
+    private EvaluacionCompetencia evaluacion=new EvaluacionCompetencia();
     private Funcionario funcionario;
     
     @EJB
@@ -38,6 +39,12 @@ public class EvaluacionCompetenciasBBean {
     @ManagedProperty(value = "#{menuBBean.selectedOption.menLabel}")
     private String idMenu;
 
+    @PostConstruct
+    public void cargar() {
+        listarCursos();
+    }
+
+    
     
     public String listarFuncionarios(){
         FuncionarioBBean funBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);        
@@ -66,6 +73,12 @@ public class EvaluacionCompetenciasBBean {
         JsfUtil.addSuccessMessage("genericSingleSaveSuccess"); 
         FuncionarioBBean funBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);        
         return funBBean.filtrar();        
+    }
+    
+    public void guardarEvaluacion(){
+        evaluacion = evaluacionService.guardar(evaluacion, 
+                JsfUtil.getFuncionarioSesion());
+        JsfUtil.addSuccessMessage("genericSingleSaveSuccess");      
     }
     
     public void listarCursos(){

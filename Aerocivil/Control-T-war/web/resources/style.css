@@ -6,7 +6,7 @@
         Purpose of the stylesheet follows.
 */
 .boton_submit{
-font-family: Calibri !important;
+    font-family: Calibri !important;
     font-size: 12pt !important;
     background-color:#808080 !important;
     border: 1px #C0C0C0 solid !important;
@@ -19,7 +19,7 @@ font-family: Calibri !important;
     border-radius: 0 !important;
 }
 .destacado {
-    
+
     color: rgb(237,125,49) !important;
     font-weight: bold;
 }
@@ -29,7 +29,7 @@ font-family: Calibri !important;
 }
 root { 
     display: block;
-    
+
 }
 body{
     font-family: Tahoma;
@@ -56,11 +56,11 @@ body{
     padding-left: 10px;
     padding-top: 5px;
     vertical-align: top;
- }
- .tabla_filtros td{
-     vertical-align: top; 
 }
- 
+.tabla_filtros td{
+    vertical-align: top; 
+}
+
 .tabla_filtros th{
     vertical-align: middle;
     font-size: 10pt;
@@ -68,8 +68,8 @@ body{
     padding: 0px;
     text-align: left;
     padding-bottom: 10px;
- }
- 
+}
+
 label{
     padding-right: 10px;
 }
@@ -81,18 +81,18 @@ label{
 }
 
 .userStatus{
-   /* background-color: appworkspace;*/   
-   padding-left: 10px;
-   padding-right: 10px; 
-   /*border-bottom: 1px cornflowerblue solid;*/
+    /* background-color: appworkspace;*/   
+    padding-left: 10px;
+    padding-right: 10px; 
+    /*border-bottom: 1px cornflowerblue solid;*/
     color:white; 
     font-size: 9pt;
     font-weight: bold;
     height: 30px;
 }
 .contenido td{
-    
-     vertical-align: top;
+
+    vertical-align: top;
 
 }
 .contenido{
@@ -139,11 +139,11 @@ button[type="submit"],input[type="submit"],input[type="button"]{
     text-align: center;
 }
 .pie{
-   height: 30px;
-   font-size: 10pt;
-   text-align: center;
-   background-color: #D2D5DF;
-   
+    height: 30px;
+    font-size: 10pt;
+    text-align: center;
+    background-color: #D2D5DF;
+
 }
 .ui-datatable table{
     border: 1px !important;
@@ -154,7 +154,7 @@ div.tabla_lista td{
 
 .tabla_lista{
     border: 0px;
-    
+
 }
 
 td.menuLeft th.ui-state-default{
@@ -186,10 +186,10 @@ div.ui-dt-c{
     padding-left: 20px;
 }
 .ui-datatable .ui-sortable-column div.ui-dt-c{
-  padding-right: 15px !important;
+    padding-right: 15px !important;
 }
 .ui-state-default .ui-icon{
-    
+
 }
 
 tr.ui-datatable-odd{
@@ -264,7 +264,7 @@ tr.ui-datatable-odd{
     background-color: #F3F3F3;
     min-width: 250px;
 
-    
+
 }
 
 td.menuLeft .ui-widget-content{
@@ -281,7 +281,7 @@ td.menuLeft .ui-widget-content{
     width: 153px; 
 }
 .tabla_formulario{
-  width:100%;
+    width:100%;
 }
 span.date{
     width: 170px;
@@ -315,7 +315,7 @@ span.date{
     color:cornflowerblue;
     font-size: 9pt;
     font-weight: bold;
-   
+
 }
 
 select.selectOneMenu50px{
@@ -337,7 +337,7 @@ select.selectOneMenu50px{
 }
 
 .divOverFlow{
-    
+
     overflow-x: auto;
     height: auto;
     min-height: 400px;
@@ -370,9 +370,9 @@ select.selectOneMenu50px{
     margin: 0px;
 }
 .tablaColapsa table {
-   border-collapse: collapse;
-   width: 100%;
-   table-layout: fixed;
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
 }
 .descripcionTd
 {
@@ -380,7 +380,7 @@ select.selectOneMenu50px{
     overflow-y: auto;
     display:block;
     font-size:12px;
-    
+
 }
 
 .descripcionTd::-webkit-scrollbar {
@@ -397,7 +397,7 @@ select.selectOneMenu50px{
     background-color: #ccc;
 }
 .descripcionTd::-webkit-scrollbar-thumb:hover {
-	background-color: #aaa;
+    background-color: #aaa;
 }
 .descripcionTd::-moz-scrollbar {
     width:12px;
@@ -413,7 +413,7 @@ select.selectOneMenu50px{
     background-color: #ccc;
 }
 .descripcionTd::-moz-scrollbar-thumb:hover {
-	background-color: #aaa;
+    background-color: #aaa;
 }
 .marginTop{
     margin-top:30px;    
@@ -433,4 +433,11 @@ select.selectOneMenu50px{
 
 .asigned {
     background-color: #777373 !important;
+}
+
+.vencido{
+    color: red !important;
+}
+.por-vencer{
+    color: #ffa500 !important;
 }

@@ -4,13 +4,10 @@
  */
 package co.gov.aerocivil.controlt.services;
 
-import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.entities.Dependencia;
-import co.gov.aerocivil.controlt.entities.FuncionarioSitah;
-import co.gov.aerocivil.controlt.entities.Jornada;
-import co.gov.aerocivil.controlt.entities.ParametroSistema;
+import co.gov.aerocivil.controlt.entities.EvaluacionCompetencia;
+import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.enums.ParametrosEnum;
-import co.gov.aerocivil.controlt.to.FuncionarioTransporteTO;
 import co.gov.aerocivil.controlt.util.QueryUtil;
 import co.gov.aerocivil.controlt.util.StringDateUtil;
 import java.io.UnsupportedEncodingException;
@@ -28,12 +25,9 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
-import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
-import javax.naming.directory.SearchControls;
-import javax.naming.ldap.LdapContext;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -54,6 +48,8 @@ public class FuncionarioServiceBean implements FuncionarioService {
     private AuditoriaService auditoria;
     @EJB
     private ListasService listasService;
+    @EJB
+    private EvaluacionCompetenciaService evaluacionService;
 
     @Override
     public Funcionario guardar(Funcionario funcionario, Funcionario fSession) throws SQLIntegrityConstraintViolationException {
@@ -205,7 +201,16 @@ public class FuncionarioServiceBean implements FuncionarioService {
             query.setFirstResult(first).setMaxResults(pageSize);
         }
         try {
-            return (List<Funcionario>) query.getResultList();
+            List<Funcionario> result = (List<Funcionario>) query.getResultList();
+            for(Funcionario f : result){
+                try {
+                    EvaluacionCompetencia ev = evaluacionService.consultarEvaluacion(f);
+                    f.setEvaluacionCompetencia(ev);
+                } catch (Exception e) {
+                    f.setEvaluacionCompetencia(null);
+                }
+            }
+            return result;
         } catch (NoResultException nre) {
             nre.printStackTrace();
             return null;
@@ -339,6 +344,16 @@ public class FuncionarioServiceBean implements FuncionarioService {
         if(funcionario.getFunFvCertmedico()!=null){
             condiciones.add("f.funFvCertmedico = :fvCertmedico");
             params.put("fvCertmedico", funcionario.getFunFvCertmedico());
+        }
+        
+        if(funcionario.getFunFvCurso()!=null){
+            condiciones.add("f.funFvCurso = :fvCurso");
+            params.put("fvCurso", funcionario.getFunFvCurso());
+        }
+        
+        if(funcionario.getFunFvEvaluacion()!=null){
+            condiciones.add("f.funFvEvaluacion = :fvEvaluacion");
+            params.put("fvEvaluacion", funcionario.getFunFvEvaluacion());
         }
 
         StringBuilder strQry = new StringBuilder();

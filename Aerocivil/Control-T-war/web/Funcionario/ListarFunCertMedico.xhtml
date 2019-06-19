@@ -5,6 +5,16 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui"
       xmlns:xf="http://www.xfaces.com/jsf">
+    <head>
+        <style>
+            .#{item.color}{
+                color: red !important;
+            }
+            .por-vencer{
+                color: #ffa500 !important;
+            }
+        </style>
+    </head>
     <body>
         <ui:composition template="../template_interior.xhtml">
 
@@ -80,19 +90,19 @@
                             <f:facet name="header">
                                 <h:outputText value="#{msg.nombre}"/>
                             </f:facet>
-                            <h:outputText value="#{item.funNombre}"/>
+                            <h:outputText value="#{item.funNombre}" class="#{item.color}"/>
                         </p:column>
                         <p:column sortBy="#{item.funAlias}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.funAlias}"/>
                             </f:facet>
-                            <h:outputText value="#{item.funAlias}"/>
+                            <h:outputText value="#{item.funAlias}" class="#{item.color}"/>
                         </p:column>
                         <p:column sortBy="#{item.funEstado}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.funEstado}"/>
                             </f:facet>
-                            <h:outputText value="#{item.funEstado}"/>
+                            <h:outputText value="#{item.funEstado}" class="#{item.color}"/>
                         </p:column>
                         <p:column sortBy="#{item.funCertMedico}">
                             <f:facet name="header">
@@ -100,7 +110,7 @@
                             </f:facet>
                             <p:cellEditor>
                                 <f:facet name="output">
-                                    <h:outputText value="#{item.funCertMedico}"/>
+                                    <h:outputText value="#{item.funCertMedico}" class="#{item.color}"/>
                                 </f:facet>
                                 <f:facet name="input">
                                     <p:inputText id="inputCertificado" value="#{item.funCertMedico}"/>
@@ -113,7 +123,7 @@
                             </f:facet>
                             <p:cellEditor>
                                 <f:facet name="output">
-                                    <h:outputText value="#{item.funFvCertmedico}">
+                                    <h:outputText value="#{item.funFvCertmedico}" class="#{item.color}">
                                         <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
                                     </h:outputText>
                                 </f:facet>

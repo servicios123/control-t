@@ -12,7 +12,6 @@ import co.gov.aerocivil.controlt.services.CursoRecurrenteService;
 import co.gov.aerocivil.controlt.services.FuncionarioService;
 import co.gov.aerocivil.controlt.services.ParametroDependenciaService;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -21,9 +20,7 @@ import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 import org.primefaces.event.DateSelectEvent;
-import org.primefaces.event.SelectEvent;
 
 /**
  *
