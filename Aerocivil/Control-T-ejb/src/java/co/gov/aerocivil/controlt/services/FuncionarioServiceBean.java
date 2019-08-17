@@ -4,6 +4,7 @@
  */
 package co.gov.aerocivil.controlt.services;
 
+import co.gov.aerocivil.controlt.entities.CursoRecurrente;
 import co.gov.aerocivil.controlt.entities.Dependencia;
 import co.gov.aerocivil.controlt.entities.EvaluacionCompetencia;
 import co.gov.aerocivil.controlt.entities.Funcionario;
@@ -50,6 +51,8 @@ public class FuncionarioServiceBean implements FuncionarioService {
     private ListasService listasService;
     @EJB
     private EvaluacionCompetenciaService evaluacionService;
+    @EJB
+    private CursoRecurrenteService cursoRecurrenteService;
 
     @Override
     public Funcionario guardar(Funcionario funcionario, Funcionario fSession) throws SQLIntegrityConstraintViolationException {
@@ -205,7 +208,9 @@ public class FuncionarioServiceBean implements FuncionarioService {
             for(Funcionario f : result){
                 try {
                     EvaluacionCompetencia ev = evaluacionService.consultarEvaluacion(f);
+                    CursoRecurrente cr = cursoRecurrenteService.consultarMaxima(f.getFunId());
                     f.setEvaluacionCompetencia(ev);
+                    f.setCursoRecurrente(cr);
                 } catch (Exception e) {
                     f.setEvaluacionCompetencia(null);
                 }
@@ -370,7 +375,7 @@ public class FuncionarioServiceBean implements FuncionarioService {
         StringBuilder strQryFinal = new StringBuilder("Select f from Funcionario f ").
                 append(strQry.toString());
         if (sortField != null && sortOrder != null) {
-            strQryFinal.append("order by f.").append(sortField).append(" ").append(sortOrder);
+            strQryFinal.append(" order by f.").append(sortField).append(" ").append(sortOrder);
         }
         //System.out.println(strQryFinal);
         query = em.createQuery(strQryFinal.toString());

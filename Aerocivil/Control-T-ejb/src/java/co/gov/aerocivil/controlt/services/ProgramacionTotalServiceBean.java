@@ -764,7 +764,7 @@ public class ProgramacionTotalServiceBean
                     if (turn.getPeriod().getId() == period) {
                         for (Functionary fun : this.functionaries) {
                             if (fun.isAvailable().booleanValue()) {
-                                Turn previous = getTurnLastDayFromLastProg(fun);
+                                Turn previous = getTurnLastDayFromLastProgPrevMonth(fun);
                                 if ((previous != null) && (previous.getPeriod().getId() == required) && (previous.getPosition().getId() == turn.getPosition().getId())) {
                                     if (fun.getAlias().equalsIgnoreCase("ICG") && turn.getPeriod().getId() == 427) {
                                         System.out.println("poscision");
@@ -1055,9 +1055,11 @@ public class ProgramacionTotalServiceBean
     }
 
     private boolean solvingOrdinaryTurn(Functionary fun, Turn turn, Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
         if (validateOrdinaryTurn(fun, turn, date).booleanValue()) {
-            if (fun.getAlias().equalsIgnoreCase("ICG") && turn.getPeriod().getId() == 427) {
-                System.out.println("poscision");
+            if (c.get(Calendar.DAY_OF_MONTH) == 1 && (turn.getPeriod().getAlias() + turn.getPosition().getAlias()).equalsIgnoreCase("AF")) {
+                System.out.println("c = " + c);
             }
             turn.setFunctionary(fun);
             fun.setAvailable(Boolean.valueOf(false));
@@ -1067,9 +1069,14 @@ public class ProgramacionTotalServiceBean
     }
 
     private boolean solvingExtraOrdinaryTurn(Functionary fun, Turn extra, Boolean exceeded, Date date) {
-
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        if (c.get(Calendar.DAY_OF_MONTH) == 1 && (extra.getPeriod().getAlias() + extra.getPosition().getAlias()).equalsIgnoreCase("AF")) {
+            System.out.println("c = " + c);
+        }
         if (!fun.isAvailable().booleanValue()) {
             Turn turn = getTurnOfFunctionary(fun, date, 0, -1);
+
             if ((turn != null) && (!turn.getHaveExtra().booleanValue())) {
                 int hourEval = fun.getMaxHoursExtra();
                 if (exceeded.booleanValue()) {
@@ -1091,23 +1098,23 @@ public class ProgramacionTotalServiceBean
                     extra.setType(Type.ORDINARY);
                     turn.setType(Type.EXTRAORDINARY);
                     if (validateExtraordinaryTurn(extra, turn, date, hourEval, exceeded.booleanValue()).booleanValue()) {
-                        extra.setType(Type.ORDINARY);
-                        turn.setType(Type.EXTRAORDINARY);
-                        turn.setHaveExtra(Boolean.valueOf(true));
-                        extra.setHaveExtra(Boolean.valueOf(true));
-                        //System.out.print("Fun: " + fun.getAlias() + "\tAntes: " + fun.getMaxHoursExtra());
-                        if (exceeded.booleanValue()) {
-                            fun.decreaseMaxHoursExtraExceeded(extra.getPeriod().getTotal());
-                        } else {
-                            fun.decreaseMaxHoursExtra(extra.getPeriod().getTotal());
-                        }
-                        //System.out.println("\tAhora: " + fun.getMaxHoursExtra());
-                        Functionary aux = fun;
-                        this.functionaries.remove(fun);
-                        this.functionaries.add(aux);
-                        extra.setFunctionary(fun);
-                        turn.setFunctionary(fun);
-                        return true;
+                                    extra.setType(Type.ORDINARY);
+                                    turn.setType(Type.EXTRAORDINARY);
+                                    turn.setHaveExtra(Boolean.valueOf(true));
+                                    extra.setHaveExtra(Boolean.valueOf(true));
+                                    //System.out.print("Fun: " + fun.getAlias() + "\tAntes: " + fun.getMaxHoursExtra());
+                                    if (exceeded.booleanValue()) {
+                                        fun.decreaseMaxHoursExtraExceeded(extra.getPeriod().getTotal());
+                                    } else {
+                                        fun.decreaseMaxHoursExtra(extra.getPeriod().getTotal());
+                                    }
+                                    //System.out.println("\tAhora: " + fun.getMaxHoursExtra());
+                                    Functionary aux = fun;
+                                    this.functionaries.remove(fun);
+                                    this.functionaries.add(aux);
+                                    extra.setFunctionary(fun);
+                                    turn.setFunctionary(fun);
+                                    return true;
                     } else {
                         turn.setType(turnType);
                         extra.setType(extraType);
@@ -1224,7 +1231,7 @@ public class ProgramacionTotalServiceBean
                                                         this.functionaries.add(aux);
                                                         break;
                                                     } else {
-                                                        write("Ordinario;" + "El funcionario " + fun.getAlias() + " esta configurado con la jornada " + turn.getPeriod().getAlias() + " como no laboral;");
+                                                        write("Ordinario;" + "El funcionario " + fun.getAlias() + " esta configurado con la jornada " + turn.getPeriod().getAlias() + " como no laboral;;;;");
                                                     }
                                                 } else {
                                                     write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + "La posicion: " + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + " esta inactiva el dia: " + new SimpleDateFormat("dd/MM/yy").format(day.getDate()));
@@ -1315,6 +1322,10 @@ public class ProgramacionTotalServiceBean
         Calendar c = Calendar.getInstance();
         c.setTime(current);
 
+        if (c.get(Calendar.DAY_OF_MONTH) == 1 && (turn.getPeriod().getAlias() + turn.getPosition().getAlias()).equalsIgnoreCase("AF")) {
+            System.out.println("c = " + c);
+        }
+
         String s = "ExtraOrdinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + turn.getFunctionary().getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";" + extra.getPeriod().getAlias() + extra.getPosition().getAlias() + ";";
         if (satisfiesInitialConditionalExtra(s, turn, extra, current, hourEval, exceeded).booleanValue()) {
             if (((satisfiesEnabledPosition(turn.getFunctionary().getId(), turn.getPosition().getId()).booleanValue())
@@ -1354,9 +1365,9 @@ public class ProgramacionTotalServiceBean
                                         } else {
 
                                             if (isJornadaNoLaboral(turn, turn.getFunctionary())) {
-                                                write("Ordinario;" + "El funcionario " + turn.getFunctionary().getAlias() + " esta configurado con la jornada " + turn.getPeriod().getAlias() + " como no laboral;");
+                                                write("Ordinario;" + "El funcionario " + turn.getFunctionary().getAlias() + " esta configurado con la jornada " + turn.getPeriod().getAlias() + " como no laboral;;;;");
                                             } else if (isJornadaNoLaboral(extra, turn.getFunctionary())) {
-                                                write("Ordinario;" + "El funcionario " + turn.getFunctionary().getAlias() + " esta configurado con la jornada " + turn.getPeriod().getAlias() + " como no laboral;");
+                                                write("Ordinario;" + "El funcionario " + turn.getFunctionary().getAlias() + " esta configurado con la jornada " + turn.getPeriod().getAlias() + " como no laboral;;;;");
                                             } else {
                                                 write(s + "OK;");
                                                 return Boolean.valueOf(true);
@@ -1421,6 +1432,9 @@ public class ProgramacionTotalServiceBean
                                         if (satisfiesInactivePosition(turn, current)) {
                                             if (satisfiesPetitions(turn, current, fun)) {
                                                 write(s + "OK;");
+                                                if (c.get(Calendar.DAY_OF_MONTH) == 1 && (turn.getPeriod().getAlias() + turn.getPosition().getAlias()).equalsIgnoreCase("AF")) {
+                                                    System.out.println("c = " + c);
+                                                }
                                                 return Boolean.valueOf(true);
                                             } else {
                                                 write(s + "El funcionario tiene un peticion para la jornada: " + turn.getPeriod().getAlias() + " el dia: " + new SimpleDateFormat("dd/MM/yy").format(current));
@@ -1468,7 +1482,7 @@ public class ProgramacionTotalServiceBean
             }
         } else {
             System.out.println(s + "El funcionario " + fun.getAlias() + " esta configurado con la jornada " + turn.getPeriod().getAlias() + " como no laboral;");
-            write(s + "El funcionario " + fun.getAlias() + " esta configurado con la jornada " + turn.getPeriod().getAlias() + " como no laboral;");
+            write(s + "El funcionario " + fun.getAlias() + " esta configurado con la jornada " + turn.getPeriod().getAlias() + " como no laboral;;;;");
         }
         return Boolean.valueOf(false);
     }
@@ -1826,6 +1840,18 @@ public class ProgramacionTotalServiceBean
         return null;
     }
 
+    private Turn getTurnLastDayFromLastProgPrevMonth(Functionary fun) {
+        this.lastDay = getLastDayPrevMonth();
+        if (this.lastDay != null) {
+            for (Turn turn : this.lastDay.getTurns()) {
+                if ((turn.getFunctionary() != null) && (turn.getFunctionary().getId() == fun.getId())) {
+                    return turn;
+                }
+            }
+        }
+        return null;
+    }
+
     private Turn getTurnOfFunctionary(Functionary fun, Date current, int amountDay, int type) {
         Calendar eval = Calendar.getInstance();
         eval.setTime(current);
@@ -2104,6 +2130,37 @@ public class ProgramacionTotalServiceBean
         c.add(5, -1);
         try {
             Query query = this.em.createQuery("SELECT t FROM Turno t WHERE t.funcionario.funId is not null and t.programacion.dependencia.depId = :depId AND t.turFecha= :fecha AND t.programacion.proEstado = 1 AND (t.turTipo =2 OR ( t.turTipo =1 AND 0=(SELECT count(tt) FROM Turno tt WHERE tt.funcionario.funId is not null and t.funcionario.funId = tt.funcionario.funId AND t.turFecha=tt.turFecha AND t.turId <> tt.turId ) ) )");
+
+            query.setParameter("fecha", c.getTime(), TemporalType.DATE);
+            query.setParameter("depId", this.programming.getDependencia().getDepId());
+            List<Turno> turnos = query.getResultList();
+
+            ArrayList<Turn> turns = new ArrayList();
+            for (Turno turno : turnos) {
+                if (turno.getFuncionario() != null) {
+                    Calendar f = Calendar.getInstance();
+                    f.setTime(turno.getTurFecha());
+
+                    PosicionJornada pj = (PosicionJornada) this.em.find(PosicionJornada.class, turno.getTurPosicionJornada());
+                    Period period = new Period(pj.getJornada().getJoId().longValue(), pj.getJornada().getJoAlias(), pj.getJornada().getJoHoraInicio().byteValue(), pj.getJornada().getJoHoraFin().byteValue() + 1);
+                    Position position = new Position(pj.getPosicion().getPosId().longValue(), pj.getPosicion().getPosicionNacional().getPnAlias());
+                    Functionary fun = new Functionary(turno.getFuncionario());
+                    Turn turn = new Turn(period, position, fun, turno.getTurPosicionJornada().longValue());
+                    turns.add(turn);
+                }
+            }
+            return new Day(c.getTime(), turns);
+        } catch (NoResultException nre) {
+        }
+        return null;
+    }
+
+    private Day getLastDayPrevMonth() {
+        Calendar c = Calendar.getInstance();
+        c.setTime(this.programming.getProFechaInicio());
+        c.add(5, -1);
+        try {
+            Query query = this.em.createQuery("SELECT t FROM Turno t WHERE t.funcionario.funId is not null and t.programacion.dependencia.depId = :depId AND t.turFecha= :fecha AND t.programacion.proEstado = 1 AND (t.turTipo =2 OR t.turTipo =1)");
 
             query.setParameter("fecha", c.getTime(), TemporalType.DATE);
             query.setParameter("depId", this.programming.getDependencia().getDepId());

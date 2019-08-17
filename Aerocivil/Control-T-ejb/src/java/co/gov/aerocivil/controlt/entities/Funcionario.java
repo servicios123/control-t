@@ -152,6 +152,8 @@ public class Funcionario implements Serializable {
     private EvaluacionCompetencia evaluacionCompetencia;
     @Transient
     private EvaluacionCompetencia evaluacionCompetenciaEdicion;
+    @Transient
+    private CursoRecurrente cursoRecurrente;
 
     public Long getIntentosFallidos() {
         return intentosFallidos;
@@ -189,7 +191,7 @@ public class Funcionario implements Serializable {
     List<JornadaNoLaborable> listaJornadasNoLaborables;
     @Transient
     private boolean seleccionado;
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "curso_recurrente_funcionario",
     joinColumns =
     @JoinColumn(name = "crc_funcionario"),
@@ -587,6 +589,25 @@ public class Funcionario implements Serializable {
             return "";
         }
     }
+    
+    public String getColorCurso(){
+        if (this.funFvCurso != null) {
+            Date today = new Date();
+            long diff = this.funFvCurso.getTime() - today.getTime();
+            float days = (diff / (1000 * 60 * 60 * 24));
+            if (this.funFvCurso.before(today) || this.funFvCurso.equals(today)) {
+                return "vencido";
+            } else {
+                if (days >= 0 && days < 30) {
+                    return "por-vencer";
+                } else {
+                    return "";
+                }
+            }
+        } else {
+            return "";
+        }
+    }
 
     public void setColor(String color) {
         this.color = color;
@@ -609,5 +630,13 @@ public class Funcionario implements Serializable {
 
     public void setEvaluacionCompetenciaEdicion(EvaluacionCompetencia evaluacionCompetenciaEdicion) {
         this.evaluacionCompetenciaEdicion = evaluacionCompetenciaEdicion;
+    }
+
+    public CursoRecurrente getCursoRecurrente() {
+        return cursoRecurrente;
+    }
+
+    public void setCursoRecurrente(CursoRecurrente cursoRecurrente) {
+        this.cursoRecurrente = cursoRecurrente;
     }
 }

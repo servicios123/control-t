@@ -37,7 +37,7 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "CursoRecurrente.findByCurNombre", query = "SELECT c FROM CursoRecurrente c WHERE c.curNombre = :curNombre"),
     @NamedQuery(name = "CursoRecurrente.findByCurFechaRealiza", query = "SELECT c FROM CursoRecurrente c WHERE c.curFechaRealiza = :curFechaRealiza"),
     @NamedQuery(name = "CursoRecurrente.findByCurFechaVencimiento", query = "SELECT c FROM CursoRecurrente c WHERE c.curFechaVencimiento = :curFechaVencimiento")})
-public class CursoRecurrente implements Serializable {
+public class CursoRecurrente implements Serializable, Comparable<CursoRecurrente> {
 
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
@@ -132,5 +132,10 @@ public class CursoRecurrente implements Serializable {
 
     public void setListaFuncionarios(List<Funcionario> listaFuncionarios) {
         this.listaFuncionarios = listaFuncionarios;
+    }
+
+    @Override
+    public int compareTo(CursoRecurrente o) {
+        return this.getCurId().compareTo(o.getCurId());
     }
 }

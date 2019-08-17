@@ -441,3 +441,39 @@ select.selectOneMenu50px{
 .por-vencer{
     color: #ffa500 !important;
 }
+
+.ui-datatable-hor-scroll .ui-datatable-tablewrapper,.scrolling-div .ui-datatable-tablewrapper  
+{  
+    overflow: auto;  
+    width: 100% !important;  
+    height: 100%; padding-bottom:5px;  
+    font-size: 12px !important;
+}   
+
+.datatable {  
+    padding-left: 15px;  
+    padding-right: 15px;  
+    width: 100% !important;
+}
+
+.ui-datatable table {
+    border-collapse: collapse;
+    width: 100% !important;
+}
+
+.forty-percent {
+    width: 40%;
+}
+
+.fivety-percent {
+    width: 50%;
+    height: 50%;
+}
+
+.sixty-percent {
+    width: 60%;
+}
+
+.top-alignment {
+    vertical-align: top;
+}

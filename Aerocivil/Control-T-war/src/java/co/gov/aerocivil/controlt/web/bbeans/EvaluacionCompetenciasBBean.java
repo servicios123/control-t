@@ -50,7 +50,7 @@ public class EvaluacionCompetenciasBBean {
         FuncionarioBBean funBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);        
         String ret = funBBean.listar();
         funBBean.setColumns(new boolean[]{false,false,true});
-        return ret;
+        return "listarEvaluacionFuncionario";
     }
     public void actualiza(DateSelectEvent evento)
     {

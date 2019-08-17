@@ -58,9 +58,13 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
     public List<Funcionario> getFuncionarioTurnoPorFecha(Date date, long dep) {
 
         try {
-            Query query = em.createQuery("SELECT f FROM Funcionario f WHERE f.dependencia.depId =:depId AND f.funId IN (SELECT t.funcionario.funId FROM Turno t WHERE t.turFecha= :fecha AND t.programacion.dependencia.depId = :depId) ORDER BY f.funAlias ASC ");
+            
+            Calendar actual = Calendar.getInstance();
+                       
+            Query query = em.createQuery("SELECT f FROM Funcionario f WHERE f.dependencia.depId =:depId AND f.funId IN (SELECT t.funcionario.funId FROM Turno t WHERE t.turFecha= :fecha AND t.programacion.dependencia.depId = :depId) and f.funFvCertmedico > :actual and f.funFvCurso > :actual and f.funFvEvaluacion > :actual ORDER BY f.funAlias ASC ");
             query.setParameter("fecha", date, TemporalType.DATE);
             query.setParameter("depId", dep);
+            query.setParameter("actual", actual.getTime(), TemporalType.DATE);
             return (List<Funcionario>) query.getResultList();
 
         } catch (NoResultException nre) {
@@ -214,11 +218,11 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
 
             em.remove(t);
 
-            /*if (t.getTurTipo() == 3L) {
-             TurnoEspFuncionario tef = em.find(TurnoEspFuncionario.class, id);
-             auditoriaService.auditarDelete("TURNO_ESPECIAL_FUNCIONARIO", f, 0L, id);
-             em.remove(tef);
-             }*/
+            if (t.getTurTipo() == 3L) {
+                TurnoEspFuncionario tef = em.find(TurnoEspFuncionario.class, id);
+                auditoriaService.auditarDelete("TURNO_ESPECIAL_FUNCIONARIO", f, 0L, id);
+                em.remove(tef);
+            }
 
             return true;
         } catch (Exception e) {
@@ -320,8 +324,8 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
                 minutos = (int) Math.floor(diferencia / 60);
                 diferencia = diferencia - (minutos * 60);
             }
-            if(minutos>=59){
-                horas = horas+1;
+            if (minutos >= 59) {
+                horas = horas + 1;
             }
             return new Long(horas).longValue();
         } catch (ParseException ex) {

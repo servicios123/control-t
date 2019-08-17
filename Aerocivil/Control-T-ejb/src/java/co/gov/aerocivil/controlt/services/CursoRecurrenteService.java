@@ -16,5 +16,7 @@ import javax.ejb.Local;
 public interface CursoRecurrenteService {
 
     CursoRecurrente guardar(CursoRecurrente cursoRecurrente, Funcionario f);
+
+    public co.gov.aerocivil.controlt.entities.CursoRecurrente consultarMaxima(java.lang.Long funId);
     
 }

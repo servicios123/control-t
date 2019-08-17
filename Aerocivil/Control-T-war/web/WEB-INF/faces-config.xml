@@ -427,7 +427,11 @@
         <navigation-case>
             <from-outcome>verManual</from-outcome>
             <to-view-id>resources/Manual.pdf</to-view-id>
-        </navigation-case>                
+        </navigation-case>   
+        <navigation-case>
+            <from-outcome>listarEvaluacionFuncionario</from-outcome>
+            <to-view-id>/EvaluacionCompetencia/ListarEvaluacionFuncionario.xhtml</to-view-id>
+        </navigation-case>             
     </navigation-rule>
     <managed-bean>
         <managed-bean-name>currentDate</managed-bean-name>

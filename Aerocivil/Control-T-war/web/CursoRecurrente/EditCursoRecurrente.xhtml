@@ -20,12 +20,17 @@
                 <h:form>
                     <ui:include src="/Funcionario/filtroFuncionario.xhtml">
                         <ui:param name="filtro2" value="true"/>
+                        <ui:param name="filtro4" value="false"/>
+                        <ui:param name="filtro3" value="true"/>
                     </ui:include>
-                <br></br>
+                    <br></br>
                 </h:form>
                 <h:form id="form">
                     <p:dataTable value="#{funcionarioBBean.funcionariosDisponibles}"
-                                 var="item" style="overflow: auto; height: #{funcionarioBBean.heightList}; width: 540px"
+                                 var="item" paginator="true" paginatorPosition="bottom" rows="15"  
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                 rowsPerPageTemplate="10,15,20"
                                  emptyMessage="#{msg.emptyList}" >
                         <p:column style="width: 20px">
                             <f:facet name="header"></f:facet>
@@ -35,29 +40,51 @@
                             <f:facet name="header">
                                 <h:outputText value="#{msg.fuAlias}"/>
                             </f:facet>
-                            <h:outputText value="#{item.funAlias}"/>
+                            <h:outputText value="#{item.funAlias}" class="#{item.colorCurso}"/>
                         </p:column>
                         <p:column>
                             <f:facet name="header">
                                 <h:outputText value="#{msg.funNombre}"/>
                             </f:facet>
-                            <h:outputText value="#{item.funNombre}"/>
+                            <h:outputText value="#{item.funNombre}" class="#{item.colorCurso}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Nombre Curso"/>
+                            </f:facet>
+                            <h:outputText value="#{item.cursoRecurrente.curNombre}" class="#{item.colorCurso}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Fecha Termina"/>
+                            </f:facet>
+                            <h:outputText value="#{item.cursoRecurrente.curFechaRealiza}" class="#{item.colorCurso}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                            </h:outputText>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Fecha Vence"/>
+                            </f:facet>
+                            <h:outputText value="#{item.cursoRecurrente.curFechaVencimiento}" class="#{item.colorCurso}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                            </h:outputText>
                         </p:column>
                     </p:dataTable>
                     <br/><br/>
                     <h:panelGrid rendered="#{not empty funcionarioBBean.funcionariosDisponibles}"
                                  styleClass="tabla_formulario" columns="6">
                         <h:outputText value="#{msg.curNombre}"/>
-                        
+
                         <p:selectOneMenu value="#{cursoRecurrenteBBean.curso.curNombre}" required="true">
                             <f:selectItem itemValue="#{null}" itemLabel="#{msg.selectItemNull}"/>
                             <f:selectItems value="#{cursoRecurrenteBBean.parametros}" var="cur" itemValue="#{cur.nombre}" itemLabel="#{cur.nombre}"/>                           
                         </p:selectOneMenu>
-                        
+
                         <xf:calendar  entity="#{cursoRecurrenteBBean.curso}" fieldName="curFechaRealiza" required="true"> 
                             <p:ajax event="dateSelect" listener="#{cursoRecurrenteBBean.actualiza}" update="curFechaVencimiento"/>   
                         </xf:calendar>                 
-                        
+
                         <xf:calendar  entity="#{cursoRecurrenteBBean.curso}" fieldName="curFechaVencimiento" required="true"/> 
                         <f:facet name="footer">
                             <h:commandButton action="#{cursoRecurrenteBBean.guardar}"
