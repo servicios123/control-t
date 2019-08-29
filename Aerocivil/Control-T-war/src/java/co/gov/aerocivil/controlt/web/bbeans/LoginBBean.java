@@ -90,7 +90,7 @@ public class LoginBBean {
         JsfUtil.getServletRequest().getSession(false).invalidate();
 
         try {
-            JsfUtil.getFacesContext().getExternalContext().redirect(JsfUtil.getServletRequest().getContextPath() + "/logout.xhtml");
+            JsfUtil.getFacesContext().getExternalContext().redirect(JsfUtil.getServletRequest().getContextPath() + "/");
         } catch (IOException e) {
             e.printStackTrace();
         }

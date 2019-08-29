@@ -10,15 +10,12 @@ import co.gov.aerocivil.controlt.entities.Dependencia;
 import co.gov.aerocivil.controlt.entities.Regional;
 import co.gov.aerocivil.controlt.enums.RolEnum;
 import co.gov.aerocivil.controlt.services.DependenciaService;
-import co.gov.aerocivil.controlt.web.lazylist.DependenciaLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import co.gov.aerocivil.controlt.web.util.ListadosBBean;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -41,7 +38,7 @@ public class DependenciaBBean {
    
    
     
-    private LazyDataModel<Dependencia> lista;
+    private List<Dependencia> lista;
 
     public Dependencia getDependencia() {
         return dependencia;
@@ -110,7 +107,7 @@ public class DependenciaBBean {
     }
     
     public String filtrar() {       
-        lista = new DependenciaLazyList(dependenciaService, dependenciaFiltro);
+        lista = dependenciaService.getLista(dependenciaFiltro);
         return "listarDependencia";
     }
     
@@ -122,7 +119,7 @@ public class DependenciaBBean {
         this.dependenciaFiltro = dependenciaFiltro;
     }
 
-    public LazyDataModel<Dependencia> getLista() {
+    public List<Dependencia> getLista() {
         return lista;
     }
 

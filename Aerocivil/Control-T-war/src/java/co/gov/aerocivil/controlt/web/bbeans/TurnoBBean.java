@@ -13,13 +13,11 @@ import co.gov.aerocivil.controlt.entities.Regional;
 import co.gov.aerocivil.controlt.entities.Turno;
 import co.gov.aerocivil.controlt.enums.RolEnum;
 import co.gov.aerocivil.controlt.services.TurnoService;
-import co.gov.aerocivil.controlt.web.lazylist.TurnoLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -42,7 +40,7 @@ public class TurnoBBean {
     private Funcionario funcionario;
     private Programacion programacion;
     private List<Dependencia> listDependencia;
-    private LazyDataModel<Turno> lista;
+    private List<Turno> lista;
     private List<Aeropuerto> listAeropuerto;
     private Aeropuerto aeropuerto;
     private Regional regional;
@@ -119,7 +117,7 @@ public class TurnoBBean {
        
        
        
-        lista = new TurnoLazyList(turnoService, turnoFiltro);
+        lista = turnoService.getLista(turnoFiltro, 0, 0, null, null);
         return "listarTurnoEspFuncionario";
     }
 
@@ -213,11 +211,11 @@ public class TurnoBBean {
         this.listDependencia = listDependencia;
     }
 
-    public LazyDataModel<Turno> getLista() {
+    public List<Turno> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<Turno> lista) {
+    public void setLista(List<Turno> lista) {
         this.lista = lista;
     }
 

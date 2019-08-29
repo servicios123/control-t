@@ -9,12 +9,11 @@ import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.services.IncapacidadService;
 import co.gov.aerocivil.controlt.to.IncapacidadTO;
 import co.gov.aerocivil.controlt.to.IncapacidadVista;
-import co.gov.aerocivil.controlt.web.lazylist.IncapacidadLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -23,16 +22,13 @@ import org.primefaces.model.LazyDataModel;
 @ManagedBean
 @SessionScoped
 public class IncapacidadBBean {
-    
+
     @EJB
     private IncapacidadService service;
-    
     private Dependencia dependenciaFiltro;
     private IncapacidadTO filtro;
-    
     private int groupBy;
-
-    private LazyDataModel<IncapacidadVista> lista;
+    private List<IncapacidadVista> lista;
     private Long total;
 
     private void precargarFiltros() {
@@ -46,31 +42,31 @@ public class IncapacidadBBean {
         //System.out.println("dep::::::"+filtro.getFuncionario().getDependencia().getDepNombre());
         //System.out.println("dep::::::"+dependenciaFiltro.getDepNombre());
     }
-    private String [] groupArray = new String[]{"regional","aeropuerto","dependencia"};
-    public String listar(){
+    private String[] groupArray = new String[]{"regional", "aeropuerto", "dependencia"};
+
+    public String listar() {
         lista = null;
         total = null;
         precargarFiltros();
         return "listarIncapacidades";
     }
-    
-    
+
     public String filtrar() {
-        
+
         FuncionarioBBean funcBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);
         filtro.setFuncionario(funcBBean.getFuncionarioFiltro());
         //System.out.println("dep::::::"+filtro.getFuncionario().getDependencia().getDepNombre());
         //System.out.println("dep::::::"+dependenciaFiltro.getDepNombre());
-        lista = new IncapacidadLazyList(service, filtro, groupArray[groupBy]);
-        try{
+        lista = service.getLista(filtro, null, null,
+                null, null, groupArray[groupBy]);
+        try {
             this.total = service.getTotal(filtro, groupArray[groupBy]);
-        }
-        catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return "listarIncapacidades";
     }
-    
+
     public IncapacidadTO getIncapacidadFiltro() {
         return filtro;
     }
@@ -79,11 +75,11 @@ public class IncapacidadBBean {
         this.filtro = auditoriaFiltro;
     }
 
-    public LazyDataModel<IncapacidadVista> getLista() {
+    public List<IncapacidadVista> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<IncapacidadVista> lista) {
+    public void setLista(List<IncapacidadVista> lista) {
         this.lista = lista;
     }
 
@@ -93,7 +89,7 @@ public class IncapacidadBBean {
 
     public void setDependenciaFiltro(Dependencia dependenciaFiltro) {
         this.dependenciaFiltro = dependenciaFiltro;
-    }    
+    }
 
     public int getGroupBy() {
         return groupBy;
@@ -106,5 +102,4 @@ public class IncapacidadBBean {
     public Long getTotal() {
         return total;
     }
-
 }

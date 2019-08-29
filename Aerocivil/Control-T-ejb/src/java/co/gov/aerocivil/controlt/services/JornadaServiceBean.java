@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
@@ -47,6 +46,19 @@ public class JornadaServiceBean implements JornadaService {
         if(first!=null && pageSize!=null){
             query.setFirstResult(first).setMaxResults(pageSize);
         }
+        try{
+            return (List<Jornada>) query.getResultList();    
+        }
+        catch (NoResultException nre) {
+            nre.printStackTrace();
+            return null;
+        }        
+    }
+    
+    @Override
+    public List<Jornada> getListaPag(Jornada jornada) {
+
+        Query query = createQueryFilter(jornada);
         try{
             return (List<Jornada>) query.getResultList();    
         }
@@ -111,6 +123,62 @@ public class JornadaServiceBean implements JornadaService {
         if(sortField!=null && sortOrder!=null){
             strQryFinal.append(" order by f.").append(sortField).append(" ").append(sortOrder);
         }
+        query = em.createQuery(strQryFinal.toString());
+        QueryUtil.setParameters(query, params);
+
+        return query;
+    }
+    
+    private Query createQueryFilter(Jornada jornada){
+
+        Map<String,Object> params = new HashMap<String, Object>();
+
+        List<String> condiciones = new ArrayList<String>();
+        StringBuilder strQry = new StringBuilder();
+        if (jornada.getJoAlias() != null && !"".equals(jornada.getJoAlias())) {
+            condiciones.add("upper(f.joAlias) like :nombre ");
+            params.put("nombre", "%" + jornada.getJoAlias().toUpperCase() + "%");
+
+        }
+        if (jornada.getJoEstado() != null && !"".equals(jornada.getJoEstado())) {
+            condiciones.add("f.joEstado = :estado ");
+            params.put("estado", jornada.getJoEstado());
+
+        }
+        if (jornada.getDependencia().getDepcategoria()!= null) {
+            condiciones.add("f.dependencia.depcategoria.dcId = :depcateg ");
+           params.put("depcateg",  jornada.getDependencia().getDepcategoria().getDcId() );
+        }
+        if (jornada.getDependencia().getDepId() != null) {
+            condiciones.add("f.dependencia.depId = :dep ");
+           params.put("dep",  jornada.getDependencia().getDepId() );
+        }
+        else{
+            if (jornada.getDependencia().getAeropuerto() != null &&
+                    jornada.getDependencia().getAeropuerto().getAeId()!=null) {
+                condiciones.add("f.dependencia.aeropuerto.aeId = :aero ");
+               params.put("aero",  jornada.getDependencia().getAeropuerto().getAeId() );
+            }
+
+            else if (jornada.getDependencia().getAeropuerto() != null
+                    && jornada.getDependencia().getAeropuerto().getRegional()!=null
+                    && jornada.getDependencia().getAeropuerto().getRegional().getRegId()!=null) {
+                condiciones.add("f.dependencia.aeropuerto.regional.regId = :regId ");
+               params.put("regId",  jornada.getDependencia().getAeropuerto().getRegional().getRegId() );
+            }
+        }
+
+        if(condiciones.size()>0){
+            strQry.append("where ");
+            strQry.append(QueryUtil.joinWithAnd(condiciones));
+        }
+
+        Query query = em.createQuery("Select count(f) from Jornada f "+strQry.toString());
+        QueryUtil.setParameters(query, params);
+        count = (Long)query.getSingleResult();
+        
+        StringBuilder strQryFinal = new StringBuilder("Select f from Jornada f ").
+                append(strQry.toString());
         query = em.createQuery(strQryFinal.toString());
         QueryUtil.setParameters(query, params);
 

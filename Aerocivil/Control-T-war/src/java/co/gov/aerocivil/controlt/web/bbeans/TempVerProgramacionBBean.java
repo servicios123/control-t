@@ -115,7 +115,7 @@ public class TempVerProgramacionBBean {
             //numDiasProg[i]= (long)i; 
 
         } 
-        columns.add(new ColumnModel("Funcionario.", "Func.")); 
+        columns.add(new ColumnModel("Funcionario.", "Func")); 
         columns.add(new ColumnModel("THRX", "THRX"));
         tempVerProgramacionService.consultarTurnos(programacion); 
         lista = tempVerProgramacionService.getLista(programacion); 

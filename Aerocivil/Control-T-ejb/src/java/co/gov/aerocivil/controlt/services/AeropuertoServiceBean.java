@@ -8,7 +8,6 @@ import co.gov.aerocivil.controlt.entities.Aeropuerto;
 import co.gov.aerocivil.controlt.entities.Ciudad;
 import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.entities.Regional;
-import co.gov.aerocivil.controlt.enums.QueryType;
 import co.gov.aerocivil.controlt.util.QueryUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,6 +100,65 @@ public class AeropuertoServiceBean implements AeropuertoService {
         if(sortField!=null && sortOrder!=null){
             strQryFinal.append("order by a."+sortField+" "+sortOrder);
         }
+        query = em.createQuery(strQryFinal.toString());
+        QueryUtil.setParameters(query, params);
+
+        return query;
+        
+    }
+    
+    @Override
+    public List<Aeropuerto> getLista(Aeropuerto aeropuerto) {
+
+        Query query = createQueryFilter(aeropuerto);
+        try{
+            return (List<Aeropuerto>) query.getResultList();    
+        }
+        catch (NoResultException nre) {
+            nre.printStackTrace();
+            return null;
+        }        
+    }
+    
+    private Query createQueryFilter(Aeropuerto aeropuerto){
+        List<String> condiciones = new ArrayList<String>();
+        
+        Map<String,Object> params = new HashMap<String, Object>();
+        if (aeropuerto.getAeNombre() != null) {
+            condiciones.add("upper(a.aeNombre) like :nombre ");
+           params.put("nombre", "%" + aeropuerto.getAeNombre().toUpperCase() + "%"); 
+        }
+
+
+        if (aeropuerto.getCiudad()!=null &&
+                aeropuerto.getCiudad().getCiuId() != null) {
+            condiciones.add("a.ciudad.ciuId = :ciudad ");
+            params.put("ciudad", aeropuerto.getCiudad().getCiuId());
+        }
+        if (aeropuerto.getRegional()!=null&&
+                aeropuerto.getRegional().getRegId() != null) {
+            condiciones.add("a.regional.regId = :reg ");
+            params.put("reg", aeropuerto.getRegional().getRegId());
+        }
+
+        StringBuilder strQry = new StringBuilder();
+        
+        if(condiciones.size()>0){
+            strQry.append("where ");
+        }
+        for (Iterator<String> it = condiciones.iterator(); it.hasNext();) {
+            strQry.append(it.next());
+            if(it.hasNext()){
+                strQry.append(" and ");
+            }
+        }
+
+        Query query = em.createQuery("Select count(a) from Aeropuerto a "+strQry.toString());
+        QueryUtil.setParameters(query, params);
+        count = (Long)query.getSingleResult();
+        
+        StringBuilder strQryFinal = new StringBuilder("Select a from Aeropuerto a ").
+                append(strQry.toString());
         query = em.createQuery(strQryFinal.toString());
         QueryUtil.setParameters(query, params);
 

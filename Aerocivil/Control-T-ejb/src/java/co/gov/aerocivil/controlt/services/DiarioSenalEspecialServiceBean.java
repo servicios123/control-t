@@ -389,6 +389,71 @@ public class DiarioSenalEspecialServiceBean implements DiarioSenalEspecialServic
     }
 
     @Override
+    public List<DiarioSenalEspecial> getLista(DiarioSenalEspecial diarioSenalEspecial) {
+        try {
+            Query query = createQueryFilter(diarioSenalEspecial);
+            return (List<DiarioSenalEspecial>) query.getResultList();
+        } catch (NoResultException nre) {
+            nre.printStackTrace();
+            return null;
+        }
+    }
+
+    private Query createQueryFilter(DiarioSenalEspecial diarioSenalEspecial) {
+        List<String> condiciones = new ArrayList<String>();
+        StringBuilder strQry = new StringBuilder();
+        Map<String, Object> params = new HashMap<String, Object>();
+
+        if (diarioSenalEspecial.getDseEstado() != null) {
+            condiciones.add("d.dseEstado = :dseEstado");
+            params.put("dseEstado", diarioSenalEspecial.getDseEstado());
+        }
+        if (diarioSenalEspecial.getDseFecha() != null) {
+            if (diarioSenalEspecial.getDseFechaFinal() != null) {
+                condiciones.add("d.dseFecha between :dseFecha and :dseFechaFinal");
+                params.put("dseFecha", diarioSenalEspecial.getDseFecha());
+                params.put("dseFechaFinal", diarioSenalEspecial.getDseFechaFinal());
+            } else {
+                condiciones.add("d.dseFecha = :dseFecha");
+                params.put("dseFecha", diarioSenalEspecial.getDseFecha());
+            }
+
+
+        }
+        if (diarioSenalEspecial.getDseDependencia() != null) {
+            condiciones.add("d.dseDependencia.depId = :dseDependencia");
+            params.put("dseDependencia", diarioSenalEspecial.getDseDependencia().getDepId());
+        }
+        if (diarioSenalEspecial.getDseJornadaOp() != null) {
+            condiciones.add("d.dseJornadaOp.joId = :dseJornadaOp");
+            params.put("dseJornadaOp", diarioSenalEspecial.getDseJornadaOp().getJoId());
+        }
+
+        if (condiciones.size() > 0) {
+            strQry.append("where ");
+        }
+        for (Iterator<String> it = condiciones.iterator(); it.hasNext();) {
+            strQry.append(it.next());
+            if (it.hasNext()) {
+                strQry.append(" and ");
+            }
+        }
+
+        Query query = em.createQuery("Select count(d) from DiarioSenalEspecial d  " + strQry.toString());
+        QueryUtil.setParameters(query, params);
+        count = (Long) query.getSingleResult();
+
+        StringBuilder strQryFinal = new StringBuilder("Select d from DiarioSenalEspecial d ").append(strQry.toString());
+        strQryFinal.append(" order by d.dseFecha desc");
+
+        query = em.createQuery(strQryFinal.toString());
+        //System.out.println("DiarioSenalEspecialService\t" + strQryFinal.toString());
+        QueryUtil.setParameters(query, params);
+        return query;
+
+    }
+
+    @Override
     public Long getCount() {
         return count;
     }

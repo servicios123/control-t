@@ -13,8 +13,6 @@ import co.gov.aerocivil.controlt.services.PosicionInactivaService;
 import co.gov.aerocivil.controlt.services.ProgramacionTurnosSession;
 import co.gov.aerocivil.controlt.web.util.DateUtil;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,15 +21,13 @@ import java.util.Map;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import javax.faces.event.ActionEvent;
-import org.primefaces.event.DateSelectEvent;
-import org.primefaces.event.ScheduleEntrySelectEvent;
+import org.primefaces.component.schedule.Schedule;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
-import org.primefaces.model.LazyScheduleModel;
 import org.primefaces.model.DefaultScheduleModel;
+import org.primefaces.model.LazyScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
-import org.primefaces.component.schedule.Schedule;
 
 /**
  *
@@ -208,12 +204,12 @@ Integer[] arrayInactivas = new Integer[cantidadPos];
         this.posJornadas = posJornadas;
     }
     
-    public void onEventSelect(ScheduleEntrySelectEvent selectEvent) {
+    public void onEventSelect(SelectEvent selectEvent) {
         Calendar hoy = DateUtil.setCeroHoras(Calendar.getInstance());
         hoy.set(Calendar.HOUR_OF_DAY, 12);
         
         Calendar evDate = Calendar.getInstance();
-        evDate.setTime(selectEvent.getScheduleEvent().getStartDate());
+        evDate.setTime(((ScheduleEvent) selectEvent.getObject()).getStartDate());
         evDate = DateUtil.setCeroHoras(evDate);
         evDate.set(Calendar.HOUR_OF_DAY, 12);
         
@@ -228,15 +224,15 @@ Integer[] arrayInactivas = new Integer[cantidadPos];
         titlePopUp=DateUtil.formatDate(evDate.getTime());
         //popupVisible = true;
         arrayInactivas = mapa.get(titlePopUp);
-        event = selectEvent.getScheduleEvent();
+        event = ((ScheduleEvent) selectEvent.getObject());
     }
     
 
-    public void onDateSelect(DateSelectEvent selectEvent) {
+    public void onDateSelect(SelectEvent selectEvent) {
         Calendar hoy = DateUtil.setCeroHoras(Calendar.getInstance());
         
         Calendar evDate = Calendar.getInstance();
-        evDate.setTime(selectEvent.getDate());
+        evDate.setTime((Date)selectEvent.getObject());
         evDate = DateUtil.setCeroHoras(evDate);
 /*
         if (evDate.before(hoy)
@@ -266,7 +262,7 @@ Integer[] arrayInactivas = new Integer[cantidadPos];
         }
         if(!assigned){
             //popupVisible = true;
-            event = new DefaultScheduleEvent("Festivo", selectEvent.getDate(), selectEvent.getDate());
+            event = new DefaultScheduleEvent("Festivo", evDate.getTime(), evDate.getTime());
             arrayInactivas = new Integer[this.cantidadPos];
         }
     }
@@ -352,7 +348,7 @@ Integer[] arrayInactivas = new Integer[cantidadPos];
             JsfUtil.getRequestContext().execute("eventDialog.show()");
         }
         else{
-            JsfUtil.getRequestContext().execute("eventDialog.hide()");
+            JsfUtil.getRequestContext().execute("eventDialog.show()");
         }
     }
 

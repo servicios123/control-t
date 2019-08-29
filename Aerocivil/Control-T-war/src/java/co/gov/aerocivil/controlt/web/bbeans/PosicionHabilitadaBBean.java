@@ -9,7 +9,6 @@ import co.gov.aerocivil.controlt.entities.DepCategoria;
 import co.gov.aerocivil.controlt.entities.Dependencia;
 import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.entities.Jornada;
-import co.gov.aerocivil.controlt.entities.JornadaNoLaborable;
 import co.gov.aerocivil.controlt.entities.Posicion;
 import co.gov.aerocivil.controlt.entities.PosicionHabilitada;
 import co.gov.aerocivil.controlt.entities.PosicionNacional;
@@ -21,8 +20,6 @@ import co.gov.aerocivil.controlt.services.JornadaService;
 import co.gov.aerocivil.controlt.services.ListasServiceBean;
 import co.gov.aerocivil.controlt.services.PosicionHabilitadaService;
 import co.gov.aerocivil.controlt.services.PosicionService;
-import co.gov.aerocivil.controlt.services.PosicionServiceBean;
-import co.gov.aerocivil.controlt.web.lazylist.PosicionHabilitadaLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Calendar;
@@ -32,7 +29,6 @@ import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -65,7 +61,7 @@ public class PosicionHabilitadaBBean {
     private Posicion[] listPosicionSelected;
     private Long[] listadoPosiciones;
     private ListasServiceBean listar;
-    private LazyDataModel<PosicionHabilitada> lista;
+    private List<PosicionHabilitada> lista;
     private Long[] jornadas;
     private List<Jornada> listJornada;
 
@@ -204,12 +200,12 @@ public class PosicionHabilitadaBBean {
 
     public String filtrar() {
 
-        lista = new PosicionHabilitadaLazyList(posicionHabilitadaService, posicionHabilitadaFiltro);
+        lista = posicionHabilitadaService.getLista(posicionHabilitadaFiltro);
         return "listarPosicionHabilitada";
     }
 
     public String filtrarVencimientos() {
-        lista = new PosicionHabilitadaLazyList(posicionHabilitadaService, posicionHabilitadaFiltro);
+        lista = posicionHabilitadaService.getLista(posicionHabilitadaFiltro);
         return "listarVencimientoPosicionHabilitada";
     }
 
@@ -272,7 +268,6 @@ public class PosicionHabilitadaBBean {
                 i++;
             }
         }
-
         return "asignarPosicion";
 
     }
@@ -382,11 +377,11 @@ public class PosicionHabilitadaBBean {
         this.posicionHabilitadaFiltro = posicionHabilitadaFiltro;
     }
 
-    public LazyDataModel<PosicionHabilitada> getLista() {
+    public List<PosicionHabilitada> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<PosicionHabilitada> lista) {
+    public void setLista(List<PosicionHabilitada> lista) {
         this.lista = lista;
     }
 

@@ -18,7 +18,7 @@ import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.event.DateSelectEvent;
+import org.primefaces.event.SelectEvent;
 
 /**
  *
@@ -27,64 +27,71 @@ import org.primefaces.event.DateSelectEvent;
 @ManagedBean
 @SessionScoped
 public class EvaluacionCompetenciasBBean {
-    
+
     @EJB
     private EvaluacionCompetenciaService evaluacionService;
-    private EvaluacionCompetencia evaluacion=new EvaluacionCompetencia();
+    private EvaluacionCompetencia evaluacion = new EvaluacionCompetencia();
     private Funcionario funcionario;
-    
+    private Funcionario funcionarioFiltro;
     @EJB
     private ParametroDependenciaService dependenciaService;
     private List<ParametrosDependencia> parametros;
-    @ManagedProperty(value = "#{menuBBean.selectedOption.menLabel}")
     private String idMenu;
 
     @PostConstruct
     public void cargar() {
+        idMenu = "Evaluación Competencias";
+        funcionarioFiltro = new Funcionario();
         listarCursos();
     }
 
-    
-    
-    public String listarFuncionarios(){
-        FuncionarioBBean funBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);        
-        String ret = funBBean.listar();
-        funBBean.setColumns(new boolean[]{false,false,true});
+    public String listarFuncionarios() {
+        FuncionarioBBean funBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);
+        String ret = funBBean.listarVencimiento(new Funcionario());
+        funBBean.setColumns(new boolean[]{false, false, true});
         return "listarEvaluacionFuncionario";
     }
-    public void actualiza(DateSelectEvent evento)
-    {
-       Calendar c = Calendar.getInstance();
-       c.setTime(evento.getDate());
-       c.add(Calendar.YEAR, 1);        
-       Date date= evento.getDate();  
-       evaluacion.setEvFechaVence(c.getTime());
+
+    public String listarFuncionariosFiltro() {
+        FuncionarioBBean funBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);
+        String ret = funBBean.listarVencimiento(funcionarioFiltro);
+        funBBean.setColumns(new boolean[]{false, false, true});
+        return "listarEvaluacionFuncionario";
     }
-    public String crear(){
+
+    public void actualiza(SelectEvent evento) {
+        Calendar c = Calendar.getInstance();
+        c.setTime((Date) evento.getObject());
+        c.add(Calendar.YEAR, 1);
+        Date date = (Date) evento.getObject();
+        evaluacion.setEvFechaVence(c.getTime());
+    }
+
+    public String crear() {
         listarCursos();
         evaluacion = new EvaluacionCompetencia();
-        evaluacion.setFuncionario(funcionario);        
+        evaluacion.setFuncionario(funcionario);
         return "editEvaluacionCompetencias";
     }
-    
-    public String guardar(){
-        evaluacion = evaluacionService.guardar(evaluacion, 
+
+    public String guardar() {
+        evaluacion = evaluacionService.guardar(evaluacion,
                 JsfUtil.getFuncionarioSesion());
-        JsfUtil.addSuccessMessage("genericSingleSaveSuccess"); 
-        FuncionarioBBean funBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);        
-        return funBBean.filtrar();        
+        JsfUtil.addSuccessMessage("genericSingleSaveSuccess");
+        FuncionarioBBean funBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);
+        return funBBean.filtrar();
     }
-    
-    public void guardarEvaluacion(){
-        evaluacion = evaluacionService.guardar(evaluacion, 
+
+    public void guardarEvaluacion() {
+        evaluacion = evaluacionService.guardar(evaluacion,
                 JsfUtil.getFuncionarioSesion());
-        JsfUtil.addSuccessMessage("genericSingleSaveSuccess");      
+        JsfUtil.addSuccessMessage("genericSingleSaveSuccess");
     }
-    
-    public void listarCursos(){
+
+    public void listarCursos() {
         parametros = dependenciaService.listarTiposParametrosDependencia(JsfUtil.getFuncionarioSesion().getDependencia().getDepcategoria(), idMenu);
     }
-    
+
     public EvaluacionCompetencia getEvaluacion() {
         return evaluacion;
     }
@@ -116,7 +123,12 @@ public class EvaluacionCompetenciasBBean {
     public void setIdMenu(String idMenu) {
         this.idMenu = idMenu;
     }
-    
-    
 
+    public Funcionario getFuncionarioFiltro() {
+        return funcionarioFiltro;
+    }
+
+    public void setFuncionarioFiltro(Funcionario funcionarioFiltro) {
+        this.funcionarioFiltro = funcionarioFiltro;
+    }
 }

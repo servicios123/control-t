@@ -19,6 +19,7 @@ public interface AeropuertoService{
     
     public List<Aeropuerto> getLista(Aeropuerto aeropuerto, int first, int pageSize, 
             String sortField, String sortOrder);
+    public List<Aeropuerto> getLista(Aeropuerto aeropuerto);
     
     public Long getCount();
     

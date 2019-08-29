@@ -37,7 +37,6 @@ public class SolicitudServiceBean implements SolicitudService {
     @PersistenceContext(unitName = "ControlT-ejbPU")
     private EntityManager em;
     private Long count;
-
     @EJB
     private AuditoriaService auditoria;
 
@@ -46,7 +45,9 @@ public class SolicitudServiceBean implements SolicitudService {
             String sortField, String sortOrder) {
 
         Query query = createQueryFilter(solicitud, sortField, sortOrder);
-        query.setFirstResult(first).setMaxResults(pageSize);
+        if (first > 0) {
+            query.setFirstResult(first).setMaxResults(pageSize);
+        }
         try {
             return (List<Solicitud>) query.getResultList();
         } catch (NoResultException nre) {
@@ -70,38 +71,38 @@ public class SolicitudServiceBean implements SolicitudService {
             condiciones.add("d.solFechaRegistro = :fr ");
             params.put("fr", solicitud.getSolFechaRegistro());
         }
-        if (solicitud.getFuncionario_sol()!=null && solicitud.getFuncionario_sol().getFunId() != null) {
+        if (solicitud.getFuncionario_sol() != null && solicitud.getFuncionario_sol().getFunId() != null) {
             condiciones.add("d.funcionario_sol.funId = :fs ");
             params.put("fs", solicitud.getFuncionario_sol().getFunId());
         }
-        if (solicitud.getFuncionario_reem()!=null && solicitud.getFuncionario_reem().getFunId() != null) {
+        if (solicitud.getFuncionario_reem() != null && solicitud.getFuncionario_reem().getFunId() != null) {
             condiciones.add("d.funcionario_reem.funId = :free ");
             params.put("free", solicitud.getFuncionario_reem().getFunId());
         }
-        if (solicitud.getSolTipo()!=null ) {
+        if (solicitud.getSolTipo() != null) {
             condiciones.add("d.solTipo = :tip ");
             params.put("tip", solicitud.getSolTipo());
         }
-        if (solicitud.getTurno()!=null && solicitud.getTurno().getPjId() != null) {
+        if (solicitud.getTurno() != null && solicitud.getTurno().getPjId() != null) {
             condiciones.add("d.turno.pjId = :tur ");
             params.put("tur", solicitud.getTurno().getPjId());
         }
 
-        if (solicitud.getDependencia()!=null && solicitud.getDependencia().getDepId() != null) {
+        if (solicitud.getDependencia() != null && solicitud.getDependencia().getDepId() != null) {
             condiciones.add("d.dependencia.depId = :dep ");
             params.put("dep", solicitud.getDependencia().getDepId());
         }
 
-        if (solicitud.getDependencia()!=null && solicitud.getDependencia().getDepcategoria().getDcId() != null && !"".equals(solicitud.getDependencia().getDepcategoria().getDcId())) {
+        if (solicitud.getDependencia() != null && solicitud.getDependencia().getDepcategoria().getDcId() != null && !"".equals(solicitud.getDependencia().getDepcategoria().getDcId())) {
             condiciones.add("d.dependencia.depcategoria.dcId = :dc ");
             params.put("dc", solicitud.getDependencia().getDepcategoria().getDcId());
         }
-        if (solicitud.getDependencia()!=null && solicitud.getDependencia().getAeropuerto().getAeId() != null) {
+        if (solicitud.getDependencia() != null && solicitud.getDependencia().getAeropuerto().getAeId() != null) {
             condiciones.add("d.dependencia.aeropuerto.aeId = :aero ");
             params.put("aero", solicitud.getDependencia().getAeropuerto().getAeId());
         }
 
-        if (solicitud.getDependencia()!=null && solicitud.getDependencia().getAeropuerto().getRegional().getRegId() != null) {
+        if (solicitud.getDependencia() != null && solicitud.getDependencia().getAeropuerto().getRegional().getRegId() != null) {
             condiciones.add("d.dependencia.aeropuerto.regional.regId = :regional ");
             params.put("regional", solicitud.getDependencia().getAeropuerto().getRegional().getRegId());
         }
@@ -154,11 +155,11 @@ public class SolicitudServiceBean implements SolicitudService {
         params.put("fini", Finicial);
         params.put("ffin", Ffinal);
 
-        
-      
-        
-     /*   condiciones.add("TO_CHAR(df_fecha,'M')=1");
-        params.put("1", solicitud.getSolFechaCambio().getMonth());*/
+
+
+
+        /*   condiciones.add("TO_CHAR(df_fecha,'M')=1");
+         params.put("1", solicitud.getSolFechaCambio().getMonth());*/
 
         condiciones.add("d.solEstado = :estado");
         params.put("estado", "Aprobado");
@@ -196,48 +197,41 @@ public class SolicitudServiceBean implements SolicitudService {
         solicitud.setTurno(em.find(PosicionJornada.class, solicitud.getTurno().getPjId()));
 //        solicitud.setTurno_pago(em.find(PosicionJornada.class, solicitud.getTurno_pago().getPjId()));
         solicitud.setSolFechaRegistro(new Date());
-        return (Solicitud) auditoria.auditar(solicitud,f);
+        return (Solicitud) auditoria.auditar(solicitud, f);
     }
 
     @Override
     public Solicitud actualizar(Solicitud solicitud, Funcionario f) {
 
-        return (Solicitud) auditoria.auditar(solicitud,f);
+        return (Solicitud) auditoria.auditar(solicitud, f);
 
     }
 
     @Override
     public List<PosicionJornada> obtenerPJenProgramacion(Date fecha, Funcionario fun) {
-        Query qturno= em.createQuery("Select t From Turno t Where t.turFecha = :fecha and t.funcionario.funId = :funId and t.turTipo in (1,2)");
+        Query qturno = em.createQuery("Select t From Turno t Where t.turFecha = :fecha and t.funcionario.funId = :funId and t.turTipo in (1,2)");
         qturno.setParameter("fecha", fecha, TemporalType.DATE);
-        qturno.setParameter("funId",fun.getFunId());
-        try 
-        {
-            List<Turno> turnos =  (List<Turno>) qturno.getResultList();   
-            if(!turnos.isEmpty())
-            {
-                    ArrayList<Long> ts = new ArrayList<Long>();
-                    for (Turno turno : turnos)
-                    {
-                        ts.add(turno.getTurPosicionJornada());
-                    }
-                    Query query = em.createQuery("Select p From PosicionJornada p Where p.pjId in :pjs ");
-                    query.setParameter("pjs", ts);
-                    return (List<PosicionJornada>) query.getResultList();
-            }
-            else
-            {
+        qturno.setParameter("funId", fun.getFunId());
+        try {
+            List<Turno> turnos = (List<Turno>) qturno.getResultList();
+            if (!turnos.isEmpty()) {
+                ArrayList<Long> ts = new ArrayList<Long>();
+                for (Turno turno : turnos) {
+                    ts.add(turno.getTurPosicionJornada());
+                }
+                Query query = em.createQuery("Select p From PosicionJornada p Where p.pjId in :pjs ");
+                query.setParameter("pjs", ts);
+                return (List<PosicionJornada>) query.getResultList();
+            } else {
                 return null;
             }
-           
-            
-        } 
-        catch(NoResultException nre)
-        {
-            return null;            
-        }        
-        
-      
+
+
+        } catch (NoResultException nre) {
+            return null;
+        }
+
+
     }
 
     @Override

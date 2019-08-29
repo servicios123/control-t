@@ -21,7 +21,6 @@ import co.gov.aerocivil.controlt.services.ProgramacionTurnosSession;
 import co.gov.aerocivil.controlt.services.TurnoEspFuncionarioService;
 import co.gov.aerocivil.controlt.services.TurnoService;
 import co.gov.aerocivil.controlt.services.VistaProgramacionService;
-import co.gov.aerocivil.controlt.web.lazylist.TurnoEspFuncionarioLazyList;
 import co.gov.aerocivil.controlt.web.util.DateUtil;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.util.ArrayList;
@@ -34,13 +33,12 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.component.schedule.Schedule;
-import org.primefaces.event.DateSelectEvent;
-import org.primefaces.event.ScheduleEntrySelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
-import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
+import weblogic.wtc.jatmi.evt_mib;
 
 /**
  *
@@ -69,7 +67,7 @@ public class TurnoEspFuncionarioBBean {
     private TurnoEspecial turnoEspecial;
     private List<TurnoEspecial> listTurnoEspecial;
     private List<Dependencia> listDependencia;
-    private LazyDataModel<TurnoEspFuncionario> lista;
+    private List<TurnoEspFuncionario> lista;
     private List<Aeropuerto> listAeropuerto;
     private Aeropuerto aeropuerto;
     private Regional regional;
@@ -207,7 +205,7 @@ public class TurnoEspFuncionarioBBean {
         /*cargarAeropuerto();
          cargarDependencia();*/
         ver = false;
-        lista = new TurnoEspFuncionarioLazyList(turnoEspFuncionarioService, turnoEspFuncionarioFiltro);
+        lista = turnoEspFuncionarioService.getLista(turnoEspFuncionarioFiltro, 0, 0, null, null);
         return "listarTurnoEspFuncionario";
     }
 
@@ -601,12 +599,13 @@ public class TurnoEspFuncionarioBBean {
         }
     }
 
-    public void onDateSelect(DateSelectEvent selectEvent) {
+    public void onDateSelect(SelectEvent selectEvent) {
         Calendar hoy = DateUtil.setCeroHoras(Calendar.getInstance());
 
         Calendar evDate = Calendar.getInstance();
-        evDate.setTime(selectEvent.getDate());
+        evDate.setTime((Date)selectEvent.getObject());
         evDate = DateUtil.setCeroHoras(evDate);
+        evDate.add(Calendar.DATE, 1);
 
         if (!turnoEspFuncionarioService.validarDisponibilidadTurno(evDate.getTime(), funcionario).equals("OK")) {
             JsfUtil.addWarningMessage("fechaOcupada");
@@ -619,6 +618,7 @@ public class TurnoEspFuncionarioBBean {
             Calendar c = Calendar.getInstance();
             c.setTime(ev.getStartDate());
             c = DateUtil.setCeroHoras(c);
+            c.add(Calendar.DATE, 1);
 
             if (evDate.getTime().equals(c.getTime())) {
                 event = ev;
@@ -629,16 +629,16 @@ public class TurnoEspFuncionarioBBean {
         }
         if (!assigned) {
             //popupVisible = true;
-            asignarTrop(selectEvent.getDate());
+            asignarTrop(evDate.getTime());
         }
     }
 
-    public void onEventSelect(ScheduleEntrySelectEvent selectEvent) {
+    public void onEventSelect(SelectEvent selectEvent) {
         Calendar hoy = DateUtil.setCeroHoras(Calendar.getInstance());
         hoy.set(Calendar.HOUR_OF_DAY, 12);
 
         Calendar evDate = Calendar.getInstance();
-        evDate.setTime(selectEvent.getScheduleEvent().getStartDate());
+        evDate.setTime(((ScheduleEvent)selectEvent.getObject()).getStartDate());
         evDate = DateUtil.setCeroHoras(evDate);
         evDate.set(Calendar.HOUR_OF_DAY, 12);
 
@@ -649,7 +649,7 @@ public class TurnoEspFuncionarioBBean {
                 || serviceProg.isFechaProgramada(evDate.getTime(), dependencia.getDepId(), EstadoProgramacion.PROGRAMADA)) {
             return;
         }
-        event = selectEvent.getScheduleEvent();
+        event = (ScheduleEvent) selectEvent.getObject();
     }
 
     public String nextPrevious() {
@@ -854,11 +854,11 @@ public class TurnoEspFuncionarioBBean {
         this.listAeropuerto = listAeropuerto;
     }
 
-    public LazyDataModel<TurnoEspFuncionario> getLista() {
+    public List<TurnoEspFuncionario> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<TurnoEspFuncionario> lista) {
+    public void setLista(List<TurnoEspFuncionario> lista) {
         this.lista = lista;
     }
 

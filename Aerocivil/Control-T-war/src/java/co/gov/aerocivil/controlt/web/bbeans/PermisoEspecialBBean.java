@@ -18,7 +18,6 @@ import co.gov.aerocivil.controlt.services.PermisoService;
 import co.gov.aerocivil.controlt.services.TurnoEspFuncionarioService;
 import co.gov.aerocivil.controlt.services.TurnoEspecialService;
 import co.gov.aerocivil.controlt.web.enums.EstadoPeticionEnum;
-import co.gov.aerocivil.controlt.web.lazylist.PermisoLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -48,7 +46,7 @@ public class PermisoEspecialBBean {
     private TurnoEspFuncionarioService turnoEspFuncionarioService;
     private PermisoEspecial permiso;
     private PermisoEspecial permisoFiltro;
-    private LazyDataModel<PermisoEspecial> lista;
+    private List<PermisoEspecial> lista;
     private Dependencia dependenciaFiltro;
     private List<Aeropuerto> listAeropuerto;
     private List<Dependencia> listDependencia;
@@ -213,15 +211,15 @@ public class PermisoEspecialBBean {
     }
 
     public String filtrar() {
-        lista = new PermisoLazyList(service, permisoFiltro);
+        lista = service.getLista(permisoFiltro, 0, 0, null, null);
         return "listarPermisos";
     }
 
-    public LazyDataModel<PermisoEspecial> getLista() {
+    public List<PermisoEspecial> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<PermisoEspecial> lista) {
+    public void setLista(List<PermisoEspecial> lista) {
         this.lista = lista;
     }
 

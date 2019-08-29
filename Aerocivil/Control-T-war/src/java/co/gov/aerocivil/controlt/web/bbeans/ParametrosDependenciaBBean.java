@@ -5,19 +5,16 @@
 package co.gov.aerocivil.controlt.web.bbeans;
 
 import co.gov.aerocivil.controlt.entities.DepCategoria;
-import co.gov.aerocivil.controlt.entities.Menu;
 import co.gov.aerocivil.controlt.entities.ParametrosDependencia;
 import co.gov.aerocivil.controlt.services.DepCategoriaService;
 import co.gov.aerocivil.controlt.services.ListasService;
 import co.gov.aerocivil.controlt.services.ParametroDependenciaService;
-import co.gov.aerocivil.controlt.web.lazylist.ParametroDependenciaLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -35,7 +32,7 @@ public class ParametrosDependenciaBBean {
     private ListasService listaService;
     private ParametrosDependencia dependencia;
     private ParametrosDependencia dependenciaFiltro;
-    private LazyDataModel<ParametrosDependencia> lista;
+    private List<ParametrosDependencia> lista;
     private List<DepCategoria> listaCategorias;
     private List<ParametrosDependencia> listaParametros;
     private List<String> listaModulos;
@@ -69,11 +66,11 @@ public class ParametrosDependenciaBBean {
         this.dependenciaFiltro = dependenciaFiltro;
     }
 
-    public LazyDataModel<ParametrosDependencia> getLista() {
+    public List<ParametrosDependencia> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<ParametrosDependencia> lista) {
+    public void setLista(List<ParametrosDependencia> lista) {
         this.lista = lista;
     }
 
@@ -150,7 +147,7 @@ public class ParametrosDependenciaBBean {
 
     public String filtrar() {
         dependenciaFiltro.setCategoria(new DepCategoria());
-        lista = new ParametroDependenciaLazyList(this.dependenciaService, dependenciaFiltro);
+        lista = this.dependenciaService.getLista(dependenciaFiltro, 0, 0, null, null);
         return "listarParametrosDependencia";
     }
 }

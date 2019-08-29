@@ -10,7 +10,6 @@ import co.gov.aerocivil.controlt.entities.Jornada;
 import co.gov.aerocivil.controlt.entities.Regional;
 import co.gov.aerocivil.controlt.enums.RolEnum;
 import co.gov.aerocivil.controlt.services.JornadaService;
-import co.gov.aerocivil.controlt.web.lazylist.JornadaLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -37,7 +35,7 @@ public class JornadaBBean {
     private Jornada jornadaFiltro;
     private Jornada jornadaObligatoria;
     private List<Jornada> listaJornadaRestriccion;
-    private LazyDataModel<Jornada> lista;
+    private List<Jornada> lista;
     private List<Aeropuerto> listAeropuerto;
     private List<Dependencia> listDependencia;
     private boolean cons;
@@ -169,7 +167,7 @@ public class JornadaBBean {
             jornada=jornadaService.guardar(jornada, 
                 JsfUtil.getFuncionarioSesion());
             JsfUtil.addSuccessMessage("genericSingleSaveSuccess");
-            return editar();
+            return "ListarJornada";
         }
         catch(Exception ex){
             JsfUtil.addWarningMessage("jornadaDependenciaAsignada");
@@ -257,7 +255,7 @@ public class JornadaBBean {
     }
 
     public String filtrar() {
-        lista = new JornadaLazyList(jornadaService, jornadaFiltro);
+        lista = jornadaService.getListaPag(jornadaFiltro);
         return "listarJornada";
     }
 
@@ -334,11 +332,11 @@ public class JornadaBBean {
         this.listDependencia = listDependencia;
     }
 
-    public LazyDataModel<Jornada> getLista() {
+    public List<Jornada> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<Jornada> lista) {
+    public void setLista(List<Jornada> lista) {
         this.lista = lista;
     }
 

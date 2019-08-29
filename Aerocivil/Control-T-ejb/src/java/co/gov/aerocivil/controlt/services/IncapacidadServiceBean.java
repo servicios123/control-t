@@ -40,7 +40,9 @@ public class IncapacidadServiceBean implements IncapacidadService{
         }*/
         //System.out.println("strQryFinal::: "+sb);
         Query query = em.createNativeQuery(sb.toString());
+        if(first!=null){
         query.setFirstResult(first).setMaxResults(pageSize);
+        }
         //QueryUtil.setParameters(query, params);
         setRowCount(sb.toString());
 

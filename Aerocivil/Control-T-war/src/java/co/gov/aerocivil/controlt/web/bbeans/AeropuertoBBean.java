@@ -8,14 +8,12 @@ import co.gov.aerocivil.controlt.entities.Aeropuerto;
 import co.gov.aerocivil.controlt.entities.Ciudad;
 import co.gov.aerocivil.controlt.entities.Regional;
 import co.gov.aerocivil.controlt.services.AeropuertoService;
-import co.gov.aerocivil.controlt.web.lazylist.AeropuertoLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import co.gov.aerocivil.controlt.web.util.ListadosBBean;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -34,7 +32,7 @@ public class AeropuertoBBean {
     private Aeropuerto aeropuertoFiltro;
 
     
-    private LazyDataModel<Aeropuerto> lazyList;
+    private List<Aeropuerto> lazyList;
 
     public Aeropuerto getAeropuerto() {
         return aeropuerto;
@@ -81,7 +79,7 @@ public class AeropuertoBBean {
     
     public String filtrar() {
        
-        lazyList=new AeropuertoLazyList(aeropuertoService, aeropuertoFiltro);
+        lazyList= aeropuertoService.getLista(aeropuertoFiltro);
         return "listarAeropuerto";
     }
     
@@ -93,7 +91,7 @@ public class AeropuertoBBean {
         this.aeropuertoFiltro = aeropuertoFiltro;
     }
 
-    public LazyDataModel<Aeropuerto> getLazyList() {
+    public List<Aeropuerto> getLazyList() {
         return lazyList;
     }
 

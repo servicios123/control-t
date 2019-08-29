@@ -32,7 +32,6 @@ public class ParametroDependenciaServiceBean implements ParametroDependenciaServ
     private Long count;
     @EJB
     private AuditoriaService auditoria;
-    
     @PersistenceContext(unitName = "ControlT-ejbPU")
     private EntityManager em;
 
@@ -71,75 +70,74 @@ public class ParametroDependenciaServiceBean implements ParametroDependenciaServ
         } catch (Exception e) {
             return false;
         }
-            
+
     }
-    
+
     @Override
     public List<ParametrosDependencia> getLista(ParametrosDependencia dependencia, int first, int pageSize,
             String sortField, String sortOrder) {
 
         Query query = createQueryFilter(dependencia, sortField, sortOrder);
-        query.setFirstResult(first).setMaxResults(pageSize);
-        try{
-            return (List<ParametrosDependencia>) query.getResultList();    
+        if (first > 0) {
+            query.setFirstResult(first).setMaxResults(pageSize);
         }
-        catch (NoResultException nre) {
+        try {
+            return (List<ParametrosDependencia>) query.getResultList();
+        } catch (NoResultException nre) {
             nre.printStackTrace();
             return null;
-        }        
+        }
     }
-    
-    private Query createQueryFilter(ParametrosDependencia parametroDependencia, String sortField, String sortOrder){
-        
-        Map<String,Object> params = new HashMap<String, Object>();
-        
-            List<String> condiciones = new ArrayList<String>();
-            
 
-            if (parametroDependencia.getNombre() != null) {
-                condiciones.add("upper(d.nombre) like :nombre ");
-                params.put("nombre", "%" + parametroDependencia.getNombre().toUpperCase() + "%");
-            }
-            if (parametroDependencia.getModulo() != null) {
-                condiciones.add("upper(d.modulo) like :modulo ");
-                params.put("modulo", "%" + parametroDependencia.getModulo().toUpperCase() + "%");
-            }
-            if (parametroDependencia.getCategoria().getDcId() != null) {
-                condiciones.add("d.categoria.dcId = :categoria ");
-                params.put("categoria", parametroDependencia.getCategoria().getDcId() );
-            }
-            
-            StringBuilder strQry = new StringBuilder();
-            if(condiciones.size()>0){
-                strQry.append("where ");
-            }
-            for (Iterator<String> it = condiciones.iterator(); it.hasNext();) {
-                strQry.append(it.next());
-                if(it.hasNext()){
-                    strQry.append(" and ");
-                }
-            }
+    private Query createQueryFilter(ParametrosDependencia parametroDependencia, String sortField, String sortOrder) {
 
-        Query query = em.createQuery("Select count(d) from ParametrosDependencia d "+strQry.toString());
+        Map<String, Object> params = new HashMap<String, Object>();
+
+        List<String> condiciones = new ArrayList<String>();
+
+
+        if (parametroDependencia.getNombre() != null) {
+            condiciones.add("upper(d.nombre) like :nombre ");
+            params.put("nombre", "%" + parametroDependencia.getNombre().toUpperCase() + "%");
+        }
+        if (parametroDependencia.getModulo() != null) {
+            condiciones.add("upper(d.modulo) like :modulo ");
+            params.put("modulo", "%" + parametroDependencia.getModulo().toUpperCase() + "%");
+        }
+        if (parametroDependencia.getCategoria().getDcId() != null) {
+            condiciones.add("d.categoria.dcId = :categoria ");
+            params.put("categoria", parametroDependencia.getCategoria().getDcId());
+        }
+
+        StringBuilder strQry = new StringBuilder();
+        if (condiciones.size() > 0) {
+            strQry.append("where ");
+        }
+        for (Iterator<String> it = condiciones.iterator(); it.hasNext();) {
+            strQry.append(it.next());
+            if (it.hasNext()) {
+                strQry.append(" and ");
+            }
+        }
+
+        Query query = em.createQuery("Select count(d) from ParametrosDependencia d " + strQry.toString());
         QueryUtil.setParameters(query, params);
-        count = (Long)query.getSingleResult();
-        
+        count = (Long) query.getSingleResult();
+
         StringBuilder strQryFinal = new StringBuilder("Select d from ParametrosDependencia d ").
                 append(strQry.toString());
-        if(sortField!=null && sortOrder!=null){
+        if (sortField != null && sortOrder != null) {
             strQryFinal.append("order by d.").append(sortField).append(" ").append(sortOrder);
         }
         query = em.createQuery(strQryFinal.toString());
         QueryUtil.setParameters(query, params);
 
         return query;
-        
+
     }
-    
-    
+
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
-
     public Long getCount() {
         return count;
     }
@@ -158,20 +156,18 @@ public class ParametroDependenciaServiceBean implements ParametroDependenciaServ
 
     @Override
     public List<Menu> listarModulos() {
-        String sql = "select m1.MEN_ID,m2.MEN_LABEL||' - '||m1.men_label modulo  from menu m1 "+
-                    "join (select * from menu where MEN_METODO is null) m2 on SUBSTR(m1.MEN_POSICION,1,instr(m1.MEN_POSICION,',')-1) = m2.MEN_POSICION "
+        String sql = "select m1.MEN_ID,m2.MEN_LABEL||' - '||m1.men_label modulo  from menu m1 "
+                + "join (select * from menu where MEN_METODO is null) m2 on SUBSTR(m1.MEN_POSICION,1,instr(m1.MEN_POSICION,',')-1) = m2.MEN_POSICION "
                 + "where m1.men_label in ('Evaluación Competencias','Curso Recurrente')";
         List<Menu> modulos = new ArrayList<Menu>();
         Query q = em.createNativeQuery(sql);
         List<Object[]> list = q.getResultList();
-        for(Object[] objects : list){
+        for (Object[] objects : list) {
             Menu modulo = new Menu();
-            modulo.setMenId(((BigDecimal)objects[0]).longValue());
-            modulo.setMenLabel((String)objects[1]);
+            modulo.setMenId(((BigDecimal) objects[0]).longValue());
+            modulo.setMenLabel((String) objects[1]);
             modulos.add(modulo);
         }
         return modulos;
     }
-    
-    
 }

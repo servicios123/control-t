@@ -30,7 +30,6 @@ public class SecuenciaServiceBean implements SecuenciaService {
     @PersistenceContext(unitName = "ControlT-ejbPU")
     private EntityManager em;
     private Long count;
-
     @EJB
     private AuditoriaService auditoria;
 
@@ -38,7 +37,9 @@ public class SecuenciaServiceBean implements SecuenciaService {
             String sortField, String sortOrder) {
 
         Query query = createQueryFilter(secuencia, sortField, sortOrder);
-        query.setFirstResult(first).setMaxResults(pageSize);
+        if (first > 0) {
+            query.setFirstResult(first).setMaxResults(pageSize);
+        }
         try {
             return (List<Secuencia>) query.getResultList();
         } catch (NoResultException nre) {
@@ -47,22 +48,22 @@ public class SecuenciaServiceBean implements SecuenciaService {
         }
     }
 
-    
     @Override
-    public void borrarDetalle(Secuencia secuencia){
-        
+    public void borrarDetalle(Secuencia secuencia) {
+
         StringBuilder strQry = new StringBuilder();
         Query q = em.createNativeQuery(strQry.toString());
-       
-         strQry.append("delete from det_secuencia d where  d.ds_secuencia = ")
-               .append(secuencia.getSecuId());
-             
-    
+
+        strQry.append("delete from det_secuencia d where  d.ds_secuencia = ")
+                .append(secuencia.getSecuId());
+
+
         q = em.createNativeQuery(strQry.toString());
         q.executeUpdate();
-        
-       
+
+
     }
+
     private Query createQueryFilter(Secuencia secuencia, String sortField, String sortOrder) {
 
         Map<String, Object> params = new HashMap<String, Object>();
@@ -119,16 +120,16 @@ public class SecuenciaServiceBean implements SecuenciaService {
         return count;
     }
 
-   @Override
+    @Override
     public Secuencia guardar(Secuencia secuencia, Funcionario f) {
-         List<DetSecuencia> detSecuencias = secuencia.getDetSecuencias();
-         secuencia=(Secuencia) auditoria.auditar(secuencia,f);
-         for(DetSecuencia ds:detSecuencias ){
-         ds.setSecuencia(secuencia);
-         auditoria.auditar(ds,f);
-         }
-         return secuencia;
-         
+        List<DetSecuencia> detSecuencias = secuencia.getDetSecuencias();
+        secuencia = (Secuencia) auditoria.auditar(secuencia, f);
+        for (DetSecuencia ds : detSecuencias) {
+            ds.setSecuencia(secuencia);
+            auditoria.auditar(ds, f);
+        }
+        return secuencia;
+
 
     }
 }

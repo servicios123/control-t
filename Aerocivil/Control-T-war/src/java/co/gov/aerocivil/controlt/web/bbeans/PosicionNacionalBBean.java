@@ -4,21 +4,14 @@
  */
 package co.gov.aerocivil.controlt.web.bbeans;
 
-import co.gov.aerocivil.controlt.entities.Aeropuerto;
 import co.gov.aerocivil.controlt.entities.DepCategoria;
-import co.gov.aerocivil.controlt.entities.Dependencia;
 import co.gov.aerocivil.controlt.entities.PosicionNacional;
 import co.gov.aerocivil.controlt.services.PosicionNacionalService;
-import co.gov.aerocivil.controlt.web.lazylist.PosicionNacionalLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -35,7 +28,7 @@ public class PosicionNacionalBBean {
     private PosicionNacionalService posicionService;
     private PosicionNacional posicion;
     private PosicionNacional posicionFiltro;
-    private LazyDataModel<PosicionNacional> lista;
+    private List<PosicionNacional> lista;
     private List<PosicionNacional> listPosicionNacional;
     private boolean activo;
     private boolean editando;
@@ -44,13 +37,7 @@ public class PosicionNacionalBBean {
         return editando;
     }
 
-    public LazyDataModel<PosicionNacional> getLista() {
-        return lista;
-    }
-
-    public void setLista(LazyDataModel<PosicionNacional> lista) {
-        this.lista = lista;
-    }
+   
 
     public String crear() {
         editando = false;
@@ -112,7 +99,7 @@ public class PosicionNacionalBBean {
 
     public String filtrar() {
 
-        lista = new PosicionNacionalLazyList(posicionService, posicionFiltro);
+        lista = posicionService.getLista(posicionFiltro, null, null, null, null);
         return "listarPosicionNacional";
     }
 
@@ -138,5 +125,13 @@ public class PosicionNacionalBBean {
 
     public void setListPosicionNacional(List<PosicionNacional> listPosicionNacional) {
         this.listPosicionNacional = listPosicionNacional;
+    }
+    
+     public List<PosicionNacional> getLista() {
+        return lista;
+    }
+
+    public void setLista(List<PosicionNacional> lista) {
+        this.lista = lista;
     }
 }

@@ -47,5 +47,12 @@ public interface ControlDiarioPosicionesService {
     public List<DiarioPosicionesIndividualVista> getListaDiarioPosicionesIndividual(Funcionario f, Date fIni, Date fFin);
      
     public List<RepHorasExtras> getReporteHorasExtras(RepHorasExtras filtroReporte);
+
+    
+    public java.util.List<co.gov.aerocivil.controlt.entities.Vistaprogramacion> getListaProgramadoVsEjecutado(co.gov.aerocivil.controlt.entities.Programacion programacion, co.gov.aerocivil.controlt.entities.Funcionario funcionario);
+
+    public java.util.List<co.gov.aerocivil.controlt.entities.Vistaprogramacion> getListaTurnos(co.gov.aerocivil.controlt.entities.DiarioPosicion diarioPosicion);
+
+    public java.util.List<co.gov.aerocivil.controlt.entities.DiarioPosicion> getLista(co.gov.aerocivil.controlt.entities.DiarioPosicion diarioPosicion);
     
 }

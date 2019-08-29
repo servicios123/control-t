@@ -11,14 +11,12 @@ import co.gov.aerocivil.controlt.entities.Notificacion;
 import co.gov.aerocivil.controlt.entities.Regional;
 import co.gov.aerocivil.controlt.enums.RolEnum;
 import co.gov.aerocivil.controlt.services.NotificacionService;
-import co.gov.aerocivil.controlt.web.lazylist.NotificacionLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -35,7 +33,7 @@ public class NotificacionBBean {
     private NotificacionService notificacionService;
     private Notificacion notificacion;
     private Notificacion notificacionFiltro;
-    private LazyDataModel<Notificacion> lista;
+    private List<Notificacion> lista;
     private List<Aeropuerto> listAeropuerto;
     private List<Dependencia> listDependencia;
     private Date fechaInicial;
@@ -102,7 +100,7 @@ public class NotificacionBBean {
 
     public String filtrar() {
 
-        lista = new NotificacionLazyList(notificacionService, notificacionFiltro);
+        lista = notificacionService.getLista(notificacionFiltro, 0, 0, null, null);
         return "listarNotificacion";
     }
 
@@ -163,11 +161,11 @@ public class NotificacionBBean {
         this.notificacionFiltro = notificacionFiltro;
     }
 
-    public LazyDataModel<Notificacion> getLista() {
+    public List<Notificacion> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<Notificacion> lista) {
+    public void setLista(List<Notificacion> lista) {
         this.lista = lista;
     }
 

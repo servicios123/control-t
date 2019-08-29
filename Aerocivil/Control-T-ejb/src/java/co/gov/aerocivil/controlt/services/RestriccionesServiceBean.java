@@ -31,65 +31,56 @@ import javax.persistence.Query;
  */
 @Stateless
 public class RestriccionesServiceBean implements RestriccionesService {
+
     @PersistenceContext(unitName = "ControlT-ejbPU")
     private EntityManager em;
     private Long count;
-
     @EJB
     private AuditoriaService auditoria;
 
     @Override
-    
-    public Long obtenerValor(Long rpId, Long dependenciaID)
-    {
+    public Long obtenerValor(Long rpId, Long dependenciaID) {
         Query query = em.createQuery("SELECT r.rdValor FROM RestriccionDependencia r WHERE r.dependencia.depId = :dependencia and r.restriccionProgramacion.rpId=:rpId");
         query.setParameter("dependencia", dependenciaID);
         query.setParameter("rpId", rpId);
-        try
-        {           
-            Object s= (Object) query.getSingleResult();
-            if(s==null)
-            {
-                return (long) 0;     
-            }
-            else
-            {
+        try {
+            Object s = (Object) query.getSingleResult();
+            if (s == null) {
+                return (long) 0;
+            } else {
                 return (Long) s;
             }
+        } catch (NoResultException nre) {
+            return (long) 0;
         }
-        catch(NoResultException nre)
-        {
-            return (long) 0;            
-        }
-       
+
     }
-    
+
     @Override
-    public List<RestriccionTO> guardarListaRestricciones(List<RestriccionTO> restricciones, Dependencia dep, Funcionario f){
+    public List<RestriccionTO> guardarListaRestricciones(List<RestriccionTO> restricciones, Dependencia dep, Funcionario f) {
         StringBuilder strQry = null;
         Query query = null;
-        for (RestriccionTO r : restricciones){
+        for (RestriccionTO r : restricciones) {
             //System.out.println(r);
-            if (r.getRdId()!=null){ //update
+            if (r.getRdId() != null) { //update
                 /*strQry = new StringBuilder();
-                strQry.append("UPDATE RESTRICCION_DEPENDENCIA SET RD_VALOR= ").
-                        append(r.getRdValor()).append(" WHERE RD_ID= ").append(r.getRdId());
-                //System.out.println("UpdQry: " + strQry.toString());
-                query = em.createNativeQuery(strQry.toString());
-                query.executeUpdate();
-                auditoria.auditar("RESTRICCION_DEPENDENCIA", r.getRdId(), f);*/
-                
+                 strQry.append("UPDATE RESTRICCION_DEPENDENCIA SET RD_VALOR= ").
+                 append(r.getRdValor()).append(" WHERE RD_ID= ").append(r.getRdId());
+                 //System.out.println("UpdQry: " + strQry.toString());
+                 query = em.createNativeQuery(strQry.toString());
+                 query.executeUpdate();
+                 auditoria.auditar("RESTRICCION_DEPENDENCIA", r.getRdId(), f);*/
+
                 RestriccionDependencia rd = em.find(RestriccionDependencia.class, r.getRdId());
                 rd.setRdValor(r.getRdValor());
-                auditoria.auditar(rd,f);
-            }
-            else{//insert
-                if(r.getRdValor()!=null){
+                auditoria.auditar(rd, f);
+            } else {//insert
+                if (r.getRdValor() != null) {
                     RestriccionDependencia rd = new RestriccionDependencia();
                     rd.setDependencia(dep);
                     rd.setRestriccionProgramacion(new RestriccionProgramacion(r.getRpId()));
                     rd.setRdValor(r.getRdValor());
-                    auditoria.auditar(rd,f);
+                    auditoria.auditar(rd, f);
                 }
             }
         }
@@ -105,7 +96,7 @@ public class RestriccionesServiceBean implements RestriccionesService {
         strQry.append(" Left Join Restriccion_dependencia rd  on rd.rd_restriccion=rp.rp_id and rd.rd_dependencia=").append(dep.getDepId());
         strQry.append(" order by rp_Id");
         Query query = em.createNativeQuery(strQry.toString());
-        
+
         if (query.getResultList() != null && !query.getResultList().isEmpty()) {
             Iterator<Object[]> resultado = query.getResultList().iterator();
             while (resultado.hasNext()) {
@@ -113,14 +104,14 @@ public class RestriccionesServiceBean implements RestriccionesService {
                 RestriccionTO registro = new RestriccionTO();
                 registro.setRpId(((BigDecimal) rs[0]).longValue());
                 registro.setRpDescripcion((String) rs[1]);
-                if(rs[2]!=null){
+                if (rs[2] != null) {
                     registro.setRdId(((BigDecimal) rs[2]).longValue());
-                    if(rs[3]!=null) {
+                    if (rs[3] != null) {
                         registro.setRdValor(((BigDecimal) rs[3]).longValue());
                     }
-                    
+
                 }
-                
+
                 listaRestricciones.add(registro);
             }
         }
@@ -135,23 +126,24 @@ public class RestriccionesServiceBean implements RestriccionesService {
 
     @Override
     public List<RestriccionDependencia> getLista(RestriccionDependencia restriccionFiltro, int first, int pageSize, String sortField, String sortOrder) {
-                Query query = createQueryFilter(restriccionFiltro, sortField, sortOrder);
-        query.setFirstResult(first).setMaxResults(pageSize);
-        try{
-            return (List<RestriccionDependencia>) query.getResultList();    
+        Query query = createQueryFilter(restriccionFiltro, sortField, sortOrder);
+        if (first > 0) {
+            query.setFirstResult(first).setMaxResults(pageSize);
         }
-        catch (NoResultException nre) {
+        try {
+            return (List<RestriccionDependencia>) query.getResultList();
+        } catch (NoResultException nre) {
             nre.printStackTrace();
             return null;
-        }    
+        }
     }
-    
-    private Query createQueryFilter(RestriccionDependencia permiso, String sortField, String sortOrder){
+
+    private Query createQueryFilter(RestriccionDependencia permiso, String sortField, String sortOrder) {
         List<String> condiciones = new ArrayList<String>();
-        
-        Map<String,Object> params = new HashMap<String, Object>();
-        if(permiso.getRestriccionProgramacion()!=null 
-                && permiso.getRestriccionProgramacion().getRpDescripcion()!=null){
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        if (permiso.getRestriccionProgramacion() != null
+                && permiso.getRestriccionProgramacion().getRpDescripcion() != null) {
             condiciones.add("upper(p.restriccionProgramacion.rpDescripcion) like :descripcion ");
             params.put("descripcion", "%" + permiso.getRestriccionProgramacion().getRpDescripcion().toUpperCase() + "%");
         }
@@ -164,41 +156,40 @@ public class RestriccionesServiceBean implements RestriccionesService {
         if (permiso.getDependencia() != null && permiso.getDependencia().getDepId() != null) {
             condiciones.add("p.dependencia.depId = :dep ");
             params.put("dep", permiso.getDependencia().getDepId());
-        } 
-        
-        if (permiso.getDependencia() != null && 
-                permiso.getDependencia().getAeropuerto() != null && 
-                permiso.getDependencia().getAeropuerto().getAeId() != null) {
+        }
+
+        if (permiso.getDependencia() != null
+                && permiso.getDependencia().getAeropuerto() != null
+                && permiso.getDependencia().getAeropuerto().getAeId() != null) {
             condiciones.add("p.dependencia.aeropuerto.aeId = :aero ");
             params.put("aero", permiso.getDependencia().getAeropuerto().getAeId());
-        } 
-        else if (permiso.getDependencia() != null && 
-                permiso.getDependencia().getAeropuerto().getRegional() != null && 
-                permiso.getDependencia().getAeropuerto().getRegional().getRegId() != null) {
+        } else if (permiso.getDependencia() != null
+                && permiso.getDependencia().getAeropuerto().getRegional() != null
+                && permiso.getDependencia().getAeropuerto().getRegional().getRegId() != null) {
             condiciones.add("p.dependencia.aeropuerto.regional.regId = :reg ");
             params.put("reg", permiso.getDependencia().getAeropuerto().getRegional().getRegId());
         }
 
         StringBuilder strQry = new StringBuilder();
-        
-        if(condiciones.size()>0){
+
+        if (condiciones.size() > 0) {
             strQry.append("where ");
         }
         strQry.append(QueryUtil.joinWithAnd(condiciones));
         Query query = em.createQuery("Select count(p) from RestriccionDependencia p ".concat(strQry.toString()));
         QueryUtil.setParameters(query, params);
-        count = (Long)query.getSingleResult();
-        
+        count = (Long) query.getSingleResult();
+
         StringBuilder strQryFinal = new StringBuilder("Select p from RestriccionDependencia p ").
                 append(strQry.toString());
-        if(sortField!=null && sortOrder!=null){
+        if (sortField != null && sortOrder != null) {
             strQryFinal.append("order by p.").append(sortField).append(" ").append(sortOrder);
         }
         query = em.createQuery(strQryFinal.toString());
         QueryUtil.setParameters(query, params);
 
         return query;
-        
+
     }
 
     @Override
@@ -208,16 +199,13 @@ public class RestriccionesServiceBean implements RestriccionesService {
 
     @Override
     public List<RestriccionProgramacion> getListaFaltantesDep(Dependencia dep) {
-       
-        Query query= em.createQuery("SELECT r FROM RestriccionProgramacion r WHERE r.rpId NOT IN (SELECT rd.restriccionProgramacion.rpId FROM RestriccionDependencia rd WHERE rd.dependencia.depId = :depId)");
+
+        Query query = em.createQuery("SELECT r FROM RestriccionProgramacion r WHERE r.rpId NOT IN (SELECT rd.restriccionProgramacion.rpId FROM RestriccionDependencia rd WHERE rd.dependencia.depId = :depId)");
         query.setParameter("depId", dep.getDepId());
-        try 
-        {
-            return (List<RestriccionProgramacion>) query.getResultList();            
-        } 
-        catch(NoResultException nre)
-        {
-            return null; 
+        try {
+            return (List<RestriccionProgramacion>) query.getResultList();
+        } catch (NoResultException nre) {
+            return null;
         }
     }
 
@@ -225,20 +213,14 @@ public class RestriccionesServiceBean implements RestriccionesService {
     public Jornada obtenerJornada(long dependencia) {
         Query query = em.createQuery("SELECT r FROM RestriccionDependencia r WHERE r.dependencia.depId = :dependencia and r.restriccionProgramacion.rpId=4");
         query.setParameter("dependencia", dependencia);
-        try
-        {
+        try {
             RestriccionDependencia rd = (RestriccionDependencia) query.getSingleResult();
             Query query2 = em.createQuery("SELECT j FROM Jornada j WHERE j.joId = :joId");
             //System.out.println("Valor: "+rd.getRdValor());
             query2.setParameter("joId", rd.getRdValor());
             return (Jornada) query2.getSingleResult();
-        }
-        catch(NoResultException nre)
-        {
-            return new Jornada();            
+        } catch (NoResultException nre) {
+            return new Jornada();
         }
     }
-
-   
-
 }

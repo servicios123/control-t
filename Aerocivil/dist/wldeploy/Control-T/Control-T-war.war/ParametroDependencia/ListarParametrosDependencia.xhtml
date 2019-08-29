@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.configuracionParametrosDependencias}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                <h:form>
+
+                    <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
+                        <f:facet name="header" ><h:outputText value="#{msg.filtros}" ></h:outputText></f:facet>
+
+                        <xf:inputText entity="#{parametrosDependenciaBBean.dependenciaFiltro}" fieldName="nombre" />
+                        
+                        <xf:selectOneMenu  entity="#{parametrosDependenciaBBean.dependenciaFiltro.categoria}"  fieldName="dcId">  
+                            <f:selectItems value="#{parametrosDependenciaBBean.listaCategorias}" var="cat" itemValue="#{cat.dcId}" itemLabel="#{cat.dcNombre}" />  
+                            <p:ajax update=":tblForm:paramTable" />  
+                        </xf:selectOneMenu> 
+                        <xf:selectOneMenu  entity="#{parametrosDependenciaBBean.dependenciaFiltro}"  fieldName="modulo">  
+                            <f:selectItems value="#{parametrosDependenciaBBean.listaModulos}" var="men" itemValue="#{men}" itemLabel="#{men}" />  
+                            <p:ajax update=":tblForm:paramTable" />  
+                        </xf:selectOneMenu> 
+
+                        <f:facet name="footer" >
+                            <h:commandButton  action="#{parametrosDependenciaBBean.filtrar}" value="#{msg.buscar}"  />
+                        </f:facet>
+
+                    </h:panelGrid>
+                </h:form>
+                <br></br>
+                <h:form id="tblForm">
+                    <p:dataTable value="#{parametrosDependenciaBBean.lista}" var="item" styleClass="tabla_lista"
+                                 paginator="true" paginatorPosition="bottom" rows="15"  
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                 rowsPerPageTemplate="10,15,20" id="paramTable" draggableColumns="true"
+                                 sortBy="#{item.nombre}" paginatorAlwaysVisible="false"
+                                 emptyMessage="#{msg.emptyList}">
+
+                        <p:column rendered="#{loginBBean.funNivel == 0}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.editar}"/>
+                            </f:facet>
+                            <h:commandLink value="#{msg.editar}" action="#{parametrosDependenciaBBean.editar}">
+                                <f:setPropertyActionListener value="#{item}" target="#{parametrosDependenciaBBean.dependencia}"/>
+                            </h:commandLink>
+                        </p:column>
+                        <p:column sortBy="#{item.nombre}">
+                            <f:facet name="header">
+                                <h:outputText value="Parametro #{msg.dependencia}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.nombre}"/>
+                        </p:column>
+                        
+                        <p:column sortBy="#{item.modulo}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.modulo}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.modulo}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.categoria.dcNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dcId}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.categoria.dcNombre}"/>
+                        </p:column>
+
+                    </p:dataTable>
+                    <br/>
+                    <h:commandButton action="#{parametrosDependenciaBBean.crear}" value="#{msg.crear} #{msg.parametroDependencia}" rendered="#{loginBBean.funNivel == 1}"  />
+
+                </h:form>
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

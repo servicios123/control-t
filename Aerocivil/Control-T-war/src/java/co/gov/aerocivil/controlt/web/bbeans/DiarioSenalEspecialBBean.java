@@ -6,7 +6,6 @@ package co.gov.aerocivil.controlt.web.bbeans;
 
 import co.gov.aerocivil.controlt.entities.Dependencia;
 import co.gov.aerocivil.controlt.entities.DiarioSenalCategoria;
-import co.gov.aerocivil.controlt.entities.DiarioSenalCierreTurno;
 import co.gov.aerocivil.controlt.entities.DiarioSenalEspecial;
 import co.gov.aerocivil.controlt.entities.DiarioSenalFuncionario;
 import co.gov.aerocivil.controlt.entities.DiarioSenalInfo;
@@ -15,12 +14,9 @@ import co.gov.aerocivil.controlt.entities.DiarioSenalTipo;
 import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.entities.Jornada;
 import co.gov.aerocivil.controlt.entities.Posicion;
-import co.gov.aerocivil.controlt.entities.Turno;
-import co.gov.aerocivil.controlt.entities.Vistaprogramacion;
-import co.gov.aerocivil.controlt.enums.ParametrosEnum;
 import co.gov.aerocivil.controlt.services.DiarioSenalEspecialService;
 import co.gov.aerocivil.controlt.services.ListasService;
-import co.gov.aerocivil.controlt.web.lazylist.DiarioSenalEspecialLazyList;
+import co.gov.aerocivil.controlt.services.PosicionService;
 import co.gov.aerocivil.controlt.web.util.DateUtil;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import com.itextpdf.text.Element;
@@ -28,18 +24,10 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -53,6 +41,8 @@ public class DiarioSenalEspecialBBean {
     private DiarioSenalEspecialService diarioSenalEspecialService;
     @EJB
     private ListasService listasService;
+    @EJB
+    private PosicionService posicionService;
     /* -- / Registro / ---*/
     private DiarioSenalEspecial diarioSenalEspecial;
     private DiarioSenalFuncionario diarioSenalFuncionario;
@@ -87,7 +77,7 @@ public class DiarioSenalEspecialBBean {
     private boolean disabled;
     /* -- / Consulta / ---*/
     private DiarioSenalEspecial diarioSenalEspecialFiltro;
-    private LazyDataModel<DiarioSenalEspecial> lista;
+    private List<DiarioSenalEspecial> lista;
     private List<Jornada> jornadas;
     private DiarioSenalEspecial verDiarioSenalEspecial;
     private List<DiarioSenalFuncionario> verFuncionarios;
@@ -434,6 +424,7 @@ public class DiarioSenalEspecialBBean {
         Dependencia d = new Dependencia();
         d.setDepId(306L);
         diarioSenalEspecialFiltro.setDseDependencia(d);
+        diarioSenalEspecialFiltro.setDseJornadaOp(new Jornada());
         jornadas = JsfUtil.getListadosBBean().getListaJornadaXDependencia(d.getDepId());
 
 
@@ -443,7 +434,7 @@ public class DiarioSenalEspecialBBean {
 
     public String filtrar() {
         verDiarioSenalEspecial = new DiarioSenalEspecial();
-        lista = new DiarioSenalEspecialLazyList(diarioSenalEspecialService, diarioSenalEspecialFiltro);
+        lista = diarioSenalEspecialService.getLista(diarioSenalEspecialFiltro);
         return "FiltrarDiarioSenalEspecial";
 
     }
@@ -557,6 +548,8 @@ public class DiarioSenalEspecialBBean {
                     if (posicion.getPosId() != null) {
                         diarioSenalFuncionario.setDsfPosicion(posicion);
 
+                    }else{
+                        diarioSenalFuncionario.setDsfPosicion(new Posicion());
                     }
 
                     diarioSenalFuncionario.setDsfEstado("ABIERTO");
@@ -564,6 +557,8 @@ public class DiarioSenalEspecialBBean {
                     diarioSenalFuncionario.setDsfDiarioSenalEspecial(diarioSenalEspecial);
                 }
             }
+            
+            diarioSenalInfo.setDsiCategoria(new DiarioSenalCategoria());
 
         } else {
             JsfUtil.addWarningMessage("dseJornadaAviso");
@@ -611,10 +606,13 @@ public class DiarioSenalEspecialBBean {
         jornada = new Jornada();
         diarioSenalEspecial = new DiarioSenalEspecial();
         diarioSenalFuncionario = new DiarioSenalFuncionario();
+        diarioSenalFuncionario.setDsfPosicion(new Posicion());
         diarioSenalInfo = new DiarioSenalInfo();
+        diarioSenalInfo.setDsiTipo(new DiarioSenalTipo());
+        diarioSenalInfo.setDsiCategoria(new DiarioSenalCategoria());
         posicion = new Posicion();
         diarioSenalInfoSeleccionado = new DiarioSenalInfo();
-
+        diarioSenalFuncionario.setDsfPosicion(new Posicion());
     }
 
     private DiarioSenalEspecial guardarDse(DiarioSenalEspecial dse, Funcionario func) throws Exception {
@@ -685,6 +683,9 @@ public class DiarioSenalEspecialBBean {
             Calendar actual = Calendar.getInstance();
             diarioSenalFuncionario.setDsfHoraEntrada(convertirHora(actual));
             diarioSenalFuncionario.setDsfEstado("ABIERTO");
+            Posicion p = (Posicion) posicionService.getPorId(diarioSenalFuncionario.getDsfPosicion().getPosId());
+            diarioSenalFuncionario.setDsfPosicion(p);
+            
             LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
             verDsf = guardarDsf(diarioSenalFuncionario, logbbean.getFuncionarioTO().getFuncionario());
 
@@ -898,7 +899,9 @@ public class DiarioSenalEspecialBBean {
                     horaUTC = null;
                     minutoUTC = null;
                 }
-
+                if(dsi.getDsiCategoria()!=null && dsi.getDsiCategoria().getDscId()==null){
+                    dsi.setDsiCategoria(null);
+                }
                 diarioSenalEspecialService.guardarDsi(dsi, logbbean.getFuncionarioTO().getFuncionario());
                 JsfUtil.addSuccessMessage("dsiRegistradoExitosamente");
             } else {
@@ -911,10 +914,10 @@ public class DiarioSenalEspecialBBean {
     }
 
     public String guardarDsi() {
-
         persistir(diarioSenalInfo);
 
         diarioSenalInfo = new DiarioSenalInfo();
+        diarioSenalInfo.setDsiTipo(new DiarioSenalTipo());
         actualizarPrincipales();
         return frontend();
 
@@ -1161,14 +1164,14 @@ public class DiarioSenalEspecialBBean {
     /**
      * @return the lista
      */
-    public LazyDataModel<DiarioSenalEspecial> getLista() {
+    public List<DiarioSenalEspecial> getLista() {
         return lista;
     }
 
     /**
      * @param lista the lista to set
      */
-    public void setLista(LazyDataModel<DiarioSenalEspecial> lista) {
+    public void setLista(List<DiarioSenalEspecial> lista) {
         this.lista = lista;
     }
 

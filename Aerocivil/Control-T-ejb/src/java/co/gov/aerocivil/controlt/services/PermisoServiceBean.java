@@ -36,20 +36,20 @@ import javax.persistence.TemporalType;
  */
 @Stateless
 public class PermisoServiceBean implements PermisoService {
+
     @PersistenceContext(unitName = "ControlT-ejbPU")
     private EntityManager em;
     private Long count;
-
     @EJB
     private AuditoriaService auditoria;
-    
+
     @Override
-    public PermisoEspecial guardar (PermisoEspecial permiso, Funcionario f){
+    public PermisoEspecial guardar(PermisoEspecial permiso, Funcionario f) {
         return (PermisoEspecial) auditoria.auditar(permiso, f);
     }
-    
+
     @Override
-    public List<Jornada> getJornadasPermiso(PermisoEspecial permiso){
+    public List<Jornada> getJornadasPermiso(PermisoEspecial permiso) {
         PermisoEspecial find = em.find(PermisoEspecial.class, permiso.getPeId());
         return find.getListaJornadas();
     }
@@ -57,50 +57,51 @@ public class PermisoServiceBean implements PermisoService {
     @Override
     public List<PermisoEspecial> getLista(PermisoEspecial permisoFiltro, int first, int pageSize, String sortField, String sortOrder) {
         Query query = createQueryFilter(permisoFiltro, sortField, sortOrder);
-        query.setFirstResult(first).setMaxResults(pageSize);
-        try{
-            return (List<PermisoEspecial>) query.getResultList();    
+        if (first > 0) {
+            query.setFirstResult(first).setMaxResults(pageSize);
         }
-        catch (NoResultException nre) {
+        try {
+            return (List<PermisoEspecial>) query.getResultList();
+        } catch (NoResultException nre) {
             nre.printStackTrace();
             return null;
-        }        
+        }
     }
-    
-    private Query createQueryFilter(PermisoEspecial permiso, String sortField, String sortOrder){
+
+    private Query createQueryFilter(PermisoEspecial permiso, String sortField, String sortOrder) {
         List<String> condiciones = new ArrayList<String>();
-        
-        Map<String,Object> params = new HashMap<String, Object>();
-        if(permiso.getFuncionario()!=null ){
-            if(permiso.getFuncionario().getFunNombre()!=null ){
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        if (permiso.getFuncionario() != null) {
+            if (permiso.getFuncionario().getFunNombre() != null) {
                 condiciones.add(" (p.funcionario.funNombre) like :nombre");
-                params.put("nombre", "%" +  permiso.getFuncionario().getFunNombre().toUpperCase() + "%"); 
+                params.put("nombre", "%" + permiso.getFuncionario().getFunNombre().toUpperCase() + "%");
             }
-            if(permiso.getFuncionario().getFunAlias()!=null ){
+            if (permiso.getFuncionario().getFunAlias() != null) {
                 condiciones.add(" (p.funcionario.funAlias) like :nombre");
-                params.put("nombre", "%" +  permiso.getFuncionario().getFunAlias().toUpperCase() + "%"); 
+                params.put("nombre", "%" + permiso.getFuncionario().getFunAlias().toUpperCase() + "%");
             }
-            if(permiso.getFuncionario().getFunId()!=null ){
+            if (permiso.getFuncionario().getFunId() != null) {
                 condiciones.add(" (p.funcionario.funId) = :funId");
-                params.put("funId",  permiso.getFuncionario().getFunId()); 
+                params.put("funId", permiso.getFuncionario().getFunId());
             }
             /*if(permiso.getFuncionario().getFuNivel()!=null ){
-                //ej: nivel 3 ve a los de nivel 4
-                condiciones.add(" (p.funcionario.fuNivel) > :nivel");
-                params.put("nivel",  permiso.getFuncionario().getFuNivel()); 
-            }*/
+             //ej: nivel 3 ve a los de nivel 4
+             condiciones.add(" (p.funcionario.fuNivel) > :nivel");
+             params.put("nivel",  permiso.getFuncionario().getFuNivel()); 
+             }*/
         }
-        if(permiso.getPeFechaPermiso()!=null ){
+        if (permiso.getPeFechaPermiso() != null) {
             condiciones.add(" (p.peFechaPermiso) = :fechaPermiso");
-            params.put("fechaPermiso", permiso.getPeFechaPermiso()); 
+            params.put("fechaPermiso", permiso.getPeFechaPermiso());
         }
-        if(permiso.getPeFechaRegistro()!=null ){
+        if (permiso.getPeFechaRegistro() != null) {
             condiciones.add(" (p.peFechaRegistro) = :fechaRegistro");
-            params.put("fechaRegistro", permiso.getPeFechaRegistro()); 
+            params.put("fechaRegistro", permiso.getPeFechaRegistro());
         }
-        if(permiso.getPeEstado()!=null ){
+        if (permiso.getPeEstado() != null) {
             condiciones.add(" (p.peEstado) = :estado");
-            params.put("estado", permiso.getPeEstado()); 
+            params.put("estado", permiso.getPeEstado());
         }
 
         if (permiso.getDependencia() != null
@@ -112,47 +113,46 @@ public class PermisoServiceBean implements PermisoService {
         if (permiso.getDependencia() != null && permiso.getDependencia().getDepId() != null) {
             condiciones.add("p.funcionario.dependencia.depId = :dep ");
             params.put("dep", permiso.getDependencia().getDepId());
-        } 
-        
-        if (permiso.getDependencia() != null && 
-                permiso.getDependencia().getAeropuerto() != null && 
-                permiso.getDependencia().getAeropuerto().getAeId() != null) {
+        }
+
+        if (permiso.getDependencia() != null
+                && permiso.getDependencia().getAeropuerto() != null
+                && permiso.getDependencia().getAeropuerto().getAeId() != null) {
             condiciones.add("p.funcionario.dependencia.aeropuerto.aeId = :aero ");
             params.put("aero", permiso.getDependencia().getAeropuerto().getAeId());
-        } 
-        else if (permiso.getDependencia() != null && 
-                permiso.getDependencia().getAeropuerto().getRegional() != null && 
-                permiso.getDependencia().getAeropuerto().getRegional().getRegId() != null) {
+        } else if (permiso.getDependencia() != null
+                && permiso.getDependencia().getAeropuerto().getRegional() != null
+                && permiso.getDependencia().getAeropuerto().getRegional().getRegId() != null) {
             condiciones.add("p.funcionario.dependencia.aeropuerto.regional.regId = :reg ");
             params.put("reg", permiso.getDependencia().getAeropuerto().getRegional().getRegId());
         }
 
         StringBuilder strQry = new StringBuilder();
-        
-        if(condiciones.size()>0){
+
+        if (condiciones.size() > 0) {
             strQry.append("where ");
         }
         for (Iterator<String> it = condiciones.iterator(); it.hasNext();) {
             strQry.append(it.next());
-            if(it.hasNext()){
+            if (it.hasNext()) {
                 strQry.append(" and ");
             }
         }
 
         Query query = em.createQuery("Select count(p) from PermisoEspecial p ".concat(strQry.toString()));
         QueryUtil.setParameters(query, params);
-        count = (Long)query.getSingleResult();
-        
+        count = (Long) query.getSingleResult();
+
         StringBuilder strQryFinal = new StringBuilder("Select p from PermisoEspecial p ").
                 append(strQry.toString());
-        if(sortField!=null && sortOrder!=null){
+        if (sortField != null && sortOrder != null) {
             strQryFinal.append(" order by p.").append(sortField).append(" ").append(sortOrder);
         }
         query = em.createQuery(strQryFinal.toString());
         QueryUtil.setParameters(query, params);
 
         return query;
-        
+
     }
 
     /**
@@ -171,55 +171,47 @@ public class PermisoServiceBean implements PermisoService {
         strQry.append(" select count(*) from programacion where pro_dependencia = ").
                 append(permiso.getDependencia().getDepId()).append(" and '").
                 append(dateToString(permiso.getPeFechaPermiso())).
-                append("' between pro_fecha_inicio and pro_fecha_fin");        
+                append("' between pro_fecha_inicio and pro_fecha_fin");
         Query q = em.createNativeQuery(strQry.toString());
-        count = (BigDecimal)q.getSingleResult();
+        count = (BigDecimal) q.getSingleResult();
         //System.out.println(strQry.toString()+" - "+count);
-        return count!=null && count.longValue()>0;
+        return count != null && count.longValue() > 0;
 
     }
-    
-    private String dateToString(Date d) {        
+
+    private String dateToString(Date d) {
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         return df.format(d);
     }
 
     @Override
-    public void solvePetitions(Programacion programacion) 
-    {
+    public void solvePetitions(Programacion programacion) {
         TurnoEspecial te = getTurnoEspecial(programacion.getDependencia());
-        List<PermisoEspecial> pes = getPetitions(programacion.getDependencia(), programacion.getProFechaInicio(),  programacion.getProFechaFin());
-        if(pes!=null)
-        {   
-            List<TurnoEspFuncionario> tefs = getSpecialTurns(programacion.getDependencia(),  programacion.getProFechaInicio(), programacion.getProFechaFin(), te.getTeId());
-            for (PermisoEspecial pe : pes) 
-            {
-                boolean asignado=false;
-                if(tefs!=null)
-                {
-                    for (TurnoEspFuncionario tef : tefs) 
-                    {
-                        if(tef.getFuncionario().getFunId() == pe.getFuncionario().getFunId() && 
-                                pe.getPeFechaPermiso().compareTo(tef.getTefFini()) >= 0 && 
-                                pe.getPeFechaPermiso().compareTo(tef.getTefFfin()) <=0)
-                                {
-                                    asignado=true;
-                                    break;
-                                }
+        List<PermisoEspecial> pes = getPetitions(programacion.getDependencia(), programacion.getProFechaInicio(), programacion.getProFechaFin());
+        if (pes != null) {
+            List<TurnoEspFuncionario> tefs = getSpecialTurns(programacion.getDependencia(), programacion.getProFechaInicio(), programacion.getProFechaFin(), te.getTeId());
+            for (PermisoEspecial pe : pes) {
+                boolean asignado = false;
+                if (tefs != null) {
+                    for (TurnoEspFuncionario tef : tefs) {
+                        if (tef.getFuncionario().getFunId() == pe.getFuncionario().getFunId()
+                                && pe.getPeFechaPermiso().compareTo(tef.getTefFini()) >= 0
+                                && pe.getPeFechaPermiso().compareTo(tef.getTefFfin()) <= 0) {
+                            asignado = true;
+                            break;
+                        }
                     }
                 }
-                if(!asignado)
-                {
+                if (!asignado) {
                     saveTEF(pe, te);
                 }
-            }           
-                    
+            }
+
         }
-        
+
     }
-    
-    private void saveTEF(PermisoEspecial pe, TurnoEspecial te)
-    {
+
+    private void saveTEF(PermisoEspecial pe, TurnoEspecial te) {
         TurnoEspFuncionario tef = new TurnoEspFuncionario();
         tef.setComision(null);
         tef.setEditable(true);
@@ -230,23 +222,21 @@ public class PermisoServiceBean implements PermisoService {
         tef.setTurnoEspecial(te);
         em.persist(tef);
     }
-    
-    private TurnoEspecial getTurnoEspecial(Dependencia dep)
-    {
-        
-        try
-        {
-                     
-            Query query= em.createQuery("SELECT t FROM TurnoEspecial t WHERE t.dependencia.depId=:depId AND t.teSigla = :sigla ");   
-          
+
+    private TurnoEspecial getTurnoEspecial(Dependencia dep) {
+
+        try {
+
+            Query query = em.createQuery("SELECT t FROM TurnoEspecial t WHERE t.dependencia.depId=:depId AND t.teSigla = :sigla ");
+
             query.setParameter("depId", dep.getDepId());
             query.setParameter("sigla", "PET");
             query.setMaxResults(1);
-                        
+
             return (TurnoEspecial) query.getSingleResult();
-            
-        }catch (NoResultException nre) {
-            
+
+        } catch (NoResultException nre) {
+
             TurnoEspecial te = new TurnoEspecial();
             te.setDependencia(dep);
             te.setTeEstado("Activo");
@@ -257,61 +247,52 @@ public class PermisoServiceBean implements PermisoService {
             te.setTeMinicio((byte) 0);
             te.setTeNombre("Peticiones");
             te.setTeSigla("PET");
-            
+
             em.persist(te);
-            
-            if(te.getTeId() != null)
-            {
+
+            if (te.getTeId() != null) {
                 //System.out.println("Si guardo :)");
-            }
-            else
-            {
+            } else {
                 //System.out.println("No guardo :(");
             }
-            
-            return te;         
-    
-        }          
-        
+
+            return te;
+
+        }
+
     }
-    
-    private List<TurnoEspFuncionario> getSpecialTurns(Dependencia dep, Date fechaIni, Date fechaFin, long te)
-    {
-        try
-        {
-            Calendar actual= Calendar.getInstance();           
-            Query query= em.createQuery("SELECT t FROM TurnoEspFuncionario t WHERE t.turnoEspecial.teId = :te AND t.turnoEspecial.dependencia.depId= :depId AND t.tefEstado= :estado AND t.funcionario.dependencia.depId = :depId AND t.funcionario.funFvCertmedico > :fecha AND t.funcionario.funFvCurso > :fecha AND t.funcionario.funFvEvaluacion > :fecha AND ((t.tefFini between :start and :finish) or (t.tefFini between :start and :finish)) ");   
+
+    private List<TurnoEspFuncionario> getSpecialTurns(Dependencia dep, Date fechaIni, Date fechaFin, long te) {
+        try {
+            Calendar actual = Calendar.getInstance();
+            Query query = em.createQuery("SELECT t FROM TurnoEspFuncionario t WHERE t.turnoEspecial.teId = :te AND t.turnoEspecial.dependencia.depId= :depId AND t.tefEstado= :estado AND t.funcionario.dependencia.depId = :depId AND t.funcionario.funFvCertmedico > :fecha AND t.funcionario.funFvCurso > :fecha AND t.funcionario.funFvEvaluacion > :fecha AND ((t.tefFini between :start and :finish) or (t.tefFini between :start and :finish)) ");
             query.setParameter("te", te);
             query.setParameter("depId", dep.getDepId());
             query.setParameter("estado", "Programado");
             query.setParameter("start", fechaIni, TemporalType.DATE);
             query.setParameter("finish", fechaFin, TemporalType.DATE);
             query.setParameter("fecha", actual.getTime(), TemporalType.DATE);
-             
+
             return (List<TurnoEspFuncionario>) query.getResultList();
-        }catch (NoResultException nre) {
+        } catch (NoResultException nre) {
             return null;
-        }   
+        }
     }
-    
-    
-    private List<PermisoEspecial> getPetitions(Dependencia dep, Date fechaIni, Date fechaFin)
-    {
-        
-       try
-        {
-            Calendar actual= Calendar.getInstance();           
-            Query query= em.createQuery("SELECT p FROM PermisoEspecial p WHERE p.funcionario.dependencia.depId= :depId AND p.peEstado = :estado and p.peFechaPermiso between :start and :finish");   
+
+    private List<PermisoEspecial> getPetitions(Dependencia dep, Date fechaIni, Date fechaFin) {
+
+        try {
+            Calendar actual = Calendar.getInstance();
+            Query query = em.createQuery("SELECT p FROM PermisoEspecial p WHERE p.funcionario.dependencia.depId= :depId AND p.peEstado = :estado and p.peFechaPermiso between :start and :finish");
             query.setParameter("depId", dep.getDepId());
             query.setParameter("estado", "Aprobado");
             query.setParameter("start", fechaIni, TemporalType.DATE);
             query.setParameter("finish", fechaFin, TemporalType.DATE);
-           
-            
-            return (List<PermisoEspecial>) query.getResultList();
-        }catch (NoResultException nre) {
-            return null;
-        }      
-    }
 
+
+            return (List<PermisoEspecial>) query.getResultList();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
 }

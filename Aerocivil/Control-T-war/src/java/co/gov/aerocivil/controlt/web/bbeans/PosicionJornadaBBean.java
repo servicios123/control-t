@@ -13,17 +13,14 @@ import co.gov.aerocivil.controlt.entities.PosicionJornada;
 import co.gov.aerocivil.controlt.entities.PosicionNacional;
 import co.gov.aerocivil.controlt.entities.Regional;
 import co.gov.aerocivil.controlt.enums.RolEnum;
-import co.gov.aerocivil.controlt.services.ListasServiceBean;
 
 
 import co.gov.aerocivil.controlt.services.PosicionJornadaService;
-import co.gov.aerocivil.controlt.web.lazylist.PosicionJornadaLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -40,7 +37,7 @@ public class PosicionJornadaBBean {
     private PosicionJornadaService posicionJornadaService;
     private PosicionJornada posicionJornada;
     private PosicionJornada posicionJornadaFiltro;
-    private LazyDataModel<PosicionJornada> lista;
+    private List<PosicionJornada> lista;
     private List<Dependencia> listDependencia;
     private List<Aeropuerto> listAeropuerto;
     private List<Posicion> listPosicion;
@@ -159,7 +156,7 @@ public class PosicionJornadaBBean {
 
     public String filtrar() {
 
-        lista = new PosicionJornadaLazyList(posicionJornadaService, posicionJornadaFiltro);
+        lista = posicionJornadaService.getLista(posicionJornadaFiltro);
         return "listarPosicionJornada";
     }
 
@@ -187,11 +184,11 @@ public class PosicionJornadaBBean {
         this.posicionJornadaFiltro = posicionJornadaFiltro;
     }
 
-    public LazyDataModel<PosicionJornada> getLista() {
+    public List<PosicionJornada> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<PosicionJornada> lista) {
+    public void setLista(List<PosicionJornada> lista) {
         this.lista = lista;
     }
 

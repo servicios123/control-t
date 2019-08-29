@@ -18,7 +18,7 @@ import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.event.AjaxBehaviorEvent;
-import org.primefaces.event.DateSelectEvent;
+import org.primefaces.event.SelectEvent;
 
 /**
  *
@@ -163,7 +163,7 @@ public class VistaProgramacionBBean {
         //System.out.println("event = " + turn_asignar.toString());
     }
   
-    public void onDateCambio1(DateSelectEvent ev)
+    public void onDateCambio1(SelectEvent ev)
     {
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         fun_cambio_1= null;
@@ -172,39 +172,39 @@ public class VistaProgramacionBBean {
         list_turn_cambio_2= null;
         fun_cambio_2= null;
         turn_cambio_2 = null;   
-        list_fun_cambio_1 = modificarTurnoServiceBean.getFuncionarioTurnoPorFecha(ev.getDate(), logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId());
+        list_fun_cambio_1 = modificarTurnoServiceBean.getFuncionarioTurnoPorFecha((Date)ev.getObject(), logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId());
         //System.out.println("Entra a onDateCambio1 \t N. "+list_fun_cambio_1.size());
     }
     
-    public void onDateCambio4(DateSelectEvent ev)
+    public void onDateCambio4(SelectEvent ev)
     {
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);  
-        list_fun_asignar_esp = modificarTurnoServiceBean.getFunctionariesAvaibleSpecial(ev.getDate(), JsfUtil.getFuncionarioSesion().getDependencia());
+        list_fun_asignar_esp = modificarTurnoServiceBean.getFunctionariesAvaibleSpecial((Date)ev.getObject(), JsfUtil.getFuncionarioSesion().getDependencia());
         //System.out.println("Entra a onDateCambio1 \t N. "+list_fun_asignar.size());
     }
    
-    public void onDateCambio2(DateSelectEvent ev)
+    public void onDateCambio2(SelectEvent ev)
     {        
         list_turn_cambio_2= null;
         fun_cambio_2= null;
         turn_cambio_2 = null;               
     }
     
-    public void onDateAsignar(DateSelectEvent ev)
+    public void onDateAsignar(SelectEvent ev)
     {
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         turn_asignar= new PosNoAsig();         
-        list_turn_asignar= modificarTurnoServiceBean.getPosNoAsigPorFecha(ev.getDate(), logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId());
+        list_turn_asignar= modificarTurnoServiceBean.getPosNoAsigPorFecha((Date)ev.getObject(), logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId());
         //System.out.println("Entra a onDateAsignar \t N. "+list_turn_asignar.size());
     }
     
-    public void onDateAnular(DateSelectEvent ev)
+    public void onDateAnular(SelectEvent ev)
     {
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         fun_anular= null;
         list_turn_anular= null;
         turn_anular = null;
-        list_fun_anular = modificarTurnoServiceBean.getFuncionarioTurnoEspecialPorFecha(ev.getDate(), logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId());
+        list_fun_anular = modificarTurnoServiceBean.getFuncionarioTurnoEspecialPorFecha((Date)ev.getObject(), logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId());
         //System.out.println("Entra a onDateAnular \t N. "+list_fun_anular.size());
     }
     

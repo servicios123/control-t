@@ -63,4 +63,6 @@ public interface DiarioSenalEspecialService {
     public DiarioSenalFuncionario guardarDsf(DiarioSenalFuncionario diarioSenalFuncionario, Funcionario funcionario);
     public DiarioSenalInfo guardarDsi(DiarioSenalInfo diarioSenalInfo, Funcionario funcionario);
     public void eliminarDSI(DiarioSenalInfo dsi);
+
+    public java.util.List<co.gov.aerocivil.controlt.entities.DiarioSenalEspecial> getLista(co.gov.aerocivil.controlt.entities.DiarioSenalEspecial diarioSenalEspecial);
 }

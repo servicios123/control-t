@@ -4,19 +4,14 @@
  */
 package co.gov.aerocivil.controlt.web.bbeans;
 
-import co.gov.aerocivil.controlt.entities.Aeropuerto;
 import co.gov.aerocivil.controlt.entities.Dependencia;
 import co.gov.aerocivil.controlt.entities.Transporte;
 import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.entities.Jornada;
-import co.gov.aerocivil.controlt.enums.ParametrosEnum;
-import co.gov.aerocivil.controlt.enums.RolEnum;
 import co.gov.aerocivil.controlt.services.TransporteFuncionarioService;
 import co.gov.aerocivil.controlt.services.FuncionarioService;
 import co.gov.aerocivil.controlt.services.ListasService;
-import co.gov.aerocivil.controlt.to.FuncionarioTransporteTO;
 import co.gov.aerocivil.controlt.web.enums.SortOrderEnum;
-import co.gov.aerocivil.controlt.web.lazylist.TransporteFuncionarioLazyList;
 import co.gov.aerocivil.controlt.web.util.DateUtil;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import co.gov.aerocivil.controlt.web.util.ListadosBBean;
@@ -27,8 +22,6 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.component.selectonemenu.SelectOneMenu;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -51,7 +44,7 @@ public class TransporteFuncionarioBBean {
     private List<Transporte> funcionariosTranspLista;
     private Dependencia dependenciaFiltro;
     private Transporte transporteFiltro;
-    private LazyDataModel<Transporte> lazyList;
+    private List<Transporte> lazyList;
     private List<Jornada> listJornada;
     private Date fechaTransporte;
     private Jornada jornadaTransporte;
@@ -73,13 +66,7 @@ public class TransporteFuncionarioBBean {
         this.listJornada = listJornada;
     }
 
-    public void setLazyList(LazyDataModel<Transporte> lazyList) {
-        this.lazyList = lazyList;
-    }
-
-    public LazyDataModel<Transporte> getLazyList() {
-        return lazyList;
-    }
+   
 
     public List<Transporte> getFuncionariosTranspLista() {
         return funcionariosTranspLista;
@@ -204,7 +191,7 @@ public class TransporteFuncionarioBBean {
     }
     
     public String filtrar(){        
-        lazyList = new TransporteFuncionarioLazyList(transpFuncService, transporteFiltro);
+        lazyList = transpFuncService.getLista(transporteFiltro, null, null, null, null);
         return "listTransporte";
     }
 
@@ -241,5 +228,14 @@ public class TransporteFuncionarioBBean {
                 
         JsfUtil.generaReporte("Transporte", map, lista);
         return null;
+    }
+    
+    
+     public void setLazyList(List<Transporte> lazyList) {
+        this.lazyList = lazyList;
+    }
+
+    public List<Transporte> getLazyList() {
+        return lazyList;
     }
 }

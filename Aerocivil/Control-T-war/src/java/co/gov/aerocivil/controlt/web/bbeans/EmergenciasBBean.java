@@ -12,14 +12,12 @@ import co.gov.aerocivil.controlt.entities.Regional;
 import co.gov.aerocivil.controlt.enums.RolEnum;
 import co.gov.aerocivil.controlt.services.EmergenciasService;
 import co.gov.aerocivil.controlt.services.FuncionarioService;
-import co.gov.aerocivil.controlt.web.lazylist.EmergenciasLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -40,7 +38,7 @@ public class EmergenciasBBean {
     private Emergencias emergencias;
     private Emergencias emergenciasFiltro;
     
-    private LazyDataModel<Emergencias> lista;
+    private List<Emergencias> lista;
     private List<Aeropuerto> listAeropuerto;
     private List<Dependencia> listDependencia;
     private List<Funcionario> listFuncionario;
@@ -137,7 +135,7 @@ public class EmergenciasBBean {
     }
 
     public String filtrar() {
-        lista = new EmergenciasLazyList(emergenciasService, emergenciasFiltro);
+        lista = emergenciasService.getLista(emergenciasFiltro, 0, 0, null, null);
         return "listarEmergencia";
     }
 
@@ -206,11 +204,11 @@ public class EmergenciasBBean {
         this.emergenciasFiltro = emergenciasFiltro;
     }
 
-    public LazyDataModel<Emergencias> getLista() {
+    public List<Emergencias> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<Emergencias> lista) {
+    public void setLista(List<Emergencias> lista) {
         this.lista = lista;
     }
 

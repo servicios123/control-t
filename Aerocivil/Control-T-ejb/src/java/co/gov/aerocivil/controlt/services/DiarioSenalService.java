@@ -20,4 +20,6 @@ public interface DiarioSenalService {
             String sortField, String sortOrder);
        public DiarioSenal guardar(DiarioSenal diarioSenal, Funcionario f);
   public Long getCount();
+
+    public java.util.List<co.gov.aerocivil.controlt.entities.DiarioSenal> getLista(co.gov.aerocivil.controlt.entities.DiarioSenal diarioSenal);
 }

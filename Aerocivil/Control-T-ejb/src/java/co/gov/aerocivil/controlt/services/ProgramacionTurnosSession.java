@@ -21,14 +21,22 @@ import javax.ejb.Local;
 @Local
 public interface ProgramacionTurnosSession {
 
- public boolean isFechaProgramada(Date d, Long depId, EstadoProgramacion estado);
+    public boolean isFechaProgramada(Date d, Long depId, EstadoProgramacion estado);
+
     public void generarProgramacion(Programacion programacion) throws SQLException;
+
     public Programacion guardar(Programacion programacion, Funcionario f);
+
     public void borrarPendientes(Programacion programacion);
-     public Date fechaUltimaProgramacion(Dependencia dependencia);
-     public List<Programacion> getListaPag(Programacion programacion, int first, int pageSize,
+
+    public Date fechaUltimaProgramacion(Dependencia dependencia);
+
+    public List<Programacion> getListaPag(Programacion programacion, int first, int pageSize,
             String sortField, String sortOrder);
-     public boolean existeProgramacion(Dependencia dependecia, Date fecha);
-         
+
+    public List<Programacion> getListaPag(Programacion programacion);
+
+    public boolean existeProgramacion(Dependencia dependecia, Date fecha);
+
     public Long getCount();
 }

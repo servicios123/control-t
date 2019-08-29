@@ -6,14 +6,10 @@ package co.gov.aerocivil.controlt.web.bbeans;
  
 import co.gov.aerocivil.controlt.entities.Auditoria;
 import co.gov.aerocivil.controlt.entities.Dependencia;
-import co.gov.aerocivil.controlt.entities.DiarioPosicion;
 import co.gov.aerocivil.controlt.entities.Funcionario;
-import co.gov.aerocivil.controlt.entities.PermisoEspecial;
-import co.gov.aerocivil.controlt.entities.Vistaprogramacion;
 import co.gov.aerocivil.controlt.services.AuditoriaService;
-import co.gov.aerocivil.controlt.web.lazylist.AuditoriaLazyList;
-import co.gov.aerocivil.controlt.web.lazylist.PermisoLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -33,7 +29,7 @@ public class AuditoriaBBean {
     private Dependencia dependenciaFiltro;
     private Auditoria auditoriaFiltro;
 
-    private LazyDataModel<Auditoria> lista;
+    private List<Auditoria> lista;
 
     private void precargarFiltros() {
         FuncionarioBBean funcBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);
@@ -68,7 +64,7 @@ public class AuditoriaBBean {
         auditoriaFiltro.setAudTabla("FUNCIONARIO");
  /*       //System.out.println("dep::::::"+auditoriaFiltro.getFuncionario().getDependencia().getDepNombre());
         //System.out.println("dep::::::"+dependenciaFiltro.getDepNombre());*/
-        lista = new AuditoriaLazyList(service, auditoriaFiltro);
+        lista = service.getLista(auditoriaFiltro);
         return "listarFuncionarioAud";
     }
     
@@ -77,7 +73,7 @@ public class AuditoriaBBean {
         auditoriaFiltro.setFuncionario(funcBBean.getFuncionarioFiltro());
         //System.out.println("dep::::::"+auditoriaFiltro.getFuncionario().getDependencia().getDepNombre());
         //System.out.println("dep::::::"+dependenciaFiltro.getDepNombre());
-        lista = new AuditoriaLazyList(service, auditoriaFiltro);
+        lista = service.getLista(auditoriaFiltro);
         return "listarAuditoria";
     }
     
@@ -89,11 +85,11 @@ public class AuditoriaBBean {
         this.auditoriaFiltro = auditoriaFiltro;
     }
 
-    public LazyDataModel<Auditoria> getLista() {
+    public List<Auditoria> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<Auditoria> lista) {
+    public void setLista(List<Auditoria> lista) {
         this.lista = lista;
     }
 

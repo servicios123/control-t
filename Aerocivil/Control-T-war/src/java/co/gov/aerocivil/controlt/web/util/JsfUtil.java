@@ -67,6 +67,10 @@ import org.primefaces.context.RequestContext;
 
 public class JsfUtil {
 
+    public static RequestContext getRequestContext() {
+        return RequestContext.getCurrentInstance();
+    }
+    
     public static SelectItem[] getSelectItems(List<?> entities, boolean selectOne) {
         int size = selectOne ? entities.size() + 1 : entities.size();
         SelectItem[] items = new SelectItem[size];
@@ -210,10 +214,6 @@ public class JsfUtil {
         return JsfUtil.getValueBinding(
                 JsfUtil.getJsfEl(bBname)).
                 getValue(FacesContext.getCurrentInstance());
-    }
-
-    public static RequestContext getRequestContext() {
-        return RequestContext.getCurrentInstance();
     }
 
     public static String ejecutarNavegacion(String bBname, String method) {

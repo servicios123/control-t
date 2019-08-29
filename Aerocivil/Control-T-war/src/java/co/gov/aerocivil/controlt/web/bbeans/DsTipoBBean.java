@@ -8,13 +8,11 @@ import co.gov.aerocivil.controlt.entities.DepCategoria;
 import co.gov.aerocivil.controlt.entities.DsTipo;
 import co.gov.aerocivil.controlt.services.DepCategoriaService;
 import co.gov.aerocivil.controlt.services.DsTipoService;
-import co.gov.aerocivil.controlt.web.lazylist.DsTipoLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -30,7 +28,7 @@ public class DsTipoBBean {
     private DepCategoriaService categoriaService;
     private DsTipo tipo;
     private DsTipo tipoFiltro;
-    private LazyDataModel<DsTipo> lista;
+    private List<DsTipo> lista;
     private List<DepCategoria> listaCategorias;
 
     /**
@@ -83,7 +81,7 @@ public class DsTipoBBean {
 
     public String filtrar() {
         tipoFiltro.setCategoria(new DepCategoria());
-        lista = new DsTipoLazyList(this.tipoService, tipoFiltro);
+        lista = this.tipoService.getLista(tipoFiltro, 0, 0, null, null);
         return "listarDsTipo";
     }
 
@@ -103,11 +101,11 @@ public class DsTipoBBean {
         this.tipoFiltro = tipoFiltro;
     }
 
-    public LazyDataModel<DsTipo> getLista() {
+    public List<DsTipo> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<DsTipo> lista) {
+    public void setLista(List<DsTipo> lista) {
         this.lista = lista;
     }
 
@@ -118,7 +116,4 @@ public class DsTipoBBean {
     public void setListaCategorias(List<DepCategoria> listaCategorias) {
         this.listaCategorias = listaCategorias;
     }
-    
-    
-    
 }

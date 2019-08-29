@@ -125,6 +125,76 @@ public class PosicionJornadaServiceBBean implements PosicionJornadaService {
     }
     
     @Override
+    public List<PosicionJornada> getLista(PosicionJornada posicionJornada){
+        
+        try {            
+            Query query = createQueryFilter(posicionJornada);
+            return (List<PosicionJornada>) query.getResultList();
+        } catch (NoResultException nre) {
+            nre.printStackTrace();
+            return null;
+        }
+
+    }
+    
+    
+    private Query createQueryFilter(PosicionJornada posicionJornada){
+        
+        List<String> condiciones = new ArrayList<String>();
+            StringBuilder strQry = new StringBuilder();
+         Map<String,Object> params = new java.util.HashMap<String, Object>();
+        
+         if (posicionJornada.getPosicion().getPosicionNacional().getPnAlias() != null && !"".equals(posicionJornada.getPosicion().getPosicionNacional().getPnAlias())) {
+            condiciones.add("upper(t.posicion.posicionNacional.pnAlias) = :alias ");
+            params.put("alias", posicionJornada.getPosicion().getPosicionNacional().getPnAlias().toUpperCase());
+        }
+        if (posicionJornada.getPjEstado()!= null  && !"".equals(posicionJornada.getPjEstado())) {
+            condiciones.add("t.pjEstado = :estado ");
+            params.put("estado",  posicionJornada.getPjEstado());
+        }
+       
+        if (posicionJornada.getDependencia().getAeropuerto().getRegional().getRegId() != null ) {
+            condiciones.add("t.dependencia.aeropuerto.regional.regId = :reg ");
+            params.put("reg",  posicionJornada.getDependencia().getAeropuerto().getRegional().getRegId() );
+        }
+        
+        if (posicionJornada.getDependencia().getAeropuerto().getAeId() != null ) {
+            condiciones.add("t.dependencia.aeropuerto.aeId = :aero ");
+            params.put("aero",  posicionJornada.getDependencia().getAeropuerto().getAeId() );
+        }
+        
+        if (posicionJornada.getDependencia().getDepId() != null ) {
+            condiciones.add("t.dependencia.depId = :dep ");
+            params.put("dep",  posicionJornada.getDependencia().getDepId() );
+        }
+        if (posicionJornada.getDependencia().getDepcategoria() != null && posicionJornada.getDependencia().getDepcategoria().getDcId() !=null && !"".equals(posicionJornada.getDependencia().getDepcategoria().getDcId())) {
+            condiciones.add("t.dependencia.depcategoria.dcId = :depcat ");
+            params.put("depcat",  posicionJornada.getDependencia().getDepcategoria().getDcId() );
+        }
+
+        if(condiciones.size()>0){
+            strQry.append("where ");
+        }
+        for (Iterator<String> it = condiciones.iterator(); it.hasNext();) {
+            strQry.append(it.next());
+            if(it.hasNext()){
+                strQry.append(" and ");
+            }
+        }
+
+        Query query = em.createQuery("Select count(t) from PosicionJornada t "+strQry.toString());
+        QueryUtil.setParameters(query, params);
+        count = (Long)query.getSingleResult();
+        
+        StringBuilder strQryFinal = new StringBuilder("Select t from PosicionJornada t ").
+                append(strQry.toString());
+
+        query = em.createQuery(strQryFinal.toString());
+        QueryUtil.setParameters(query, params);
+        return query;
+    }
+    
+    @Override
     public Long getCount() {
         return count;
     }

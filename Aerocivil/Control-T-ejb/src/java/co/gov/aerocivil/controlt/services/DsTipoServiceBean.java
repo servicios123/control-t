@@ -4,9 +4,6 @@
  */
 package co.gov.aerocivil.controlt.services;
 
-import co.gov.aerocivil.controlt.entities.Aeropuerto;
-import co.gov.aerocivil.controlt.entities.DepCategoria;
-import co.gov.aerocivil.controlt.entities.Dependencia;
 import co.gov.aerocivil.controlt.entities.DsTipo;
 import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.util.QueryUtil;
@@ -33,7 +30,6 @@ public class DsTipoServiceBean implements DsTipoService {
     @PersistenceContext(unitName = "ControlT-ejbPU")
     private EntityManager em;
     private Long count;
-
     @EJB
     private AuditoriaService auditoria;
 
@@ -46,7 +42,9 @@ public class DsTipoServiceBean implements DsTipoService {
             String sortField, String sortOrder) {
 
         Query query = createQueryFilter(tipo, sortField, sortOrder);
-        query.setFirstResult(first).setMaxResults(pageSize);
+        if (first > 0) {
+            query.setFirstResult(first).setMaxResults(pageSize);
+        }
         try {
             return (List<DsTipo>) query.getResultList();
         } catch (NoResultException nre) {
@@ -104,7 +102,7 @@ public class DsTipoServiceBean implements DsTipoService {
 
     @Override
     public List<DsTipo> getLista(DsTipo tipo) {
-        
+
         StringBuilder strQry = new StringBuilder();
         strQry.append("Select d from DsTipo d ");
         strQry.append("where ");
@@ -116,5 +114,4 @@ public class DsTipoServiceBean implements DsTipoService {
         return query.getResultList();
 
     }
-
 }

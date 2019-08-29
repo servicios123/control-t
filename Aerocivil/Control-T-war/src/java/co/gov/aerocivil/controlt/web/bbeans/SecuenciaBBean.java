@@ -14,14 +14,12 @@ import co.gov.aerocivil.controlt.entities.Secuencia;
 import co.gov.aerocivil.controlt.enums.RolEnum;
 
 import co.gov.aerocivil.controlt.services.SecuenciaService;
-import co.gov.aerocivil.controlt.web.lazylist.SecuenciaLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -42,7 +40,7 @@ public class SecuenciaBBean {
     private List<Dependencia> listDependencia;
     private List<Jornada> jornadas = new ArrayList<Jornada>();
     private List<DetSecuencia> detSecuencias = new ArrayList<DetSecuencia>();
-    private LazyDataModel<Secuencia> lista;
+    private List<Secuencia> lista;
 
     public String listar() {
         secuenciaFiltro = new Secuencia();
@@ -137,7 +135,7 @@ public class SecuenciaBBean {
     public String filtrar() {
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         secuenciaFiltro.setDependencia(logbbean.getFuncionarioTO().getFuncionario().getDependencia());
-        lista = new SecuenciaLazyList(secuenciaService, secuenciaFiltro);
+        lista = secuenciaService.getLista(secuenciaFiltro, 0, 0, null, null);
         return "listarSecuencia";
     }
 
@@ -280,11 +278,11 @@ public class SecuenciaBBean {
         this.listDependencia = listDependencia;
     }
 
-    public LazyDataModel<Secuencia> getLista() {
+    public List<Secuencia> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<Secuencia> lista) {
+    public void setLista(List<Secuencia> lista) {
         this.lista = lista;
     }
 

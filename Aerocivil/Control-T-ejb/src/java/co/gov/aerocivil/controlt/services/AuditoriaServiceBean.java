@@ -64,13 +64,14 @@ public class AuditoriaServiceBean implements AuditoriaService{
             Auditoria aud = new Auditoria();
             if(entity instanceof Funcionario ){
                 aud.setAudDatos(((Funcionario)entity).toString());       
+            }else{
+                aud.setAudDatos(data);
             }            
             aud.setAudTabla(entity.getClass().getAnnotation(Table.class).name());
             aud.setAudFecha(new Date());
             aud.setAudPk(Long.valueOf(objId.toString()));
             aud.setFuncionario(func); 
             aud.setAudAccion(accion);
-            aud.setAudDatos(data);
             em.merge(aud);
         }
         return entity;    
@@ -242,6 +243,101 @@ public class AuditoriaServiceBean implements AuditoriaService{
         if(sortField!=null && sortOrder!=null){
             strQryFinal.append(" order by p.").append(sortField).append(" ").append(sortOrder);
         }
+        //System.out.println("strQryFinal::: "+strQryFinal);
+        query = em.createQuery(strQryFinal.toString());
+        QueryUtil.setParameters(query, params);
+
+        return query;
+        
+    }
+    
+    @Override
+    public List<Auditoria> getLista(Auditoria auditoriaFiltro) {
+        Query query = createQueryFilter(auditoriaFiltro);
+        try{
+            return (List<Auditoria>) query.getResultList();    
+        }
+        catch (NoResultException nre) {
+            nre.printStackTrace();
+            return null;
+        }        
+    }
+    
+    private Query createQueryFilter(Auditoria auditoria){
+        List<String> condiciones = new ArrayList<String>();
+        //verificar los campos de 
+                
+        Map<String,Object> params = new HashMap<String, Object>();
+        if(auditoria.getFuncionario()!=null ){
+            if(auditoria.getFuncionario().getFunNombre()!=null && 
+                    !"".equals(auditoria.getFuncionario().getFunNombre())){
+                condiciones.add(" (p.funcionario.funNombre) like :nombre ");
+                params.put("nombre", "%" +  auditoria.getFuncionario().getFunNombre().toUpperCase() + "%"); 
+            }
+            if(auditoria.getFuncionario().getFunAlias()!=null &&
+                    !"".equals(auditoria.getFuncionario().getFunAlias())){
+                condiciones.add(" (p.funcionario.funAlias) like :alias ");
+                params.put("alias", "%" +  auditoria.getFuncionario().getFunAlias().toUpperCase() + "%"); 
+            }
+            if(auditoria.getFuncionario().getFunId()!=null ){
+                condiciones.add(" (p.funcionario.funId) = :funId ");
+                params.put("funId",  auditoria.getFuncionario().getFunId()); 
+            }
+        }
+        if(auditoria.getAudFecha()!=null ){
+            condiciones.add(" (p.audFecha) between :fechaIni and :fechaFin ");
+            params.put("fechaIni", auditoria.getAudFecha()); 
+            params.put("fechaFin", auditoria.getAudFechaFin()); 
+        }
+        
+        if(auditoria.getAudPk()!=null ){
+            condiciones.add(" p.audPk = :apk");
+            params.put("apk", auditoria.getAudPk()); 
+           
+        }
+        if(auditoria.getAudAccion()!=null ){
+            condiciones.add(" p.audAccion = :accion");
+            params.put("accion", auditoria.getAudAccion()); 
+           
+        }
+        
+        if (auditoria.getFuncionario().getDependencia() != null
+                && auditoria.getFuncionario().getDependencia().getDepcategoria() != null
+                && auditoria.getFuncionario().getDependencia().getDepcategoria().getDcId() != null) {
+            condiciones.add("p.funcionario.dependencia.depcategoria.dcId = :depCat ");
+            params.put("depCat", auditoria.getFuncionario().getDependencia().getDepcategoria().getDcId());
+        }
+        if (auditoria.getFuncionario().getDependencia() != null && auditoria.getFuncionario().getDependencia().getDepId() != null) {
+            condiciones.add("p.funcionario.dependencia.depId = :dep ");
+            params.put("dep", auditoria.getFuncionario().getDependencia().getDepId());
+        } 
+        
+        if (auditoria.getFuncionario().getDependencia() != null && 
+                auditoria.getFuncionario().getDependencia().getAeropuerto() != null && 
+                auditoria.getFuncionario().getDependencia().getAeropuerto().getAeId() != null) {
+            condiciones.add("p.funcionario.dependencia.aeropuerto.aeId = :aero ");
+            params.put("aero", auditoria.getFuncionario().getDependencia().getAeropuerto().getAeId());
+        } 
+        else if (auditoria.getFuncionario().getDependencia() != null && 
+                auditoria.getFuncionario().getDependencia().getAeropuerto().getRegional() != null && 
+                auditoria.getFuncionario().getDependencia().getAeropuerto().getRegional().getRegId() != null) {
+            condiciones.add("p.funcionario.dependencia.aeropuerto.regional.regId = :reg ");
+            params.put("reg", auditoria.getFuncionario().getDependencia().getAeropuerto().getRegional().getRegId());
+        }
+
+        StringBuilder strQry = new StringBuilder();
+        
+        if(condiciones.size()>0){
+            strQry.append(" where ");
+            strQry.append(QueryUtil.joinWithAnd(condiciones));
+        }        
+        
+        Query query = em.createQuery("Select count(p) from Auditoria p ".concat(strQry.toString()));
+        QueryUtil.setParameters(query, params);
+        count = (Long)query.getSingleResult();
+        
+        StringBuilder strQryFinal = new StringBuilder("Select p from Auditoria p ").
+                append(strQry.toString());
         //System.out.println("strQryFinal::: "+strQryFinal);
         query = em.createQuery(strQryFinal.toString());
         QueryUtil.setParameters(query, params);

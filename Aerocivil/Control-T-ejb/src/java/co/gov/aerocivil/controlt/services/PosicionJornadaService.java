@@ -19,6 +19,7 @@ public interface PosicionJornadaService {
     
     public List<PosicionJornada> getLista(PosicionJornada posicionJornada, int first, int pageSize, 
             String sortField, String sortOrder);
+    public List<PosicionJornada> getLista(PosicionJornada posicionJornada);
     
     public Long getCount(); 
 }

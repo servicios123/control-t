@@ -15,13 +15,11 @@ import co.gov.aerocivil.controlt.enums.RolEnum;
 import co.gov.aerocivil.controlt.services.JornadaService;
 import co.gov.aerocivil.controlt.services.RestriccionesService;
 import co.gov.aerocivil.controlt.to.RestriccionTO;
-import co.gov.aerocivil.controlt.web.lazylist.RestriccionesLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -44,7 +42,7 @@ public class RestriccionDependenciaBBean {
     //4 Paginatorade
     private String jornadaAlias;
     private RestriccionDependencia restriccionFiltro;
-    private LazyDataModel<RestriccionDependencia> listaRestriccionesLazy;
+    private List<RestriccionDependencia> listaRestriccionesLazy;
     //private Dependencia dependenciaFiltro;
     private List<Dependencia> listDependencia;
     
@@ -163,15 +161,15 @@ public class RestriccionDependenciaBBean {
 
     
     public String filtrar() {
-        listaRestriccionesLazy = new RestriccionesLazyList(service, restriccionFiltro);        
+        listaRestriccionesLazy = service.getLista(restriccionFiltro, 0, 0, null, null);      
         return "listarRestricciones";
     }
     
-    public LazyDataModel<RestriccionDependencia> getListaRestriccionesLazy() {
+    public List<RestriccionDependencia> getListaRestriccionesLazy() {
         return listaRestriccionesLazy;
     }
 
-    public void setListaRestriccionesLazy(LazyDataModel<RestriccionDependencia> listaRestriccionesLazy) {
+    public void setListaRestriccionesLazy(List<RestriccionDependencia> listaRestriccionesLazy) {
         this.listaRestriccionesLazy = listaRestriccionesLazy;
     }
 

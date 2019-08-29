@@ -22,6 +22,7 @@ public interface JornadaService{
      
     public List<Jornada> getListaPag(Jornada jornada, Integer first, Integer pageSize,
             String sortField, String sortOrder);    
+    public List<Jornada> getListaPag(Jornada jornada);    
     public Long getCount();
 
     public Jornada getJornadaAnterior(Jornada jornada);

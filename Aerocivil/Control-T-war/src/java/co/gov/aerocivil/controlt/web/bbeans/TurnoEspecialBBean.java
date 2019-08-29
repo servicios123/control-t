@@ -11,16 +11,12 @@ import co.gov.aerocivil.controlt.entities.Regional;
 import co.gov.aerocivil.controlt.entities.TurnoEspecial;
 import co.gov.aerocivil.controlt.enums.RolEnum;
 import co.gov.aerocivil.controlt.services.TurnoEspecialService;
-import co.gov.aerocivil.controlt.web.lazylist.TurnoEspecialLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -38,7 +34,7 @@ public class TurnoEspecialBBean {
     private boolean crear;
     private TurnoEspecial turnoEspecial;
     private TurnoEspecial turnoEspecialFiltro;
-    private LazyDataModel<TurnoEspecial> lista;
+    private List<TurnoEspecial> lista;
     private List<Dependencia> listDependencia;
     private List<Aeropuerto> listAeropuerto;
 
@@ -177,7 +173,7 @@ public class TurnoEspecialBBean {
     public String filtrar() {
         /*cargarAeropuerto();
          cargarDependencia();*/
-        lista = new TurnoEspecialLazyList(turnoEspecialService, turnoEspecialFiltro);
+        lista = turnoEspecialService.getLista(turnoEspecialFiltro, 0, 0, null, null);
         return "listarTurnoEspecial";
     }
 
@@ -205,11 +201,11 @@ public class TurnoEspecialBBean {
         this.turnoEspecialFiltro = turnoEspecialFiltro;
     }
 
-    public LazyDataModel<TurnoEspecial> getLista() {
+    public List<TurnoEspecial> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<TurnoEspecial> lista) {
+    public void setLista(List<TurnoEspecial> lista) {
         this.lista = lista;
     }
 

@@ -17,10 +17,8 @@ import co.gov.aerocivil.controlt.services.DependenciaService;
 import co.gov.aerocivil.controlt.services.DiarioSenalService;
 import co.gov.aerocivil.controlt.services.DsTipoService;
 import co.gov.aerocivil.controlt.services.ListasService;
-import co.gov.aerocivil.controlt.to.OptionTO;
 import co.gov.aerocivil.controlt.web.enums.SortOrderEnum;
 import co.gov.aerocivil.controlt.web.enums.ValoresLugarSuceso;
-import co.gov.aerocivil.controlt.web.lazylist.DiarioSenalLazyList;
 import co.gov.aerocivil.controlt.web.util.DateUtil;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import co.gov.aerocivil.controlt.web.util.LugarSucesoDto;
@@ -33,9 +31,7 @@ import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -63,7 +59,7 @@ public class DiarioSenalBBean {
     @EJB
     private DsTipoService tipoService;
     private List<Dependencia> listDependencia;
-    private LazyDataModel<DiarioSenal> lista;
+    private List<DiarioSenal> lista;
     private String Test;
     private String Test2;
     private String dependencia;
@@ -160,7 +156,7 @@ public class DiarioSenalBBean {
         } else {
             diarioSenalFiltro.setDsenLugarSuceso(null);
         }
-        lista = new DiarioSenalLazyList(diarioSenalService, diarioSenalFiltro);
+        lista = diarioSenalService.getLista(diarioSenalFiltro);
         return "listarDiarioSenal";
     }
 
@@ -486,11 +482,11 @@ public class DiarioSenalBBean {
         this.listDependencia = listDependencia;
     }
 
-    public LazyDataModel<DiarioSenal> getLista() {
+    public List<DiarioSenal> getLista() {
         return lista;
     }
 
-    public void setLista(LazyDataModel<DiarioSenal> lista) {
+    public void setLista(List<DiarioSenal> lista) {
         this.lista = lista;
     }
 

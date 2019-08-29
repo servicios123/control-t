@@ -8,20 +8,20 @@
         <Node id="Solicitud/CrearSolicitud.xhtml" x="3400" y="150" zoom="true"/>
         <Node id="TurnoEspFuncionaripo/__EditTurnoEspecialFuncionario.xhtml" x="2150" y="300" zoom="true"/>
         <Node id="Programacion/verProgramacion.xhtml" x="1400" y="1350" zoom="true"/>
-        <Node id="Funcionario/CrearFuncionario.xhtml" x="900" y="1350" zoom="true"/>
         <Node id="Incapacidades/listarIncapacidades.xhtml" x="1900" y="300" zoom="true"/>
+        <Node id="Funcionario/CrearFuncionario.xhtml" x="900" y="1350" zoom="true"/>
         <Node id="Funcionario/EditarCondEsp.xhtml" x="2150" y="1050" zoom="true"/>
         <Node id="error.xhtml" x="1150" y="1650" zoom="true"/>
         <Node id="DiarioSenalEspecial/DiarioSenalEspecial.xhtml" x="1400" y="1500" zoom="true"/>
         <Node id="Turno/ListarTurnoEspecial.xhtml" x="3400" y="300" zoom="true"/>
         <Node id="Emergencias/ListarEmergencias.xhtml" x="1900" y="600" zoom="true"/>
         <Node id="template_interior.xhtml" x="900" y="750" zoom="true"/>
+        <Node id="CursoRecurrente/EditCursoRecurrente.xhtml" x="650" y="1350" zoom="true"/>
         <Node id="Dependencia/ListarDependencia.xhtml" x="1900" y="150" zoom="true"/>
         <Node id="Funcionario/VencimientosCertificado.xhtml" x="900" y="1500" zoom="true"/>
-        <Node id="CursoRecurrente/EditCursoRecurrente.xhtml" x="650" y="1350" zoom="true"/>
         <Node id="Funcionario/EditFuncionario.xhtml" x="3150" y="450" zoom="true"/>
-        <Node id="Solicitud/ListarSolicitudPropias.xhtml" x="650" y="600" zoom="true"/>
         <Node id="Transporte/configTransporte.xhtml" x="3150" y="300" zoom="true"/>
+        <Node id="Solicitud/ListarSolicitudPropias.xhtml" x="650" y="600" zoom="true"/>
         <Node id="Funcionario/ListarAsignacionesEspeciales.xhtml" x="1650" y="1200" zoom="true"/>
         <Node id="*" x="2400" y="150" zoom="true"/>
         <Node id="TurnoEspecial/ListarTurnoEsp.xhtml" x="150" y="2100" zoom="true"/>
@@ -60,9 +60,9 @@
         <Node id="Turno/ListarTurno.xhtml" x="2650" y="450" zoom="true"/>
         <Node id="DiarioSenal/EditDiarioSenal.xhtml" x="2400" y="900" zoom="true"/>
         <Node id="Programacion/repHorasExtras.xhtml" x="1150" y="300" zoom="true"/>
-        <Node id="resources/Manual.pdf" x="650" y="300" zoom="true"/>
-        <Node id="PosicionJornada/EditPosicionJornada.xhtml" x="150" y="450" zoom="true"/>
         <Node id="DiarioPosiciones/filtroProgVsEjecutado.xhtml" x="2150" y="150" zoom="true"/>
+        <Node id="PosicionJornada/EditPosicionJornada.xhtml" x="150" y="450" zoom="true"/>
+        <Node id="resources/Manual.pdf" x="650" y="300" zoom="true"/>
         <Node id="TurnoEspecial/EditTurnoEsp.xhtml" x="150" y="1800" zoom="true"/>
         <Node id="DiarioPosiciones/filtroFuncionarioDependencia.xhtml" x="150" y="1650" zoom="true"/>
         <Node id="Jornada/EditarJornada.xhtml" x="400" y="1950" zoom="true"/>
@@ -78,8 +78,8 @@
         <Node id="Festivos/EditFestivos.xhtml" x="2150" y="750" zoom="true"/>
         <Node id="welcomePrimefaces_1.xhtml" x="150" y="750" zoom="true"/>
         <Node id="Funcionario/filtroFuncionario.xhtml" x="1650" y="600" zoom="true"/>
-        <Node id="Posicion/AsignarPosicionesDependencia.xhtml" x="3650" y="150" zoom="true"/>
         <Node id="sessionExpired.xhtml" x="1650" y="1050" zoom="true"/>
+        <Node id="Posicion/AsignarPosicionesDependencia.xhtml" x="3650" y="150" zoom="true"/>
         <Node id="PosicionHabilitada/ListarPosicionHabilitada.xhtml" x="650" y="1200" zoom="true"/>
         <Node id="PosicionJornada/ListPosicionJornada.xhtml" x="1400" y="750" zoom="true"/>
         <Node id="Solicitud/EditSolicitudFuncionario.xhtml" x="900" y="1050" zoom="true"/>
@@ -94,9 +94,9 @@
         <Node id="Dependencia/EditDependencia.xhtml" x="150" y="1350" zoom="true"/>
         <Node id="Funcionario/popupsCursosEvaluaciones.xhtml" x="1150" y="600" zoom="true"/>
         <Node id="Notificacion/ListarNotificacion.xhtml" x="2150" y="900" zoom="true"/>
+        <Node id="DiarioPosiciones/consultarDiarioIndividual.xhtml" x="150" y="150" zoom="true"/>
         <Node id="Programacion/listarProgramacion.xhtml" x="900" y="1650" zoom="true"/>
         <Node id="Permisos/ListarPermisos.xhtml" x="400" y="600" zoom="true"/>
-        <Node id="DiarioPosiciones/consultarDiarioIndividual.xhtml" x="150" y="150" zoom="true"/>
         <Node id="Jornada/ConfigurarJornada.xhtml" x="2900" y="450" zoom="true"/>
         <Node id="DiarioPosiciones/listarProgVsEjecutados.xhtml" x="1400" y="600" zoom="true"/>
         <Node id="PosicionNacional/ListarPosicionNacional.xhtml" x="2900" y="300" zoom="true"/>
@@ -104,15 +104,15 @@
         <Node id="TurnoEspFuncionaripo/crearTurnoEspecialFuncionario.xhtml" x="1900" y="750" zoom="true"/>
         <Node id="PosicionHabilitada/VencimientoPosicionHabilitada.xhtml" x="2650" y="150" zoom="true"/>
         <Node id="Regional/EditXXX.xhtml" x="150" y="1500" zoom="true"/>
-        <Node id="TurnoEspFuncionaripo/crearTurnoProgramacion.xhtml" x="2400" y="750" zoom="true"/>
         <Node id="DepCategoria/ListDepCategoria.xhtml" x="1150" y="150" zoom="true"/>
         <Node id="Programacion/programacionPaso0_0.xhtml" x="1150" y="1050" zoom="true"/>
+        <Node id="TurnoEspFuncionaripo/crearTurnoProgramacion.xhtml" x="2400" y="750" zoom="true"/>
         <Node id="Turno/EditarTurno.xhtml" x="2400" y="300" zoom="true"/>
         <Node id="Festivos/schedule.xhtml" x="900" y="1200" zoom="true"/>
         <Node id="Aeropuerto/ListarAeropuerto.xhtml" x="150" y="900" zoom="true"/>
         <Node id="DiarioSenalEspecial/FiltrarDiarioSenalEspecial.xhtml" x="1650" y="1350" zoom="true"/>
-        <Node id="PosicionInactiva/PosicionesInactivas.xhtml" x="2900" y="150" zoom="true"/>
         <Node id="Vencimientos/ListarVencimientos.xhtml" x="400" y="150" zoom="true"/>
+        <Node id="PosicionInactiva/PosicionesInactivas.xhtml" x="2900" y="150" zoom="true"/>
         <Node id="index.xhtml" x="1650" y="900" zoom="true"/>
         <Node id="Funcionario/ListarFuncionario.xhtml" x="1150" y="1500" zoom="true"/>
         <Node id="menu.xhtml" x="1150" y="1200" zoom="true"/>

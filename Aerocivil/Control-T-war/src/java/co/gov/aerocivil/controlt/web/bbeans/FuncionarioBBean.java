@@ -23,10 +23,8 @@ import co.gov.aerocivil.controlt.services.JornadaNoLaboralService;
 import co.gov.aerocivil.controlt.services.JornadaService;
 import co.gov.aerocivil.controlt.services.RegionalService;
 import co.gov.aerocivil.controlt.web.enums.SortOrderEnum;
-import co.gov.aerocivil.controlt.web.lazylist.FuncionarioLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 //import com.itextpdf.text.pdf.ArabicLigaturizer;
-import java.io.Serializable;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,13 +35,10 @@ import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import javax.faces.event.ValueChangeEvent;
 import org.primefaces.component.datatable.DataTable;
-import org.primefaces.model.LazyDataModel;
-import org.primefaces.model.DualListModel;
 import org.primefaces.component.selectonemenu.SelectOneMenu;
-import org.primefaces.event.DateSelectEvent;
 import org.primefaces.event.RowEditEvent;
+import org.primefaces.event.SelectEvent;
 
 /**
  *
@@ -70,7 +65,7 @@ public class FuncionarioBBean {
     private Funcionario funcionario;
     private Funcionario funcionarioSeleccionado;
     private Funcionario funcionarioFiltro;
-    private LazyDataModel<Funcionario> lazyList;
+    private List<Funcionario> lazyList;
     private List<Aeropuerto> listAeropuerto;
     private List<Dependencia> listDependencia;
     private List<Posicion> listPosicion;
@@ -266,6 +261,22 @@ public class FuncionarioBBean {
         }
         return filtrar();
     }
+    
+    public String listarVencimiento(Funcionario f) {
+        if(f!=null){
+            funcionarioFiltro = f;
+        }else{
+            funcionarioFiltro = new Funcionario();
+        }
+        funcionarioFiltro.setDependencia(getDependenciaXNivelUsuario());
+        funcionarioFiltro.getDependencia().setDepcategoria(new DepCategoria());
+        //columns = new boolean[3];
+        columns = new boolean[]{true, false, false};
+        if (JsfUtil.getFuncionarioSesion().getFuNivel().equals(RolEnum.NIVEL_A4.getRolId())) {
+            columns[1] = true;
+        }
+        return filtrar();
+    }
 
     public String listar_vencimiento_certificado() {
         funcionarioFiltro = new Funcionario();
@@ -293,12 +304,12 @@ public class FuncionarioBBean {
 
     public String filtrar_Cert_Medico() {
 
-        lazyList = new FuncionarioLazyList(funcionarioService, funcionarioFiltro);
+        lazyList = funcionarioService.getListaPag(funcionarioFiltro, null, null, null, null);
         return "listarCertMedico";
     }
 
     public String filtrar_vencimiento_certificado() {
-        lazyList = new FuncionarioLazyList(funcionarioService, funcionarioFiltro);
+        lazyList = funcionarioService.getListaPag(funcionarioFiltro, null, null, null, null);
         return "listarVencimientoCertificado";
     }
 
@@ -317,7 +328,7 @@ public class FuncionarioBBean {
     }
 
     public String filtrar_vencimiento_curso() {
-        lazyList = new FuncionarioLazyList(funcionarioService, funcionarioFiltro);
+        lazyList = funcionarioService.getListaPag(funcionarioFiltro, null, null, null, null);
         return "listarVencimientoCurso";
     }
 
@@ -336,7 +347,7 @@ public class FuncionarioBBean {
     }
 
     public String filtrar_vencimiento_evaluacion() {
-        lazyList = new FuncionarioLazyList(funcionarioService, funcionarioFiltro);
+        lazyList = funcionarioService.getListaPag(funcionarioFiltro, null, null, null, null);
         return "listarVencimientoEvaluacion";
     }
 
@@ -364,7 +375,7 @@ public class FuncionarioBBean {
     }
 
     public String filtrarAsignacionesEspeciales() {
-        lazyList = new FuncionarioLazyList(funcionarioService, funcionarioFiltro);
+        lazyList = funcionarioService.getListaPag(funcionarioFiltro, null, null, null, null);
         return "listarAsignacionesEspeciales";
     }
 
@@ -387,7 +398,7 @@ public class FuncionarioBBean {
     }
 
     public String filtrarCondicionesEsp() {
-        lazyList = new FuncionarioLazyList(funcionarioService, funcionarioFiltro);
+        lazyList = funcionarioService.getListaPag(funcionarioFiltro, null, null, null, null);
         return "listarCondicionesEspeciales";
     }
 
@@ -432,7 +443,7 @@ public class FuncionarioBBean {
     }
 
     public String filtrar() {
-        lazyList = new FuncionarioLazyList(funcionarioService, funcionarioFiltro);
+        lazyList = funcionarioService.getListaPag(funcionarioFiltro, null, null, null, null);
         return "listarFuncionario";
     }
 
@@ -444,7 +455,7 @@ public class FuncionarioBBean {
      */
     public String filtrarSinPaginar() {
         this.funcionariosDisponibles = funcionarioService.getListaPag(funcionarioFiltro, null, null,
-                "funAlias", SortOrderEnum.ASC.getOrder());
+                null, null);
         heightList = this.funcionariosDisponibles.size() >= 20 ? "404px"
                 : ((this.funcionariosDisponibles.size() * 28 + 58) + "px");
         JsfUtil.forceRefresh();
@@ -568,12 +579,13 @@ public class FuncionarioBBean {
         try {
             funcionarioService.guardar((Funcionario) event.getObject(),
                     JsfUtil.getFuncionarioSesion());
+            JsfUtil.addManualSuccessMessage("Operacion Exitosa");
         } catch (SQLIntegrityConstraintViolationException ex) {
             Logger.getLogger(FuncionarioBBean.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public void onCancel(RowEditEvent event) {
+    public void onRowCancel(RowEditEvent event) {
         this.funcionarioSeleccionado = new Funcionario();
         JsfUtil.addManualSuccessMessage("Operacion Cancelada");
     }
@@ -605,12 +617,12 @@ public class FuncionarioBBean {
         JsfUtil.addManualSuccessMessage("Operacion Cancelada");
     }
 
-    public void actualiza(DateSelectEvent evento) {
+    public void actualiza(SelectEvent evento) {
         Calendar c = Calendar.getInstance();
-        c.setTime(evento.getDate());
+        c.setTime((Date)evento.getObject());
         c.add(Calendar.YEAR, 1);
         this.fechaVenceEvaluacion = (c.getTime());
-        this.fechaRealizaEvaluacion = evento.getDate();
+        this.fechaRealizaEvaluacion = (Date)evento.getObject();
     }
 
     public void cargarFuncionario() {
@@ -754,7 +766,7 @@ public class FuncionarioBBean {
         this.funcionarioFiltro = funcionarioFiltro;
     }
 
-    public LazyDataModel<Funcionario> getLazyList() {
+    public List<Funcionario> getLazyList() {
         return lazyList;
     }
 

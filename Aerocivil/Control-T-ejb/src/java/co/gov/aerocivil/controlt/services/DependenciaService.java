@@ -35,5 +35,7 @@ public interface DependenciaService {
     public Dependencia findByd(Long id);
 
     public java.util.List<co.gov.aerocivil.controlt.entities.Dependencia> getDepsAts(Aeropuerto aeropuerto);
+
+    public java.util.List<co.gov.aerocivil.controlt.entities.Dependencia> getLista(co.gov.aerocivil.controlt.entities.Dependencia dependencia);
     
 }

@@ -26,16 +26,17 @@ public class NotificacionServiceBean implements NotificacionService {
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
-    
-     @PersistenceContext(unitName = "ControlT-ejbPU")
+    @PersistenceContext(unitName = "ControlT-ejbPU")
     private EntityManager em;
     private Long count;
-    
-     public List<Notificacion> getLista(Notificacion notificacion, int first, int pageSize,
+
+    public List<Notificacion> getLista(Notificacion notificacion, int first, int pageSize,
             String sortField, String sortOrder) {
 
         Query query = createQueryFilter(notificacion, sortField, sortOrder);
-        query.setFirstResult(first).setMaxResults(pageSize);
+        if (first > 0) {
+            query.setFirstResult(first).setMaxResults(pageSize);
+        }
         try {
             return (List<Notificacion>) query.getResultList();
         } catch (NoResultException nre) {
@@ -59,32 +60,32 @@ public class NotificacionServiceBean implements NotificacionService {
             condiciones.add("d.not_Funcionario.dependencia.aeropuerto.aeId = :aero ");
             params.put("aero", notificacion.getNotFuncionario().getDependencia().getAeropuerto().getAeId());
         }
-         if (notificacion.getFechaini() != null && notificacion.getFechafin()!= null) {
-                condiciones.add("d.notFecha between :fini and :ffin ");
-                params.put("fini", notificacion.getFechaini() );
-                params.put("ffin", notificacion.getFechafin());
-         }
-         if (notificacion.getFechaini() != null && notificacion.getFechafin()== null) {
-                condiciones.add("d.notFecha = :fini ");
-                params.put("fini", notificacion.getFechaini() );
-               
-         }
-         
-          if (notificacion.getFechaini() == null && notificacion.getFechafin()!= null) {
-                condiciones.add("d.notFecha = :ffin ");
-                params.put("ffin", notificacion.getFechafin());
-         }
-          
+        if (notificacion.getFechaini() != null && notificacion.getFechafin() != null) {
+            condiciones.add("d.notFecha between :fini and :ffin ");
+            params.put("fini", notificacion.getFechaini());
+            params.put("ffin", notificacion.getFechafin());
+        }
+        if (notificacion.getFechaini() != null && notificacion.getFechafin() == null) {
+            condiciones.add("d.notFecha = :fini ");
+            params.put("fini", notificacion.getFechaini());
+
+        }
+
+        if (notificacion.getFechaini() == null && notificacion.getFechafin() != null) {
+            condiciones.add("d.notFecha = :ffin ");
+            params.put("ffin", notificacion.getFechafin());
+        }
+
         if (notificacion.getNotFuncionario().getDependencia().getAeropuerto().getRegional().getRegId() != null) {
             condiciones.add("d.not_Funcionario.dependencia.aeropuerto.regional.regId = :regional ");
             params.put("regional", notificacion.getNotFuncionario().getDependencia().getAeropuerto().getRegional().getRegId());
         }
-      
+
         if (notificacion.getNotTipo() != null) {
             condiciones.add("d.notTipo = :tipo ");
             params.put("tipo", notificacion.getNotTipo());
         }
-         if (notificacion.getNotFuncionario().getFunId() != null) {
+        if (notificacion.getNotFuncionario().getFunId() != null) {
             condiciones.add("d.not_Funcionario.funId = :fId ");
             params.put("fId", notificacion.getNotFuncionario().getFunId());
         }
@@ -119,5 +120,4 @@ public class NotificacionServiceBean implements NotificacionService {
     public Long getCount() {
         return count;
     }
-
 }

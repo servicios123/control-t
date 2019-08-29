@@ -6,23 +6,16 @@ package co.gov.aerocivil.controlt.web.bbeans;
 
 import co.gov.aerocivil.controlt.entities.Aeropuerto;
 import co.gov.aerocivil.controlt.entities.Dependencia;
-import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.entities.Posicion;
 import co.gov.aerocivil.controlt.entities.PosicionNacional;
-import co.gov.aerocivil.controlt.entities.Regional;
-import co.gov.aerocivil.controlt.enums.RolEnum;
 import co.gov.aerocivil.controlt.services.PosicionNacionalService;
 import co.gov.aerocivil.controlt.services.PosicionService;
-import co.gov.aerocivil.controlt.web.enums.EstadoPeticionEnum;
-import co.gov.aerocivil.controlt.web.lazylist.AeropuertoLazyList;
-import co.gov.aerocivil.controlt.web.lazylist.PosicionLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -37,25 +30,15 @@ public class PosicionBBean {
      */
     @EJB
     private PosicionService posicionService;
-    
     @EJB
     private PosicionNacionalService posicionNacionalService;
     private Posicion posicion;
     private Posicion posicionFiltro;
-    private LazyDataModel<Posicion> lista;
+    private List<Posicion> lista;
     private List<Aeropuerto> listAeropuerto;
     private List<Dependencia> listDependencia;
     private List<PosicionNacional> listPosicionNacional;
-
     private Long[] posicionesSeleccionadas;
-
-    public LazyDataModel<Posicion> getLista() {
-        return lista;
-    }
-
-    public void setLista(LazyDataModel<Posicion> lista) {
-        this.lista = lista;
-    }
 
     public String crear() {
 
@@ -63,7 +46,7 @@ public class PosicionBBean {
 
         Dependencia dependencia = new Dependencia();
 
-       LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
+        LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         dependencia = logbbean.getFuncionarioTO().getFuncionario().getDependencia();
         posicion.setDependencia(dependencia);
         cargarFuncion();
@@ -83,18 +66,18 @@ public class PosicionBBean {
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         Dependencia dep = logbbean.getFuncionarioTO().getFuncionario().getDependencia();
 
-            posicionService.inactivarPosiciones(posicionesSeleccionadas,dep);
-      
-        for(Long posNal:posicionesSeleccionadas){
-            posicion=posicionService.getPosicionByPosNal(posNal,dep);
+        posicionService.inactivarPosiciones(posicionesSeleccionadas, dep);
+
+        for (Long posNal : posicionesSeleccionadas) {
+            posicion = posicionService.getPosicionByPosNal(posNal, dep);
             PosicionNacional posNalAux = posicionNacionalService.getPosNalById(posNal);
-            if(posicion==null){
+            if (posicion == null) {
                 posicion = new Posicion();
                 posicion.setDependencia(dep);
                 posicion.setPosicionNacional(posNalAux);
             }
-            if(posNalAux.getPnVencimiento().equals(posicion.getPosTiempoVence())
-                    && "Activo".equals(posicion.getPosEstado())){
+            if (posNalAux.getPnVencimiento().equals(posicion.getPosTiempoVence())
+                    && "Activo".equals(posicion.getPosEstado())) {
                 //si el tiempo de vencimiento no ha cambiado y
                 //se encuetra activa la posicion, continúo iterando
                 continue;
@@ -119,17 +102,16 @@ public class PosicionBBean {
         posicionFiltro.setDependencia(dependencia);
         cargarFuncionListado();
         cargarSectorListado();
-               
+
         return filtrar();
     }
 
     public String filtrar() {
 
-        lista = new PosicionLazyList(posicionService, posicionFiltro);
+        lista = posicionService.getLista(posicionFiltro, null, null, null, null);
         return "listarPosicion";
     }
 
-    
     public void cargarAeropuerto() {
 
         cargarAeropuerto(posicion);
@@ -179,32 +161,31 @@ public class PosicionBBean {
     }
 
     private void cargarFuncion(Posicion f) {
-
     }
 
     public void cargarAliasPos() {
     }
-    
-    public String configurarPosicionesDependencia(){
+
+    public String configurarPosicionesDependencia() {
         posicion = new Posicion();
-        
+
         PosicionNacional posNal = new PosicionNacional();
         posNal.setDepCategoria(JsfUtil.getFuncionarioSesion().getDependencia().getDepcategoria());
         posNal.setPnEstado("Activo");
         /*Dependencia dep = new Dependencia();
         
-        posicion.setDependencia(dep);
-        posicion.setPosEstado("Activo");*/
-        listPosicionNacional = posicionNacionalService.getLista(posNal,null,null,null,null);
+         posicion.setDependencia(dep);
+         posicion.setPosEstado("Activo");*/
+        listPosicionNacional = posicionNacionalService.getLista(posNal, null, null, null, null);
         posicionesSeleccionadas = new Long[listPosicionNacional.size()];
-        int i=0;
+        int i = 0;
         List<BigDecimal> list = posicionService.getListaPosicionesDependencia(JsfUtil.getFuncionarioSesion().getDependencia().getDepId());
-        for(BigDecimal id : list){
+        for (BigDecimal id : list) {
             posicionesSeleccionadas[i++] = id.longValue();
         }
         return "configurarPosicionesDependencia";
     }
-    
+
     public Posicion getPosicion() {
         return posicion;
     }
@@ -253,4 +234,11 @@ public class PosicionBBean {
         this.posicionesSeleccionadas = posicionesSeleccionadas;
     }
 
+    public List<Posicion> getLista() {
+        return lista;
+    }
+
+    public void setLista(List<Posicion> lista) {
+        this.lista = lista;
+    }
 }
