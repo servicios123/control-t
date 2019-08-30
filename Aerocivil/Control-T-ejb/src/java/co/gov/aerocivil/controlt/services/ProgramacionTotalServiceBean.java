@@ -401,6 +401,8 @@ public class ProgramacionTotalServiceBean
 
             solvePeriodsRecessAndRequired();
             solveRestByWeekPeriodRecess();
+            solveTropByWeekPeriodRecess();
+
 //            solveTop(10);
             for (Jornada jornada : this.jornadas) {
                 solveOrdinaryTurnsByPeriod(jornada.getJoId().longValue());
@@ -686,7 +688,6 @@ public class ProgramacionTotalServiceBean
                     ArrayList<Integer> lds = new ArrayList<Integer>();
                     String fechas = "";
 
-
                     final Random random = new Random();
                     final Set<Integer> intSet = new HashSet<Integer>();
                     while (intSet.size() < num_ld) {
@@ -868,6 +869,110 @@ public class ProgramacionTotalServiceBean
                     if (aux == null) {
                         Turn special = getTurnOfFunctionary(fun, day.getDate(), 0, 3);
                         if ((special != null) && ((special.getPeriod().getAlias() + special.getPosition().getAlias()).equals("DESC"))) {
+                            Calendar ca = Calendar.getInstance();
+                            ca.setTime(day.getDate());
+
+                            row = row + ca.get(5) + ";";
+                            existe = Boolean.valueOf(true);
+                            break;
+                        }
+                    } else {
+                        Calendar ca = Calendar.getInstance();
+                        ca.setTime(day.getDate());
+
+                        row = row + ca.get(5) + ";";
+                        existe = Boolean.valueOf(true);
+                        break;
+                    }
+                }
+                if (!existe.booleanValue()) {
+                    row = row + ";";
+                }
+            }
+            write_data(row);
+        }
+        write_data("");
+        write_data("");
+    }
+
+    private void solveTropByWeekPeriodRecess() {
+        write_data("Descansos");
+        String head = "Funcionario;";
+        Calendar cal = Calendar.getInstance();
+        for (Week week : this.weeks) {
+            cal.setTime(((Day) week.getDays().get(0)).getDate());
+            head = head + "De " + cal.get(5) + " A ";
+            cal.setTime(((Day) week.getDays().get(week.getDays().size() - 1)).getDate());
+            head = head + cal.get(5) + ";";
+        }
+        for (Week week : this.weeks) {
+            for (Functionary fun : this.functionaries) {
+                if (!isTropWeek(fun, week)) {
+                    for (Day day : week.getDays()) {
+                        Turn trop = getTurnTropOfFunctionary(fun, day.getDate(), 0, 3);
+                        if (trop == null) {
+                            Calendar c = Calendar.getInstance();
+                            c.setTime(day.getDate());
+                            Period period = new Period(0L, "", 0, 24);
+                            Position position = new Position(0L, "TROP");
+                            Turn rest = new Turn(period, position, fun, 0L);
+                            rest.setType(Type.SPECIAL);
+                            rest.setPermiteHorasExtra(false);
+                            day.addTurn(rest);
+                            write("Trop;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + rest.getPeriod().getAlias() + rest.getPosition().getAlias() + ";;OK;");
+                            break;
+
+                        }
+                    }
+                }
+
+            }
+        }
+        float max_count = 4;
+        int count;
+        for (int i = 0; i < this.weeks.size(); i++) {
+            float percent = ((Week) this.weeks.get(i)).getDays().size() / 7.0F;
+//            max_count = percent * this.functionaries.size();
+            count = 0;
+            for (Functionary fun : this.functionaries) {
+                if ((i == 0) || (count <= max_count)) {
+                    if (!isTropWeek(fun, (Week) this.weeks.get(i))) {
+                        ((Week) this.weeks.get(i)).setRandomDays();
+                        for (Day d : ((Week) this.weeks.get(i)).getDays()) {
+                            Turn trop = getTurnTropOfFunctionary(fun, d.getDate(), 0, 3);
+                            if (trop == null) {
+                                Calendar c = Calendar.getInstance();
+                                c.setTime(d.getDate());
+
+                                Period period = new Period(0L, "", 0, 24);
+                                Position position = new Position(0L, "TROP");
+                                Turn turn = new Turn(period, position, fun, 0L);
+                                turn.setType(Type.SPECIAL);
+                                turn.setPermiteHorasExtra(false);
+                                d.addTurn(turn);
+                                write("Trop;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;OK;");
+                                count++;
+                                break;
+                            }
+                        }
+
+                    } else {
+                        count++;
+                    }
+                }
+
+            }
+        }
+        write_data(head);
+        for (Functionary fun : this.functionaries) {
+            String row = fun.getAlias() + ";";
+            for (Week week : this.weeks) {
+                Boolean existe = Boolean.valueOf(false);
+                for (Day day : week.getDays()) {
+                    Turn aux = getTurnOfFunctionary(fun, day.getDate(), 0, 5);
+                    if (aux == null) {
+                        Turn special = getTurnOfFunctionary(fun, day.getDate(), 0, 3);
+                        if ((special != null) && ((special.getPeriod().getAlias() + special.getPosition().getAlias()).equals("TROP"))) {
                             Calendar ca = Calendar.getInstance();
                             ca.setTime(day.getDate());
 
@@ -1098,23 +1203,23 @@ public class ProgramacionTotalServiceBean
                     extra.setType(Type.ORDINARY);
                     turn.setType(Type.EXTRAORDINARY);
                     if (validateExtraordinaryTurn(extra, turn, date, hourEval, exceeded.booleanValue()).booleanValue()) {
-                                    extra.setType(Type.ORDINARY);
-                                    turn.setType(Type.EXTRAORDINARY);
-                                    turn.setHaveExtra(Boolean.valueOf(true));
-                                    extra.setHaveExtra(Boolean.valueOf(true));
-                                    //System.out.print("Fun: " + fun.getAlias() + "\tAntes: " + fun.getMaxHoursExtra());
-                                    if (exceeded.booleanValue()) {
-                                        fun.decreaseMaxHoursExtraExceeded(extra.getPeriod().getTotal());
-                                    } else {
-                                        fun.decreaseMaxHoursExtra(extra.getPeriod().getTotal());
-                                    }
-                                    //System.out.println("\tAhora: " + fun.getMaxHoursExtra());
-                                    Functionary aux = fun;
-                                    this.functionaries.remove(fun);
-                                    this.functionaries.add(aux);
-                                    extra.setFunctionary(fun);
-                                    turn.setFunctionary(fun);
-                                    return true;
+                        extra.setType(Type.ORDINARY);
+                        turn.setType(Type.EXTRAORDINARY);
+                        turn.setHaveExtra(Boolean.valueOf(true));
+                        extra.setHaveExtra(Boolean.valueOf(true));
+                        //System.out.print("Fun: " + fun.getAlias() + "\tAntes: " + fun.getMaxHoursExtra());
+                        if (exceeded.booleanValue()) {
+                            fun.decreaseMaxHoursExtraExceeded(extra.getPeriod().getTotal());
+                        } else {
+                            fun.decreaseMaxHoursExtra(extra.getPeriod().getTotal());
+                        }
+                        //System.out.println("\tAhora: " + fun.getMaxHoursExtra());
+                        Functionary aux = fun;
+                        this.functionaries.remove(fun);
+                        this.functionaries.add(aux);
+                        extra.setFunctionary(fun);
+                        turn.setFunctionary(fun);
+                        return true;
                     } else {
                         turn.setType(turnType);
                         extra.setType(extraType);
@@ -1155,7 +1260,7 @@ public class ProgramacionTotalServiceBean
             public int compare(Functionary o1, Functionary o2) {
                 return o1.getNumHabilities() < o2.getNumHabilities() ? -1
                         : o1.getNumHabilities() > o2.getNumHabilities() ? 1
-                        : 0;
+                                : 0;
             }
         });
     }
@@ -1166,7 +1271,7 @@ public class ProgramacionTotalServiceBean
             public int compare(Turn o1, Turn o2) {
                 return o1.getNumEnables() < o2.getNumEnables() ? -1
                         : o1.getNumEnables() > o2.getNumEnables() ? 1
-                        : 0;
+                                : 0;
             }
         });
     }
@@ -1286,6 +1391,24 @@ public class ProgramacionTotalServiceBean
 
             for (Turn turn : day.getTurns()) {
                 if ((turn.getFunctionary() != null) && (turn.getFunctionary().getId() == fun.getId()) && !turn.getPermiteDescanso()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isTropWeek(Functionary fun, Week week) {
+        for (Day day : week.getDays()) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(day.getDate());
+            if (day.getDate().compareTo(this.programming.getProFechaInicio()) == 0) {
+                if (fun.getRestedLastWeek().booleanValue()) {
+                    return true;
+                }
+            }
+            for (Turn turn : day.getTurns()) {
+                if ((turn.getFunctionary() != null) && (turn.getFunctionary().getId() == fun.getId()) && (((turn.getType() == 3) && ((turn.getPeriod().getAlias() + turn.getPosition().getAlias()).equals("TROP"))))) {
                     return true;
                 }
             }
@@ -1761,7 +1884,6 @@ public class ProgramacionTotalServiceBean
         List<JornadaNoLaborable> jornadasNoLaborales = this.jornadaNoLaboralService.getListaJornadasFuncionario(fun.getId());
         List<Jornada> jorDepNoLaboral = listasService.obtenerJornadaXDependencia(this.programming.getDependencia().getDepId());
 
-
         if (jornadasNoLaborales.size() == jorDepNoLaboral.size()) {
             return true;
         }
@@ -1874,6 +1996,24 @@ public class ProgramacionTotalServiceBean
                             return turn;
                         }
                     }
+                }
+            }
+        }
+        return null;
+    }
+    
+    private Turn getTurnTropOfFunctionary(Functionary fun, Date current, int amountDay, int type) {
+        Calendar eval = Calendar.getInstance();
+        eval.setTime(current);
+        eval.add(5, amountDay);
+        for (Day day : this.days) {
+            if (day.getDate().compareTo(eval.getTime()) == 0) {
+                for (Turn turn : turnSortByType(day.getTurns())) {
+                    
+                        if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && (type == Type.SPECIAL) && (turn.getPosition().getAlias().equals("TROP"))) {
+                            return turn;
+                        }
+                    
                 }
             }
         }
