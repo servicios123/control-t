@@ -5,33 +5,17 @@
 package co.gov.aerocivil.controlt.web.bbeans;
 
 import co.gov.aerocivil.controlt.entities.Funcionario;
-import co.gov.aerocivil.controlt.entities.Menu;
 import co.gov.aerocivil.controlt.enums.RolEnum;
 import co.gov.aerocivil.controlt.services.FuncionarioService;
 import co.gov.aerocivil.controlt.services.ListasService;
 import co.gov.aerocivil.controlt.to.FuncionarioTO;
-import co.gov.aerocivil.controlt.enums.ParametrosEnum;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
-import co.gov.aerocivil.controlt.web.util.MailUtil;
 import co.gov.aerocivil.controlt.web.util.MenuBBean;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.event.ActionEvent;
-import javax.naming.Context;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
-import javax.naming.ldap.LdapContext;
 
 /**
  *

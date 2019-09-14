@@ -376,6 +376,8 @@ public class FuncionarioServiceBean implements FuncionarioService {
                 append(strQry.toString());
         if (sortField != null && sortOrder != null) {
             strQryFinal.append(" order by f.").append(sortField).append(" ").append(sortOrder);
+        }else if(funcionario.getSortField()!=null && !funcionario.getSortField().equalsIgnoreCase("")){
+            strQryFinal.append(" order by f.").append(funcionario.getSortField()).append(" DESC");
         }
         //System.out.println(strQryFinal);
         query = em.createQuery(strQryFinal.toString());

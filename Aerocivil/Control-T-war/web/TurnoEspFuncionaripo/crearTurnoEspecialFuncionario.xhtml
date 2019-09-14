@@ -38,7 +38,7 @@
                                                  style="width: 100%;" rendered="#{!turnoEspFuncionarioBBean.ver}" >
                                     <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}" rendered="${renderNull}"/>
                                     <f:selectItems value="#{turnoEspFuncionarioBBean.listaFuncionario}" var="te" itemValue="#{te.funId}" 
-                                                   itemLabel="#{te.funNombre}"/>
+                                                   itemLabel="#{te.funAlias} - #{te.funNombre}"/>
                                     <p:ajax event="change" listener="#{turnoEspFuncionarioBBean.updateListaTurnos}" update="tefTable2 basic"/>
                                 </p:selectOneMenu>
                                 <br/>

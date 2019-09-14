@@ -292,7 +292,7 @@ public class FuncionarioBBean {
     }
 
     public String filtrar_Cert_Medico() {
-
+        funcionarioFiltro.setSortField("funFvCertmedico");
         lazyList = new FuncionarioLazyList(funcionarioService, funcionarioFiltro);
         return "listarCertMedico";
     }
@@ -317,6 +317,7 @@ public class FuncionarioBBean {
     }
 
     public String filtrar_vencimiento_curso() {
+        funcionarioFiltro.setSortField("funFvCurso");
         lazyList = new FuncionarioLazyList(funcionarioService, funcionarioFiltro);
         return "listarVencimientoCurso";
     }
@@ -336,6 +337,7 @@ public class FuncionarioBBean {
     }
 
     public String filtrar_vencimiento_evaluacion() {
+        funcionarioFiltro.setSortField("funFvEvaluacion");
         lazyList = new FuncionarioLazyList(funcionarioService, funcionarioFiltro);
         return "listarVencimientoEvaluacion";
     }
@@ -444,7 +446,7 @@ public class FuncionarioBBean {
      */
     public String filtrarSinPaginar() {
         this.funcionariosDisponibles = funcionarioService.getListaPag(funcionarioFiltro, null, null,
-                "funAlias", SortOrderEnum.ASC.getOrder());
+                "funFvCurso", SortOrderEnum.DESC.getOrder());
         heightList = this.funcionariosDisponibles.size() >= 20 ? "404px"
                 : ((this.funcionariosDisponibles.size() * 28 + 58) + "px");
         JsfUtil.forceRefresh();

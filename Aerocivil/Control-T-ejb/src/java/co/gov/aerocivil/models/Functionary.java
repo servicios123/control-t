@@ -24,7 +24,7 @@ public class Functionary {
     private int numHabilities;
     private int countExtras;
     private Boolean restedLastWeek;
-    private int countRestSunday;
+    private Integer countRestSunday;
     private int countExtrasNocturnas;
 
     public Functionary(Funcionario funcionario) {
@@ -57,6 +57,8 @@ public class Functionary {
         this.countRestSunday = 0;
         if (funcionario.getFunCatDom() != null) {
             this.countRestSunday = funcionario.getFunCatDom();
+        }else{
+            this.countRestSunday = null;
         }
         this.initialMaxHoursExtra = this.maxHoursExtra;
         this.initialMaxHoursExtraExceeded = this.maxHoursExtraExceeded;
@@ -256,14 +258,14 @@ public class Functionary {
     /**
      * @return the countRestSunday
      */
-    public int getCountRestSunday() {
+    public Integer getCountRestSunday() {
         return countRestSunday;
     }
 
     /**
      * @param countRestSunday the countRestSunday to set
      */
-    public void setCountRestSunday(int countRestSunday) {
+    public void setCountRestSunday(Integer countRestSunday) {
         this.countRestSunday = countRestSunday;
     }
 

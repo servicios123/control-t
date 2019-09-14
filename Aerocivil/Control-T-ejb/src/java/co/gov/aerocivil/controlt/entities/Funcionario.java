@@ -154,6 +154,8 @@ public class Funcionario implements Serializable {
     private EvaluacionCompetencia evaluacionCompetenciaEdicion;
     @Transient
     private CursoRecurrente cursoRecurrente;
+    @Transient
+    private String sortField;
 
     public Long getIntentosFallidos() {
         return intentosFallidos;
@@ -353,6 +355,16 @@ public class Funcionario implements Serializable {
     public void setFunPuntaje(Double funPuntaje) {
         this.funPuntaje = funPuntaje;
     }
+
+    public String getSortField() {
+        return sortField;
+    }
+
+    public void setSortField(String sortField) {
+        this.sortField = sortField;
+    }
+    
+    
 
     @Override
     public int hashCode() {
