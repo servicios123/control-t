@@ -40,7 +40,7 @@ public class PosicionNacionalLazyList  extends LazyDataModel<PosicionNacional> {
 
     @Override
     public List<PosicionNacional> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, String> filters) {
+        SortOrder sortOrder, Map<String, Object> filters) {
         lista = posicionService.getLista(posicionFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(posicionService.getCount().toString());

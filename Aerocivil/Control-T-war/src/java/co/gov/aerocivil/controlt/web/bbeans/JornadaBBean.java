@@ -250,6 +250,7 @@ public class JornadaBBean {
 
         cons = true;
         jornadaFiltro.setDependencia(dependencia);
+        jornadaFiltro.setJoEstado("Activo");
 
 
         //

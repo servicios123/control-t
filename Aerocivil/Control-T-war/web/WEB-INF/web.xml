@@ -69,7 +69,7 @@
 	<param-value>/WEB-INF/facelets/tags/xfaces.taglib.xml</param-value>
     </context-param>
     <context-param>
-        <param-name>primefaces.SKIN</param-name>
-        <param-value>black-tie</param-value>
+        <param-name>primefaces.THEME</param-name>
+        <param-value>excite-bike</param-value>
     </context-param>
 </web-app>

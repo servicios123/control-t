@@ -31,11 +31,13 @@ public interface TurnoEspFuncionarioService {
 
     public void eliminar(TurnoEspFuncionario turno) throws Exception;
 
-    public List<TurnoEspFuncionario> listarTurnosAsignacion(Funcionario funcionario);
+   public List<TurnoEspFuncionario> listarTurnosAsignacion(Funcionario funcionario, Date fecha);
 
-    public boolean turnoEspFunEnProgramacion(co.gov.aerocivil.controlt.entities.TurnoEspFuncionario turnoEspFuncionario);
+    public boolean turnoEspFunEnProgramacion(TurnoEspFuncionario turnoEspFuncionario);
     
     public String validarDisponibilidadTurno(Date date, Funcionario f);
     
     public boolean isRangoTurnoDisponible(TurnoEspFuncionario tef);
+
+    public java.util.List<TurnoEspFuncionario> listarTurnosAsignacion(TurnoEspFuncionario turnoEspFuncionario);
 }

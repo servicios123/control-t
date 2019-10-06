@@ -80,7 +80,7 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
             return null;
         }
     }
-    
+
     @Override
     public List<TurnoEspFuncionario> getLista(TurnoEspFuncionario turnoEspFuncionario) {
 
@@ -163,7 +163,7 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
             condiciones.add("d.turnoEspecial.dependencia.aeropuerto.regional.regId = :regional ");
             params.put("regional", turnoEspFuncionario.getTurnoEspecial().getDependencia().getAeropuerto().getRegional().getRegId());
         }
-         if (turnoEspFuncionario.getTurnoEspecial().getTeSigla()!= null) {
+        if (turnoEspFuncionario.getTurnoEspecial().getTeSigla() != null) {
             condiciones.add("d.turnoEspecial.teSigla = :sigla ");
             params.put("sigla", turnoEspFuncionario.getTurnoEspecial().getTeSigla());
         }
@@ -237,13 +237,32 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
 
     @Override
     public boolean isRangoTurnoDisponible(TurnoEspFuncionario tef) {
-        Query query = em.createQuery("select t from TurnoEspFuncionario t where t.funcionario.funId = :funId and ((t.tefFini between :inicio and :final)  or (t.tefFfin between :inicio and :final))");
+
+        Query query = em.createQuery("select count(t) from TurnoEspFuncionario t where t.funcionario.funId = :funId and ((t.tefFini between :inicio and :final)  or (t.tefFfin between :inicio and :final))");
         query.setParameter("funId", tef.getFuncionario().getFunId());
         query.setParameter("inicio", tef.getTefFini());
         query.setParameter("final", tef.getTefFfin());
+        Long qty = (Long) query.getSingleResult();
+        if (qty >= 2) {
+            return false;
+        }
+        
+        if(qty>0 && (tef.getTurnoEspecial()!= null && tef.getTurnoEspecial().getTeHinicio()==6 && tef.getTurnoEspecial().getTeHfin()==23)){
+            return false;
+        }
+
+        query = em.createQuery("select t from TurnoEspFuncionario t where t.funcionario.funId = :funId and ((t.tefFini between :inicio and :final)  or (t.tefFfin between :inicio and :final)) and ((:hini between t.turnoEspecial.teHinicio and t.turnoEspecial.teHfin) or (:hfin between t.turnoEspecial.teHinicio and t.turnoEspecial.teHfin))");
+        query.setParameter("funId", tef.getFuncionario().getFunId());
+        query.setParameter("inicio", tef.getTefFini());
+        query.setParameter("final", tef.getTefFfin());
+        query.setParameter("hini", tef.getTurnoEspecial().getTeHinicio());
+        query.setParameter("hfin", tef.getTurnoEspecial().getTeHfin());
         List resultList = query.getResultList();
-        return !(resultList!=null && !resultList.isEmpty());
-    }    
+        if ((resultList != null && !resultList.isEmpty())) {
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public TurnoEspFuncionario guardar(TurnoEspFuncionario turnoEspFuncionario, Funcionario f) throws Exception {
@@ -480,15 +499,43 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
     }
 
     @Override
-    public List<TurnoEspFuncionario> listarTurnosAsignacion(Funcionario funcionario) {
+    public List<TurnoEspFuncionario> listarTurnosAsignacion(Funcionario funcionario, Date fecha) {
+
+        Date fini = null;
+        Date ffin = null;
+
+        if (fecha != null) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(fecha);
+            c.set(Calendar.DAY_OF_MONTH, 1);
+
+            fini = c.getTime();
+
+            c.setTime(fecha);
+            c.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
+            c.set(Calendar.DATE, c.getActualMaximum(Calendar.DATE));
+
+            ffin = c.getTime();
+        }
+
+
         try {
             String jpql = "select MIN(t.tefFini), MAX(t.tefFfin), t.funcionario, t.turnoEspecial, t.tefEstado, t.groupId "
                     + " from TurnoEspFuncionario t "
-                    + " where t.funcionario.funId = :funId "
-                    + " GROUP BY t.groupId, t.funcionario , t.turnoEspecial , t.tefEstado "
+                    + " where t.funcionario.funId = :funId ";
+
+            if (fini != null && ffin != null) {
+                jpql += ("and ((t.tefFini >= :fini and t.tefFfin <= :ffin) or (t.tefFini>= :fini and t.tefFini<= :ffin) or (t.tefFfin>= :fini and t.tefFfin<= :ffin) or ((:fini between t.tefFini and t.tefFfin) AND (:ffin BETWEEN t.tefFini  AND t.tefFfin)))");
+            }
+
+            jpql += " GROUP BY t.groupId, t.funcionario , t.turnoEspecial , t.tefEstado "
                     + " order by MIN(t.tefFini) desc";
             Query q = em.createQuery(jpql);
             q.setParameter("funId", funcionario.getFunId());
+            if (fini != null && ffin != null) {
+                q.setParameter("fini", fini);
+                q.setParameter("ffin", ffin);
+            }
             List<Object[]> resultList = q.getResultList();
             if (resultList != null && !resultList.isEmpty()) {
                 List<TurnoEspFuncionario> turnos = new ArrayList<TurnoEspFuncionario>();
@@ -508,6 +555,85 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
             System.out.println("e = " + e);
         }
         return new ArrayList<TurnoEspFuncionario>();
+    }
+
+    @Override
+    public List<TurnoEspFuncionario> listarTurnosAsignacion(TurnoEspFuncionario turnoEspFuncionario) {
+
+        Map<String, Object> params = new HashMap<String, Object>();
+
+        List<String> condiciones = new ArrayList<String>();
+
+        if (turnoEspFuncionario.getTurnoEspecial().getTeId() != null) {
+            condiciones.add("d.turnoEspecial.teId = :turEs ");
+            params.put("turEs", turnoEspFuncionario.getTurnoEspecial().getTeId());
+        }
+        if (turnoEspFuncionario.getFuncionario().getFunId() != null && !"".equals(turnoEspFuncionario.getFuncionario().getFunId())) {
+            condiciones.add("d.funcionario.funId = :fun ");
+            params.put("fun", turnoEspFuncionario.getFuncionario().getFunId());
+        }
+        if (turnoEspFuncionario.getFuncionario().getFunAlias() != null && !"".equals(turnoEspFuncionario.getFuncionario().getFunAlias())) {
+            condiciones.add("upper(d.funcionario.funAlias) like :funAlias ");
+            params.put("funAlias", "%" + turnoEspFuncionario.getFuncionario().getFunAlias().toUpperCase() + "%");
+        }
+        if (turnoEspFuncionario.getFuncionario().getFunNombre() != null && !"".equals(turnoEspFuncionario.getFuncionario().getFunNombre())) {
+            condiciones.add("upper(d.funcionario.funNombre) like :funNom ");
+            params.put("funNom", "%" + turnoEspFuncionario.getFuncionario().getFunNombre().toUpperCase() + "%");
+        }
+
+
+        if (turnoEspFuncionario.getTurnoEspecial().getTeSigla() != null) {
+            condiciones.add("d.turnoEspecial.teSigla = :sigla ");
+            params.put("sigla", turnoEspFuncionario.getTurnoEspecial().getTeSigla());
+        }
+        if (turnoEspFuncionario.getTefEstado() != null && !"".equals(turnoEspFuncionario.getTefEstado())) {
+            condiciones.add("d.tefEstado = :estado ");
+            params.put("estado", turnoEspFuncionario.getTefEstado());
+        }
+
+        if (turnoEspFuncionario.getTefFini() != null && turnoEspFuncionario.getTefFfin() != null) {
+
+            condiciones.add("((d.tefFini >= :fini and d.tefFfin <= :ffin) or (d.tefFini>= :fini and d.tefFini<= :ffin) or (d.tefFfin>= :fini and d.tefFfin<= :ffin) or ((:fini between d.tefFini and d.tefFfin) AND (:ffin BETWEEN d.tefFini  AND d.tefFfin)))");
+            params.put("fini", turnoEspFuncionario.getTefFini());
+            params.put("ffin", turnoEspFuncionario.getTefFfin());
+        }
+
+        if (turnoEspFuncionario.getTefFini() != null && turnoEspFuncionario.getTefFfin() == null) {
+
+            condiciones.add("d.tefFini = :fini ");
+            params.put("fini", turnoEspFuncionario.getTefFini());
+
+        }
+        if (turnoEspFuncionario.getTefFini() == null && turnoEspFuncionario.getTefFfin() != null) {
+
+            condiciones.add(" d.tefFfin = :ffin");
+            params.put("ffin", turnoEspFuncionario.getTefFfin());
+        }
+
+        StringBuilder strQry = new StringBuilder();
+        if (condiciones.size() > 0) {
+            strQry.append("where ");
+        }
+        for (Iterator<String> it = condiciones.iterator(); it.hasNext();) {
+            strQry.append(it.next());
+            if (it.hasNext()) {
+                strQry.append(" and ");
+            }
+        }
+
+        StringBuilder strQryFinal = new StringBuilder("select MIN(d.tefFini), MAX(d.tefFfin), d.funcionario, d.turnoEspecial, d.tefEstado, d.groupId "
+                + " from TurnoEspFuncionario d ").append(strQry.toString()).append(" GROUP BY d.groupId, d.funcionario , d.turnoEspecial , d.tefEstado ");
+
+        Query query = em.createQuery(strQryFinal.toString());
+        QueryUtil.setParameters(query, params);
+
+
+        try {
+            return query.getResultList();
+        } catch (Exception e) {
+            return new ArrayList<TurnoEspFuncionario>();
+        }
+
     }
 
     @Override
@@ -541,7 +667,7 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
         q.setParameter("fecha", date);
         q.setParameter("funId", f.getFunId());
         List resultList = q.getResultList();
-        if(resultList != null && !resultList.isEmpty()){
+        if (resultList != null && !resultList.isEmpty()) {
             result = "La fecha seleccionada ya tiene un turno especial programado";
         }
         return result;

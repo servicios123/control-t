@@ -4,7 +4,6 @@
  */
 package co.gov.aerocivil.controlt.web.lazylist;
 
-import co.gov.aerocivil.controlt.entities.DiarioPosicion;
 import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.entities.Programacion;
 import co.gov.aerocivil.controlt.entities.Vistaprogramacion;
@@ -12,7 +11,6 @@ import co.gov.aerocivil.controlt.services.ControlDiarioPosicionesService;
 import co.gov.aerocivil.controlt.web.enums.SortOrderEnum;
 import java.util.List;
 import java.util.Map;
-
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 //import org.primefaces.model.SortOrder;
@@ -51,7 +49,7 @@ public class TurnosProgEjecutadosLazyList  extends LazyDataModel<Vistaprogramaci
 
     @Override
     public List<Vistaprogramacion> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, String> filters) {
+        SortOrder sortOrder, Map<String, Object> filters) {
         lista = service.getListaProgramadoVsEjecutado(filtro, funcionario, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(service.getCount().toString());

@@ -105,7 +105,7 @@ public class AuditoriaServiceBean implements AuditoriaService{
             }
         }
         msj+="]";
-        return msj;
+        return msj.replaceAll("co.gov.aerocivil.controlt.entities.", "");
     }
 
     public Method getterMethod(Class clazz, String fieldName, boolean recursive) {

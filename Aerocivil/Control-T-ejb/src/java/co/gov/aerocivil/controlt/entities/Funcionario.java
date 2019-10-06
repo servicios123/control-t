@@ -363,8 +363,6 @@ public class Funcionario implements Serializable {
     public void setSortField(String sortField) {
         this.sortField = sortField;
     }
-    
-    
 
     @Override
     public int hashCode() {
@@ -568,17 +566,21 @@ public class Funcionario implements Serializable {
     }
 
     public String getColor() {
-        Date today = new Date();
-        long diff = this.funFvCertmedico.getTime() - today.getTime();
-        float days = (diff / (1000 * 60 * 60 * 24));
-        if (this.funFvCertmedico.before(today) || this.funFvCertmedico.equals(today)) {
-            color = "vencido";
-        } else {
-            if (days >= 0 && days < 30) {
-                color = "por-vencer";
+        try {
+            Date today = new Date();
+            long diff = this.funFvCertmedico.getTime() - today.getTime();
+            float days = (diff / (1000 * 60 * 60 * 24));
+            if (this.funFvCertmedico.before(today) || this.funFvCertmedico.equals(today)) {
+                color = "vencido";
             } else {
-                color = "";
+                if (days >= 0 && days < 30) {
+                    color = "por-vencer";
+                } else {
+                    color = "";
+                }
             }
+        } catch (Exception e) {
+            color = "";
         }
         return color;
     }
@@ -601,8 +603,8 @@ public class Funcionario implements Serializable {
             return "";
         }
     }
-    
-    public String getColorCurso(){
+
+    public String getColorCurso() {
         if (this.funFvCurso != null) {
             Date today = new Date();
             long diff = this.funFvCurso.getTime() - today.getTime();

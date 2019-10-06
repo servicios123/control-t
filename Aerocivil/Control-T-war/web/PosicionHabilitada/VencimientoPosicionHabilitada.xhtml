@@ -58,13 +58,13 @@
                 <br></br>
                 <h:form>
                     <p:dataTable value="#{posicionHabilitadaBBean.lista}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15"  
+                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
                                  sortBy="#{item.phId}"
                                  emptyMessage="#{msg.emptyList}">
-                        <p:column>
+                        <p:column style="width: 8%">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.renovar}"/>
                             </f:facet>
@@ -86,7 +86,7 @@
                             <h:outputText value="#{item.funcionario.funNombre}" />
                         </p:column>
 
-                        <p:column sortBy="#{item.posicion.posicionNacional.pnAlias}" >
+                        <p:column sortBy="#{item.posicion.posicionNacional.pnAlias}" style="width: 8%">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.posicion}"/>
                             </f:facet>

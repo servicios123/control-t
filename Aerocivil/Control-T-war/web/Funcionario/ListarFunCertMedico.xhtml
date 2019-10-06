@@ -73,17 +73,17 @@
 
                     </h:panelGrid>    
                     <p:dataTable value="#{funcionarioBBean.lazyList}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15"  
+                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
                                  emptyMessage="#{msg.emptyList}" paginatorAlwaysVisible="false"
                                  rowKey="#{item.funId}"
-                                 editable="true" selectionMode="single" selection="#{funcionarioBBean.funcionarioSeleccionado}">
+                                 editable="true" >
 
-                        <p:ajax event="rowEdit" listener="#{funcionarioBBean.onEditEvent}"></p:ajax>
+                        <p:ajax event="rowEdit" listener="#{funcionarioBBean.onEditEvent}" update="carTable"></p:ajax>
 
-                        <p:column>
+                        <p:column style="width: 6%">
                             <p:rowEditor/>
                         </p:column>
                         <p:column sortBy="#{item.funNombre}">
@@ -92,19 +92,19 @@
                             </f:facet>
                             <h:outputText value="#{item.funNombre}" class="#{item.color}"/>
                         </p:column>
-                        <p:column sortBy="#{item.funAlias}">
+                        <p:column sortBy="#{item.funAlias}" style="width: 9%">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.funAlias}"/>
                             </f:facet>
                             <h:outputText value="#{item.funAlias}" class="#{item.color}"/>
                         </p:column>
-                        <p:column sortBy="#{item.funEstado}">
+                        <p:column sortBy="#{item.funEstado}" style="width: 8%">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.funEstado}"/>
                             </f:facet>
                             <h:outputText value="#{item.funEstado}" class="#{item.color}"/>
                         </p:column>
-                        <p:column sortBy="#{item.funCertMedico}">
+                        <p:column sortBy="#{item.funCertMedico}" style="width: 10%">
                             <f:facet name="header">
                                 <h:outputText value="Certificado"/>
                             </f:facet>
@@ -117,7 +117,7 @@
                                 </f:facet>
                             </p:cellEditor>
                         </p:column>
-                        <p:column sortBy="#{item.funFvCertmedico}">
+                        <p:column sortBy="#{item.funFvCertmedico}" style="width: 13%">
                             <f:facet name="header">
                                 <h:outputText value="Fecha vencimiento"/>
                             </f:facet>

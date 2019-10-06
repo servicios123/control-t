@@ -38,7 +38,7 @@ public class SolicitudLazyList extends LazyDataModel<Solicitud> {
 
     @Override
     public List<Solicitud> load(int first, int pageSize, String sortField,
-            SortOrder sortOrder, Map<String, String> filters) {
+            SortOrder sortOrder, Map<String, Object> filters) {
         lista = solicitudService.getLista(solicitudFiltro, first, pageSize, sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(solicitudService.getCount().toString());
         this.setRowCount(dataSize);

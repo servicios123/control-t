@@ -27,16 +27,24 @@ public class JornadaConverter implements Converter {
      
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String string) {
-        Long id= Long.valueOf(string);
-        if(string==null || string.isEmpty())
+        try{
+            Long id= Long.valueOf(string);
+            if(string==null || string.isEmpty())
         {
             return null;
         }
         return jornadaService.getPorId(id);  
+        }catch(NumberFormatException e){
+            return null;
+        }
+        
     }
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
+        if (o == null) {
+            return null;
+        }
         try{
             long id= ((Jornada) o).getJoId();          
             String s = String.valueOf(id);

@@ -34,8 +34,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.component.schedule.Schedule;
-import org.primefaces.event.DateSelectEvent;
-import org.primefaces.event.ScheduleEntrySelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.LazyDataModel;
@@ -128,7 +127,7 @@ public class TurnoEspFuncionarioBBean {
     public TurnoEspFuncionarioBBean() {
         //System.out.println("listando-...");
         turnos = new ArrayList<TurnoEspFuncionario>();
-        
+        iniDate = Calendar.getInstance().getTime();
         funcionario = new Funcionario();
         inicializaVariables();
         org.primefaces.component.calendar.Calendar obj = new org.primefaces.component.calendar.Calendar();
@@ -199,6 +198,7 @@ public class TurnoEspFuncionarioBBean {
     public String asignar() {
         asignando = true;
         turnos = new ArrayList<TurnoEspFuncionario>();
+        iniDate = Calendar.getInstance().getTime();
         FuncionarioBBean funcionarioBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);
         return funcionarioBBean.listarAsignacionesEspeciales();
     }
@@ -229,7 +229,19 @@ public class TurnoEspFuncionarioBBean {
         dependenciaVisible = false;
         dependencia = JsfUtil.getFuncionarioSesion().getDependencia();
         listaFuncionario = JsfUtil.getListadosBBean().getListFuncionariosXDependencia(JsfUtil.getFuncionarioSesion().getDependencia().getDepId());
-
+        eventModel = new DefaultScheduleModel();
+        cargarTurnoEspecial();
+    }
+    
+    public void inicializaVariablesSave() {
+        editando = false;
+        editable = true;
+        turnoEspFuncionario.setTurnoEspecial(turnoEspecial);
+        turnoEspFuncionario.setFuncionario(funcionario);
+        dependenciaVisible = false;
+        dependencia = JsfUtil.getFuncionarioSesion().getDependencia();
+        listaFuncionario = JsfUtil.getListadosBBean().getListFuncionariosXDependencia(JsfUtil.getFuncionarioSesion().getDependencia().getDepId());
+        eventModel = new DefaultScheduleModel();
         cargarTurnoEspecial();
     }
 
@@ -245,6 +257,7 @@ public class TurnoEspFuncionarioBBean {
         listaFuncionario = JsfUtil.getListadosBBean().getListFuncionariosXDependencia(JsfUtil.getFuncionarioSesion().getDependencia().getDepId());
         cargarTurnoEspecialList();
         showPrev = false;
+        updateListaTurnostrop();
         /*  cargarAeropuertoComision();    
          cargarDependenciaComision();*/
         return "crearTurnosEspFunProgramacion";
@@ -299,11 +312,24 @@ public class TurnoEspFuncionarioBBean {
     }
 
     public void updateListaTurnos() {
+        Calendar c = Calendar.getInstance();
         turnoEspFuncionario.setTurnoEspecial(new TurnoEspecial());
-        turnos = turnoEspFuncionarioService.listarTurnosAsignacion(turnoEspFuncionario.getFuncionario());
+        turnos = turnoEspFuncionarioService.listarTurnosAsignacion(turnoEspFuncionario.getFuncionario(), iniDate);
         for (TurnoEspFuncionario tef : turnos) {
             tef.setEditable(!turnoEspFunEnProgramacion(tef));
         }
+        eventModel = new DefaultScheduleModel();
+        loadEventsFull(iniDate, iniDate);
+    }
+    
+    public void updateListaTurnosSave() {
+        Calendar c = Calendar.getInstance();
+        turnos = turnoEspFuncionarioService.listarTurnosAsignacion(turnoEspFuncionario.getFuncionario(), iniDate);
+        for (TurnoEspFuncionario tef : turnos) {
+            tef.setEditable(!turnoEspFunEnProgramacion(tef));
+        }
+        eventModel = new DefaultScheduleModel();
+        loadEventsFull(iniDate, iniDate);
     }
 
     public void updateListaTurnostrop() {
@@ -314,7 +340,7 @@ public class TurnoEspFuncionarioBBean {
         Calendar c = Calendar.getInstance();
         turnoEspFuncionario.setTurnoEspecial(new TurnoEspecial());
         turnoEspFuncionario.getTurnoEspecial().setTeSigla("TROP");
-        List<TurnoEspFuncionario> listarTurnosAsignacion = turnoEspFuncionarioService.listarTurnosAsignacion(turnoEspFuncionario.getFuncionario());
+        List<TurnoEspFuncionario> listarTurnosAsignacion = turnoEspFuncionarioService.listarTurnosAsignacion(turnoEspFuncionario.getFuncionario(), iniDate);
         turnos = new ArrayList<TurnoEspFuncionario>();
         eventModel = new DefaultScheduleModel();
         for (TurnoEspFuncionario tef : listarTurnosAsignacion) {
@@ -342,6 +368,7 @@ public class TurnoEspFuncionarioBBean {
         /*  cargarAeropuertoComision();    
          cargarDependenciaComision();*/
         turnos = new ArrayList<TurnoEspFuncionario>();
+        loadEventsFull(iniDate, iniDate);
         return limpiar();
 
 
@@ -351,10 +378,10 @@ public class TurnoEspFuncionarioBBean {
     public String guardar() {//*-*
         TurnoEspFuncionario res = null;
         try {
-            if (turnoEspFuncionario.getTefFfin().before(turnoEspFuncionario.getTefFini())) {
-                JsfUtil.addWarningMessage("turnoEspecialFechas");
-                return "crearTurnosEspFuncionario";
-            }
+            /*if (turnoEspFuncionario.getTefFfin().before(turnoEspFuncionario.getTefFini())) {
+             JsfUtil.addWarningMessage("turnoEspecialFechas");
+             return "crearTurnosEspFuncionario";
+             }*/
 
             turnoEspFuncionario.setComision(comision);
             funcionario = turnoEspFuncionario.getFuncionario();
@@ -366,7 +393,7 @@ public class TurnoEspFuncionarioBBean {
                 JsfUtil.addWarningMessage("turnoEspecialFechasRango");
                 return "crearTurnosEspFuncionario";
             }
-            
+
             res = turnoEspFuncionarioService.guardar(turnoEspFuncionario,
                     JsfUtil.getFuncionarioSesion());
         } catch (Exception e) {
@@ -379,12 +406,11 @@ public class TurnoEspFuncionarioBBean {
         FuncionarioBBean funcionarioBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);
         funcionarioBBean.setFuncionario(turnoEspFuncionario.getFuncionario());
 //        JsfUtil.addSuccessMessage("genericSingleSaveSuccess");
-        turnos = turnoEspFuncionarioService.listarTurnosAsignacion(turnoEspFuncionario.getFuncionario());
+        turnos = turnoEspFuncionarioService.listarTurnosAsignacion(turnoEspFuncionario.getFuncionario(), iniDate);
         for (TurnoEspFuncionario tef : turnos) {
             tef.setEditable(!turnoEspFunEnProgramacion(tef));
         }
-        cargarTurnoEspecial();
-        inicializaVariables();
+        inicializaVariablesSave();
 //        dataTable.setValue(turnos);
 //        return funcionarioBBean.listarAsignacionesEspeciales();
         return "crearTurnosEspFuncionario";
@@ -593,6 +619,40 @@ public class TurnoEspFuncionarioBBean {
             turnos = turnoEspFuncionarioService.getLista(turnoEspFuncionario);
         }
         for (TurnoEspFuncionario tef : schedulerTurns) {
+            if (tef.getTurnoEspecial().getTeSigla().equalsIgnoreCase("TROP")) {
+                DefaultScheduleEvent defaultScheduleEvent = new DefaultScheduleEvent(tef.getTurnoEspecial().getTeSigla(),
+                        tef.getTefFini(), tef.getTefFfin(), true);
+                defaultScheduleEvent.setEditable(false);
+                defaultScheduleEvent.setStyleClass("asigned");
+                eventModel.addEvent(defaultScheduleEvent);
+            }
+        }
+    }
+
+    public void loadEventsFull(Date start, Date end) {
+        eventModel = new DefaultScheduleModel();
+        if (start == null) {
+            start = Calendar.getInstance().getTime();
+        }
+        Date start2 = JsfUtil.getFirstDayMonth(start);
+        iniDate = start2;
+        {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(start2);
+            corrimiento = cal.get(Calendar.DAY_OF_WEEK) - 1;
+        }
+        end = JsfUtil.getLastDayMonth(start2);
+        List<TurnoEspFuncionario> schedulerTurns = new ArrayList<TurnoEspFuncionario>();
+        turnoEspFuncionario.setTefFini(start2);
+
+        turnoEspFuncionario.setTefFfin(end);
+        turnoEspFuncionario.getTurnoEspecial().setDependencia(JsfUtil.getFuncionarioSesion().getDependencia());
+        if (turnoEspFuncionario.getFuncionario().getFunId() != null) {
+            turnoEspFuncionario.getFuncionario().setFunAlias(null);
+            //schedulerTurns = turnoEspFuncionarioService.getLista(turnoEspFuncionario);
+            //turnos = turnoEspFuncionarioService.getLista(turnoEspFuncionario);
+        }
+        for (TurnoEspFuncionario tef : turnos) {
             DefaultScheduleEvent defaultScheduleEvent = new DefaultScheduleEvent(tef.getTurnoEspecial().getTeSigla(),
                     tef.getTefFini(), tef.getTefFfin(), true);
             defaultScheduleEvent.setEditable(false);
@@ -601,11 +661,11 @@ public class TurnoEspFuncionarioBBean {
         }
     }
 
-    public void onDateSelect(DateSelectEvent selectEvent) {
+    public void onDateSelect(SelectEvent selectEvent) {
         Calendar hoy = DateUtil.setCeroHoras(Calendar.getInstance());
 
         Calendar evDate = Calendar.getInstance();
-        evDate.setTime(selectEvent.getDate());
+        evDate.setTime((Date)selectEvent.getObject());
         evDate = DateUtil.setCeroHoras(evDate);
 
         if (!turnoEspFuncionarioService.validarDisponibilidadTurno(evDate.getTime(), funcionario).equals("OK")) {
@@ -629,16 +689,60 @@ public class TurnoEspFuncionarioBBean {
         }
         if (!assigned) {
             //popupVisible = true;
-            asignarTrop(selectEvent.getDate());
+            asignarTrop((Date)selectEvent.getObject());
         }
     }
 
-    public void onEventSelect(ScheduleEntrySelectEvent selectEvent) {
+    public void onDateSelectFull(SelectEvent selectEvent) {
+        Calendar hoy = DateUtil.setCeroHoras(Calendar.getInstance());
+
+        Calendar evDate = Calendar.getInstance();
+        evDate.setTime((Date)selectEvent.getObject());
+        evDate = DateUtil.setCeroHoras(evDate);
+
+        if (!turnoEspFuncionarioService.validarDisponibilidadTurno(evDate.getTime(), funcionario).equals("OK")) {
+            JsfUtil.addWarningMessage("fechaOcupada");
+            return;
+        }
+
+        if (turnoEspFuncionario.getFuncionario() == null || turnoEspFuncionario.getTurnoEspecial() == null || turnoEspFuncionario.getFuncionario().getFunId() == null || turnoEspFuncionario.getTurnoEspecial().getTeId() == null) {
+            JsfUtil.addManualWarningMessage("Por favor diligencie la información requerida");
+            return;
+        }
+        boolean assigned = false;
+
+        for (ScheduleEvent ev : eventModel.getEvents()) {
+            //System.out.println("entra");
+            Calendar c = Calendar.getInstance();
+            c.setTime(ev.getStartDate());
+            c = DateUtil.setCeroHoras(c);
+
+            if (evDate.getTime().equals(c.getTime())) {
+                event = ev;
+                assigned = true;
+                //System.out.println("exit");
+                break;
+            }
+        }
+        if (!assigned) {
+            Calendar c = Calendar.getInstance();
+            c.setTime((Date)selectEvent.getObject());
+            c.add(Calendar.DAY_OF_MONTH, 1);
+            //popupVisible = true;
+            turnoEspFuncionario.setTefFini(c.getTime());
+            turnoEspFuncionario.setTefFfin(c.getTime());
+            guardar();
+            updateListaTurnosSave();
+            //activarDependencia();
+        }
+    }
+
+    public void onEventSelect(SelectEvent selectEvent) {
         Calendar hoy = DateUtil.setCeroHoras(Calendar.getInstance());
         hoy.set(Calendar.HOUR_OF_DAY, 12);
 
         Calendar evDate = Calendar.getInstance();
-        evDate.setTime(selectEvent.getScheduleEvent().getStartDate());
+        evDate.setTime(((ScheduleEvent)selectEvent.getObject()).getStartDate());
         evDate = DateUtil.setCeroHoras(evDate);
         evDate.set(Calendar.HOUR_OF_DAY, 12);
 
@@ -649,7 +753,7 @@ public class TurnoEspFuncionarioBBean {
                 || serviceProg.isFechaProgramada(evDate.getTime(), dependencia.getDepId(), EstadoProgramacion.PROGRAMADA)) {
             return;
         }
-        event = selectEvent.getScheduleEvent();
+        event = (ScheduleEvent) selectEvent.getObject();
     }
 
     public String nextPrevious() {
@@ -661,6 +765,17 @@ public class TurnoEspFuncionarioBBean {
         loadEvents(iniDate, iniDate);
         showPrev = !(Calendar.getInstance().get(Calendar.MONTH) == iniDate.getMonth());
         return "listTurnosTrop";
+    }
+
+    public String nextPreviousFull() {
+        eventModel = new DefaultScheduleModel();
+        if (iniDate == null) {
+            iniDate = Calendar.getInstance().getTime();
+        }
+        iniDate = DateUtil.addMonth(iniDate, moveValue);
+        updateListaTurnos();
+        showPrev = !(Calendar.getInstance().get(Calendar.MONTH) == iniDate.getMonth());
+        return "crearTurnosEspFuncionario";
     }
 
     private void cargarTurnoEspecialList() {

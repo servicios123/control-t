@@ -62,14 +62,14 @@
         </h:panelGrid>   
                     <br/>
                     <p:dataTable value="#{funcionarioBBean.lazyList}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15"  
+                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
                                  emptyMessage="#{msg.emptyList}"
                                  paginatorAlwaysVisible="false">
                         
-                        <p:column >
+                        <p:column style="width: 8%">
                             
                             <f:facet name="header"><h:outputText value="#{msg.configurar}"/></f:facet>
                             <h:commandLink value="#{msg.configurar}" action="#{funcionarioBBean.editCondEsp}">
@@ -78,7 +78,7 @@
                             
                         </p:column>
                         
-                         <p:column sortBy="#{item.funId}">
+                         <p:column sortBy="#{item.funId}" style="width: 13%">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.funId}"/>
                             </f:facet>
@@ -90,7 +90,7 @@
                             </f:facet>
                             <h:outputText value="#{item.funNombre}"/>
                         </p:column>
-                        <p:column sortBy="#{item.funAlias}">
+                        <p:column sortBy="#{item.funAlias}" style="width: 10%">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.funAlias}"/>
                             </f:facet>

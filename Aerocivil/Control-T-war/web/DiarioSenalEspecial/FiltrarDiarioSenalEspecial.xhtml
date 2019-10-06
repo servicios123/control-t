@@ -5,8 +5,7 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:xf="http://www.xfaces.com/jsf"
-      xmlns:c="http://java.sun.com/jsp/jstl/core">   
+      xmlns:xf="http://www.xfaces.com/jsf">   
     <h:head>
         <title>Facelet Title</title>
     </h:head>
@@ -45,8 +44,8 @@
                         </xf:selectOneMenu>
                         <h:outputLabel/>
                         <h:outputLabel/>
-                        <p:commandButton ajax="false"   action="#{diarioSenalEspecialBBean.filtrar}" value="#{msg.buscar}"  />
-                        <p:commandButton ajax="false"   action="#{diarioSenalEspecialBBean.diariosOtrasDependencias}" value="Diarios Otras Dependencias"  />
+                        <h:commandButton action="#{diarioSenalEspecialBBean.filtrar}" value="#{msg.buscar}"  />
+                        <h:commandButton action="#{diarioSenalEspecialBBean.diariosOtrasDependencias}" value="Diarios Otras Dependencias"  />
                     </h:panelGrid>
 
                 </h:form>
@@ -131,23 +130,23 @@
                         <p:commandButton value="#{msg.dseCerrar}" oncomplete="confirmation_cerrar_dse.show()"  rendered="false"  />                 
                     </h:form>
                 </p:panel>
-                
+
                 <p:dialog widgetVar="confirmation_cerrar_dse" resizable="false" header="#{msg.dsiConfirmaCerrar}" id="dseCerrar" showEffect="fade" hideEffect="explode" modal="true">
                     <h:form>
-                         <p:dataTable   styleClass="marginTop" value="#{diarioSenalEspecialBBean.funcionarios}" var="dsf" rendered="#{diarioSenalEspecialBBean.diarioSenalEspecial.dseId!= null}">
+                        <p:dataTable   styleClass="marginTop" value="#{diarioSenalEspecialBBean.funcionarios}" var="dsf" rendered="#{diarioSenalEspecialBBean.diarioSenalEspecial.dseId!= null}">
                             <f:facet name="header">
                                 <h:outputText style="color:#fff;" value="#{msg.dseFuncionariosFaltantes}"/>
                             </f:facet>
                             <p:column headerText="#{msg.dsfFuncionario}" >                                         
                                 <h:outputText value="#{dsf.dsfFuncionario.funAlias}" />
-                             </p:column>
+                            </p:column>
                             <p:column headerText="#{msg.dsfPosicion}" >                                         
                                 <h:outputText value="#{dsf.dsfPosicion.posicionNacional.pnAlias}" />
-                             </p:column>
+                            </p:column>
                         </p:dataTable>
                         <h:panelGrid styleClass="marginTop" columns="2">                           
-                               
-                            
+
+
                             <p:commandButton value="#{msg.dsiConfirmar}" action="#{diarioSenalEspecialBBean.cerrarDseConsulta}" ajax="false" />                                    
                             <p:commandButton value="#{msg.cancelar}" onclick="confirmation_cerrar_dse.hide()"/>
 
@@ -170,8 +169,8 @@
                     <p:column headerText="#{msg.dsfHoraIngreso}" >                                         
                         <h:outputText value="#{dsf.dsfHoraEntrada}" />
                     </p:column>
-                    
-                               
+
+
                 </p:dataTable>
 
                 <p:dataTable   styleClass="marginTop" value="#{diarioSenalEspecialBBean.verDsiPorDti1}" var="info" rendered="#{diarioSenalEspecialBBean.verDiarioSenalEspecial.dseId!=null}">

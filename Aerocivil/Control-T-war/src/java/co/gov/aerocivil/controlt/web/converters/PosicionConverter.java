@@ -6,24 +6,14 @@ package co.gov.aerocivil.controlt.web.converters;
 
 
 import co.gov.aerocivil.controlt.entities.Posicion;
-import co.gov.aerocivil.controlt.services.ListasService;
 import co.gov.aerocivil.controlt.services.PosicionService;
-import co.gov.aerocivil.controlt.services.PosicionServiceBean;
-import co.gov.aerocivil.controlt.web.bbeans.PosicionBBean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
-import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 /**
  *
@@ -53,6 +43,9 @@ public class PosicionConverter implements Converter {
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
+        if(o==null){
+            return null;
+        }
        try{
             long id= ((Posicion) o).getPosId();           
             String s = String.valueOf(id);

@@ -50,7 +50,7 @@
                 <br></br>
                 <h:form>
                     <p:dataTable value="#{restriccionDependenciaBBean.listaRestriccionesLazy}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15"  
+                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
@@ -63,7 +63,7 @@
                             </f:facet>
                             <h:outputText value="#{item.restriccionProgramacion.rpDescripcion}"/>
                         </p:column>
-                        <p:column sortBy="#{item.dependencia.depAbreviatura}">
+                        <p:column sortBy="#{item.dependencia.depAbreviatura}" style="width: 7%">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.depAbreviatura}"/>
                             </f:facet>
@@ -82,7 +82,7 @@
                             </f:facet>
                             <h:outputText value="#{item.dependencia.aeropuerto.regional.regNombre}"/>
                         </p:column>
-                        <p:column sortBy="#{item.rdValor}">
+                        <p:column sortBy="#{item.rdValor}" style="width: 8%">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.rdValor}"/>
                             </f:facet>  

@@ -18,7 +18,7 @@ import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.event.DateSelectEvent;
+import org.primefaces.event.SelectEvent;
 
 /**
  *
@@ -33,14 +33,15 @@ public class EvaluacionCompetenciasBBean {
     private EvaluacionCompetencia evaluacion=new EvaluacionCompetencia();
     private Funcionario funcionario;
     
+    
     @EJB
     private ParametroDependenciaService dependenciaService;
     private List<ParametrosDependencia> parametros;
-    @ManagedProperty(value = "#{menuBBean.selectedOption.menLabel}")
     private String idMenu;
 
     @PostConstruct
     public void cargar() {
+        idMenu = "Evaluación Competencias";
         listarCursos();
     }
 
@@ -48,17 +49,17 @@ public class EvaluacionCompetenciasBBean {
     
     public String listarFuncionarios(){
         FuncionarioBBean funBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);        
-        String ret = funBBean.listar();
+        String ret = funBBean.listar("funFvEvaluacion");
         funBBean.setColumns(new boolean[]{false,false,true});
         return "listarEvaluacionFuncionario";
     }
-    public void actualiza(DateSelectEvent evento)
+    public void actualiza(SelectEvent evento)
     {
        Calendar c = Calendar.getInstance();
-       c.setTime(evento.getDate());
-       c.add(Calendar.YEAR, 1);        
-       Date date= evento.getDate();  
-       evaluacion.setEvFechaVence(c.getTime());
+        c.setTime((Date) evento.getObject());
+        c.add(Calendar.YEAR, 1);
+        Date date = (Date) evento.getObject();
+        evaluacion.setEvFechaVence(c.getTime());
     }
     public String crear(){
         listarCursos();

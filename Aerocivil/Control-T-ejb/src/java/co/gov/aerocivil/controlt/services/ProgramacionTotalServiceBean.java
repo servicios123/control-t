@@ -1019,10 +1019,8 @@ public class ProgramacionTotalServiceBean
         Calendar c = Calendar.getInstance();
         c.setTime(date);
         int count;
-        if (fun.getCountRestSunday() == null) {
-            return false;
-        }
-        if ((fun.getCountRestSunday() != null) && (fun.getCountRestSunday() < 4) && (c.get(7) == 1)) {
+        
+        if ((fun.getCountRestSunday() != null) && (fun.getCountRestSunday() == 0) && (c.get(7) == 1)) {
 
             count = 0;
             for (Day day : this.days) {

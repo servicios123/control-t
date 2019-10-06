@@ -29,7 +29,7 @@ public class PermisoLazyList extends LazyDataModel<PermisoEspecial> {
     
     @Override
     public List<PermisoEspecial> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, String> filters) {
+        SortOrder sortOrder, Map<String, Object> filters) {
         lista = service.getLista(permisoFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         this.setRowCount(service.getCount().intValue());

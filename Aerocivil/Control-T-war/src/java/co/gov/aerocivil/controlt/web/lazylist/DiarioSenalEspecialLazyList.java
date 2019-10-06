@@ -17,24 +17,22 @@ import org.primefaces.model.SortOrder;
  * @author Administrador
  */
 public class DiarioSenalEspecialLazyList extends LazyDataModel<DiarioSenalEspecial> {
+
     private List<DiarioSenalEspecial> lista;
     private DiarioSenalEspecialService diarioSenalEspecialService;
     private DiarioSenalEspecial diarioSenalEspecialFiltro;
-    
-    public DiarioSenalEspecialLazyList(DiarioSenalEspecialService diarioSenalEspecialService, DiarioSenalEspecial diarioSenalEspecialFiltro)
-    {
-        this.diarioSenalEspecialFiltro= diarioSenalEspecialFiltro;
-        this.diarioSenalEspecialService= diarioSenalEspecialService;
+
+    public DiarioSenalEspecialLazyList(DiarioSenalEspecialService diarioSenalEspecialService, DiarioSenalEspecial diarioSenalEspecialFiltro) {
+        this.diarioSenalEspecialFiltro = diarioSenalEspecialFiltro;
+        this.diarioSenalEspecialService = diarioSenalEspecialService;
     }
-    
-    
-    
+
     @Override
-    public List<DiarioSenalEspecial> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, String> filters) {
-        lista = diarioSenalEspecialService.getLista(diarioSenalEspecialFiltro, first,first + pageSize,
+    public List<DiarioSenalEspecial> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+        lista = diarioSenalEspecialService.getLista(diarioSenalEspecialFiltro, first, first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(diarioSenalEspecialService.getCount().toString());
-        this.setRowCount(dataSize);  
+        this.setRowCount(dataSize);
         return lista;
     }
 
@@ -51,5 +49,4 @@ public class DiarioSenalEspecialLazyList extends LazyDataModel<DiarioSenalEspeci
     public void setLista(List<DiarioSenalEspecial> lista) {
         this.lista = lista;
     }
-    
 }

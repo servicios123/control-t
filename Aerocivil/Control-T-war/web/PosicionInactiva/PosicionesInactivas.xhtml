@@ -29,14 +29,14 @@
                     <!--actionListener="{calendar.calendarListForm.nextPrevious}"-->
                     
                     <p:schedule id="schedule" value="#{posicionInactivaBBean.eventModel}"  
-                                editable="true" widgetVar="myschedule" 
+                                widgetVar="myschedule" 
                                 resizable="true" draggable="false" leftHeaderTemplate=""
                                 rightHeaderTemplate="" transient="true" 
                                 initialDate="#{posicionInactivaBBean.iniDate}" >
                         <p:ajax event="dateSelect" listener="#{posicionInactivaBBean.onDateSelect}" 
-                                update="eventDetails,popupEvent" oncomplete="myschedule.update();" />
+                                update="eventDetails,popupEvent,mainform" oncomplete="PF('myschedule').update();" />
                         <p:ajax event="eventSelect" listener="#{posicionInactivaBBean.onEventSelect}" 
-                                update="eventDetails,popupEvent" oncomplete="myschedule.update();" />
+                                update="eventDetails,popupEvent,mainform" oncomplete="PF('myschedule').update();" />
                     </p:schedule>  
                     <!--p:dataGrid value="{posicionInactivaBBean.diasPosiciones}" var="item" columns="7"
                                 rows="6">
@@ -54,7 +54,7 @@
                             </xf:selectManyCheckbox> 
                             
                             <p:commandButton value="#{msg.guardar}"  
-                                             oncomplete="myschedule.update();eventDialog.hide();"  
+                                             oncomplete="PF('myschedule').update();PF('eventDialog').hide();"  
                                              actionListener="#{posicionInactivaBBean.registrarPosiciones}" />  
                         </h:panelGrid>  
                     </p:dialog>

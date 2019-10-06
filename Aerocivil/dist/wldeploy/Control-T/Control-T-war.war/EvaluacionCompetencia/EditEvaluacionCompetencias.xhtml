@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.actualizar} #{msg.evaluacionCompetencia}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+
+                <h:form id="form">
+                    <h:panelGrid columns="4" styleClass="tabla_formulario">
+                        <xf:inputText entity="#{evaluacionCompetenciasBBean.funcionario}" fieldName="funNombre" readonly="true"/>
+                        <xf:inputText entity="#{evaluacionCompetenciasBBean.funcionario}" fieldName="funId" readonly="true"/>
+                        <xf:inputText entity="#{evaluacionCompetenciasBBean.funcionario}" fieldName="funAlias" readonly="true"/>
+                        <xf:inputText entity="#{evaluacionCompetenciasBBean.funcionario.dependencia.aeropuerto}" fieldName="aeNombre" readonly="true"/>
+                        <xf:inputText entity="#{evaluacionCompetenciasBBean.funcionario.dependencia}" fieldName="depNombre" readonly="true"/>
+                        <xf:inputText entity="#{evaluacionCompetenciasBBean.funcionario}" fieldName="funEstado" readonly="true"/>
+                       
+                        <h:outputText value="#{msg.evDescripcion}"/>
+                        
+                        <p:selectOneMenu value="#{evaluacionCompetenciasBBean.evaluacion.evDescripcion}">
+                            <f:selectItem itemValue="#{null}" itemLabel="#{msg.selectItemNull}"/>
+                            <f:selectItems value="#{evaluacionCompetenciasBBean.parametros}" var="cur" itemValue="#{cur.nombre}" itemLabel="#{cur.nombre}"/>                                                       
+                        </p:selectOneMenu>
+                        
+                        <xf:calendar  entity="#{evaluacionCompetenciasBBean.evaluacion}" fieldName="evFechaRealiza">
+                            <p:ajax event="dateSelect" listener="#{evaluacionCompetenciasBBean.actualiza}" update="evFechaVence"/>
+                        </xf:calendar>
+                        
+                        <h:outputText value="#{msg.evResultado}"/>
+                        <p:selectOneMenu value="#{evaluacionCompetenciasBBean.evaluacion.evResultado}" 
+                                      required="true">
+                            
+                            <f:selectItem itemValue="#{null}" itemLabel="#{msg.selectItemNull}"/>
+                            <f:selectItem itemValue="Aprobó" itemLabel="Aprobó"/>
+                            <f:selectItem itemValue="No aprobó" itemLabel="No aprobó"/>
+                        </p:selectOneMenu>
+                        <xf:calendar  entity="#{evaluacionCompetenciasBBean.evaluacion}" fieldName="evFechaVence"/>
+
+                        <f:facet name="footer">
+                            <h:commandButton action="#{evaluacionCompetenciasBBean.guardar}" value="#{msg.guardar}"/>
+                        </f:facet>
+                    </h:panelGrid>
+                </h:form>
+                <f:verbatim>
+                    <script type="text/javascript" >
+                        
+                        function tuesdaysAndFridaysDisabled(date) {
+                            var day = date.getDay();
+                            return [(day != 2), '']
+                        }
+                    </script>
+                </f:verbatim>
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

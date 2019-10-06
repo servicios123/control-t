@@ -37,6 +37,9 @@ public class DiarioSenalCategoriaConverter implements Converter {
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
+        if(o==null){
+            return null;
+        }
         try{
             long id= ((DiarioSenalCategoria) o).getDscId();           
             String s = String.valueOf(id);

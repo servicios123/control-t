@@ -23,7 +23,7 @@
                     }
                     .ui-widget-header
                     { 
-                        color: #fff;
+                        color: #fff !important;
                         background: #253979 !important;
                     }
                     .ui-tabs-nav
@@ -142,7 +142,7 @@
                                         <h:outputText value="Aún no se ha cerrado el Diario de Señales de la jornada "/>
                                         <h:outputText value="#{diarioSenalEspecialBBean.verDsf.dsfDiarioSenalEspecial.dseJornadaOp.joAlias}"/>
                                         <h:outputText value="Si desea cerrarlo hacer click "/>
-                                        <p:commandLink action="#{diarioSenalEspecialBBean.verDSF}" value="Aquí" ajax="false"/>
+                                        <p:commandLink action="#{diarioSenalEspecialBBean.verDSF}" value="Aquí"/>
                                     </h:panelGrid>
                                 </li>
                             </ul>
@@ -157,8 +157,8 @@
                             <h:outputText  value="#{msg.dsfObservacionSalida}" rendered="#{diarioSenalEspecialBBean.sale_temprano}" />   
                             <p:inputTextarea  style="resize: none;width:550px !important;height:100px;overflow:auto;"  value="#{diarioSenalEspecialBBean.diarioSenalFuncionario.dsfObservacionSalida}"  rendered="#{diarioSenalEspecialBBean.sale_temprano}" />
 
-                            <p:commandButton value="#{msg.dsiConfirmar}" action="#{diarioSenalEspecialBBean.salidaDsf}" ajax="false" />                                    
-                            <p:commandButton value="#{msg.cancelar}" onclick="confirmation_saletemprano.hide()"/>
+                            <h:commandButton value="#{msg.dsiConfirmar}" action="#{diarioSenalEspecialBBean.salidaDsf}"  />                                    
+                            <h:commandButton value="#{msg.cancelar}" onclick="confirmation_saletemprano.hide()"/>
 
 
                         </h:panelGrid>
@@ -220,9 +220,9 @@
 
 
                         <h:panelGrid columns="4" styleClass="tabla_formulario marginTop" rendered="#{diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado == 'ABIERTO' and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' }">
-                            <p:commandButton ajax="false" value="#{msg.dsfIngresar}" action="#{diarioSenalEspecialBBean.entradaDsf}" rendered="#{diarioSenalEspecialBBean.diarioSenalFuncionario.dsfHoraEntrada == null}"/>
-                            <p:commandButton ajax="false"  value="#{msg.dsfTomarReceso}" action="#{diarioSenalEspecialBBean.recesoDsf}" rendered="false"/>
-                            <p:commandButton ajax="false" value="#{msg.dsfRegresar}" action="#{diarioSenalEspecialBBean.regresoDsf}" rendered="#{diarioSenalEspecialBBean.diarioSenalFuncionario.dsfHoraEntrada != null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfHoraReceso!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfHoraRegreso==null }"/>
+                            <h:commandButton value="#{msg.dsfIngresar}" action="#{diarioSenalEspecialBBean.entradaDsf}" rendered="#{diarioSenalEspecialBBean.diarioSenalFuncionario.dsfHoraEntrada == null}"/>
+                            <h:commandButton  value="#{msg.dsfTomarReceso}" action="#{diarioSenalEspecialBBean.recesoDsf}" rendered="false"/>
+                            <h:commandButton value="#{msg.dsfRegresar}" action="#{diarioSenalEspecialBBean.regresoDsf}" rendered="#{diarioSenalEspecialBBean.diarioSenalFuncionario.dsfHoraEntrada != null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfHoraReceso!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfHoraRegreso==null }"/>
                                 <p:commandButton actionListener="#{diarioSenalEspecialBBean.operarSaleTemprano}" oncomplete="confirmation_saletemprano.show()"  value="#{msg.dsfSalir}" rendered="false"/>
                             
                         </h:panelGrid>
@@ -252,7 +252,7 @@
                                 <f:ajax listener="#{diarioSenalEspecialBBean.disabledFalse}" render="boton_traer_formulario"/>
                             </xf:selectOneMenu>
 
-                            <p:commandButton disabled="#{diarioSenalEspecialBBean.disabled}" id="boton_traer_formulario" ajax="false" value="#{msg.dsiTraerFormulario}" action="#{diarioSenalEspecialBBean.traerFormulario}"/>
+                            <h:commandButton disabled="#{diarioSenalEspecialBBean.disabled}" id="boton_traer_formulario" value="#{msg.dsiTraerFormulario}" action="#{diarioSenalEspecialBBean.traerFormulario}"/>
 
                         </h:panelGrid>                        
                     </h:form>
@@ -311,7 +311,7 @@
                             <p:inputTextarea style="resize: none;height:100px;overflow:auto;" value="#{diarioSenalEspecialBBean.diarioSenalInfo.dsiObservacion}" tabindex="10"/>
 
                             <f:facet name="footer">                                     
-                                <p:commandButton ajax="false"  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.guardarDsi}" tabindex="11"/>
+                                <h:commandButton  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.guardarDsi}" tabindex="11"/>
                             </f:facet>   
                         </h:panelGrid>                    
                     </h:form>
@@ -376,7 +376,7 @@
                             <p:inputText  style="width:40%;"  value="#{diarioSenalEspecialBBean.diarioSenalInfo.dsiErroresExternos}" tabindex="23"/>                                    
 
                             <f:facet name="footer">                                     
-                                <p:commandButton ajax="false"  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.guardarDsi}" tabindex="24"/>
+                                <h:commandButton  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.guardarDsi}" tabindex="24"/>
                             </f:facet>  
                         </h:panelGrid>                    
                     </h:form>
@@ -401,7 +401,7 @@
                         <h:panelGrid columns="6" styleClass="tabla_formulario tabla_resto_info" >
 
                             <f:facet name="footer">                                     
-                                <p:commandButton ajax="false"  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.guardarDsi}" tabindex="27"/>
+                                <h:commandButton  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.guardarDsi}" tabindex="27"/>
                             </f:facet>  
                         </h:panelGrid>                    
                     </h:form>
@@ -439,7 +439,7 @@
                             <p:inputTextarea style="resize: none;height:100px;overflow:auto;" value="#{diarioSenalEspecialBBean.diarioSenalInfo.dsiObservacion}" tabindex="32"/>
 
                             <f:facet name="footer">                                     
-                                <p:commandButton ajax="false"  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.guardarDsi}" tabindex="33"/>
+                                <h:commandButton  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.guardarDsi}" tabindex="33"/>
                             </f:facet>  
                         </h:panelGrid>                    
                     </h:form>
@@ -477,7 +477,7 @@
                             <p:inputTextarea style="resize: none;height:100px;overflow:auto;" value="#{diarioSenalEspecialBBean.diarioSenalInfo.dsiObservacion}" tabindex="38"/>
 
                             <f:facet name="footer">                                     
-                                <p:commandButton ajax="false"  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.guardarDsi}" tabindex="39"/>
+                                <h:commandButton  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.guardarDsi}" tabindex="39"/>
                             </f:facet>  
                         </h:panelGrid>                    
                     </h:form>
@@ -510,7 +510,7 @@
                             <p:inputTextarea style="resize: none;height:100px;overflow:auto;" value="#{diarioSenalEspecialBBean.diarioSenalInfo.dsiObservacion}" tabindex="42"/>
 
                             <f:facet name="footer">                                     
-                                <p:commandButton ajax="false"  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.guardarDsi}" tabindex="43"/>
+                                <h:commandButton  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.guardarDsi}" tabindex="43"/>
                             </f:facet>  
                         </h:panelGrid>                    
                     </h:form>
@@ -528,14 +528,14 @@
                             <f:facet name="header">
                                 <h:outputText value="#{msg.dst1}"/>
                             </f:facet>
-                            <p:column headerText="" rendered="#{diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
+                            <p:column width="15%" style="padding: 0px 0px;" headerText="" rendered="#{diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                 <h:form>
                                     <h:panelGrid columns="2" styleClass="sinBorde tabla_formulario">                                    
 
                                         <p:commandButton icon="ui-icon-trash" oncomplete="confirmation.show()" title="#{msg.eliminar}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                             <f:setPropertyActionListener value="#{info}" target="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}"/>
                                         </p:commandButton>   
-                                        <p:commandButton ajax="false" icon="ui-icon-pencil"  action="#{diarioSenalEspecialBBean.editarDsi}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
+                                        <p:commandButton icon="ui-icon-pencil"  action="#{diarioSenalEspecialBBean.editarDsi}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                             <f:setPropertyActionListener value="#{info}" target="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}"/>
                                         </p:commandButton> 
 
@@ -577,7 +577,7 @@
                                         <p:commandButton icon="ui-icon-trash" oncomplete="confirmation.show()" title="#{msg.eliminar}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                             <f:setPropertyActionListener value="#{info}" target="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}"/>
                                         </p:commandButton>   
-                                        <p:commandButton ajax="false" icon="ui-icon-pencil"  action="#{diarioSenalEspecialBBean.editarDsi}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
+                                        <p:commandButton icon="ui-icon-pencil"  action="#{diarioSenalEspecialBBean.editarDsi}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                             <f:setPropertyActionListener value="#{info}" target="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}"/>
                                         </p:commandButton> 
 
@@ -621,14 +621,14 @@
                             <f:facet name="header">
                                 <h:outputText value="#{msg.dst3}"/>
                             </f:facet>
-                            <p:column headerText="" rendered="#{diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
+                            <p:column width="15%" style="padding: 0px 0px;" headerText="" rendered="#{diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                 <h:form>
                                     <h:panelGrid columns="2" styleClass="sinBorde tabla_formulario"> 
 
                                         <p:commandButton icon="ui-icon-trash" oncomplete="confirmation.show()" title="#{msg.eliminar}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                             <f:setPropertyActionListener value="#{info}" target="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}"/>
                                         </p:commandButton>   
-                                        <p:commandButton ajax="false" icon="ui-icon-pencil"  action="#{diarioSenalEspecialBBean.editarDsi}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
+                                        <p:commandButton icon="ui-icon-pencil"  action="#{diarioSenalEspecialBBean.editarDsi}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                             <f:setPropertyActionListener value="#{info}" target="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}"/>
                                         </p:commandButton> 
 
@@ -638,7 +638,7 @@
                             <p:column headerText="#{msg.dsfFuncionario}" >                                         
                                 <h:outputText value="#{info.dsiDiarioSenalFuncionario.dsfFuncionario.funAlias}" />
                             </p:column>
-                            <p:column headerText="#{msg.dsiPosicionTrabajo}" >                                         
+                            <p:column headerText="#{msg.dsiPosicionTrabajo}" width="18%" >                                         
                                 <h:outputText value="#{info.dsiPosicionTrabajo}" />                                        
                             </p:column>
                             <p:column headerText="#{msg.dsiActividad}"  style="width:70%;">                                         
@@ -656,14 +656,14 @@
                             <f:facet name="header">
                                 <h:outputText value="#{msg.dst4}"/>
                             </f:facet>
-                            <p:column headerText="" rendered="#{diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
+                            <p:column width="15%" style="padding: 0px 0px;" headerText="" rendered="#{diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                 <h:form>
                                     <h:panelGrid columns="2" styleClass="sinBorde tabla_formulario">                                  
 
                                         <p:commandButton icon="ui-icon-trash" oncomplete="confirmation.show()" title="#{msg.eliminar}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                             <f:setPropertyActionListener value="#{info}" target="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}"/>
                                         </p:commandButton>   
-                                        <p:commandButton ajax="false" icon="ui-icon-pencil"  action="#{diarioSenalEspecialBBean.editarDsi}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
+                                        <p:commandButton icon="ui-icon-pencil"  action="#{diarioSenalEspecialBBean.editarDsi}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                             <f:setPropertyActionListener value="#{info}" target="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}"/>
                                         </p:commandButton> 
 
@@ -701,7 +701,7 @@
                                         <p:commandButton icon="ui-icon-trash" oncomplete="confirmation.show()" title="#{msg.eliminar}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                             <f:setPropertyActionListener value="#{info}" target="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}"/>
                                         </p:commandButton>   
-                                        <p:commandButton ajax="false" icon="ui-icon-pencil"  action="#{diarioSenalEspecialBBean.editarDsi}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
+                                        <p:commandButton icon="ui-icon-pencil"  action="#{diarioSenalEspecialBBean.editarDsi}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                             <f:setPropertyActionListener value="#{info}" target="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}"/>
                                         </p:commandButton> 
 
@@ -717,10 +717,10 @@
                             <p:column headerText="#{msg.dsiHoraUtc}" >                                         
                                 <h:outputText value="#{info.dsiHoraUtc}" />                                        
                             </p:column>
-                            <p:column headerText="#{msg.dsiFalla}"  style="width:50%;">                                         
+                            <p:column headerText="#{msg.dsiFalla}"  >                                         
                                 <h:outputText value="#{info.dsiFalla}" />                                        
                             </p:column>
-                            <p:column headerText="#{msg.dsiObservacion}"  style="width:50%;">                                         
+                            <p:column headerText="#{msg.dsiObservacion}"  >                                         
                                 <h:outputText value="#{info.dsiObservacion}" />                                        
                             </p:column>
                         </p:dataTable>
@@ -734,14 +734,14 @@
                             <f:facet name="header">
                                 <h:outputText value="#{msg.dst6}"/>
                             </f:facet>
-                            <p:column headerText="" rendered="#{diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
+                            <p:column width="15%" style="padding: 0px 0px;" headerText="" rendered="#{diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                 <h:form>
                                     <h:panelGrid columns="2" styleClass="sinBorde tabla_formulario">                                    
 
                                         <p:commandButton icon="ui-icon-trash" oncomplete="confirmation.show()" title="#{msg.eliminar}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                             <f:setPropertyActionListener value="#{info}" target="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}"/>
                                         </p:commandButton>   
-                                        <p:commandButton ajax="false" icon="ui-icon-pencil"  action="#{diarioSenalEspecialBBean.editarDsi}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
+                                        <p:commandButton icon="ui-icon-pencil"  action="#{diarioSenalEspecialBBean.editarDsi}" rendered="#{info.dsiDiarioSenalFuncionario.dsfId == diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfId!=null and diarioSenalEspecialBBean.diarioSenalFuncionario.dsfEstado=='ABIERTO' and diarioSenalEspecialBBean.diarioSenalEspecial.dseEstado=='ABIERTO'}">
                                             <f:setPropertyActionListener value="#{info}" target="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}"/>
                                         </p:commandButton> 
 
@@ -755,7 +755,7 @@
                             <p:column headerText="#{msg.dsiHoraUtc}" >                                         
                                 <h:outputText value="#{info.dsiHoraUtc}" />                                        
                             </p:column>
-                            <p:column headerText="#{msg.dsiObservacion}"  style="width:80%;">                                         
+                            <p:column headerText="#{msg.dsiObservacion}"  style="width:60%;">                                         
                                 <h:outputText value="#{info.dsiObservacion}" />                                        
                             </p:column>
                         </p:dataTable>
@@ -822,7 +822,7 @@
                         <h:panelGrid styleClass="marginTop" columns="2">                           
 
 
-                            <p:commandButton value="#{msg.dsiConfirmar}" action="#{diarioSenalEspecialBBean.cerrarDse}" ajax="false" />                                    
+                            <p:commandButton value="#{msg.dsiConfirmar}" action="#{diarioSenalEspecialBBean.cerrarDse}" />                                    
                             <p:commandButton value="#{msg.cancelar}" onclick="confirmation_cerrar_dse.hide()"/>
 
 
@@ -838,7 +838,7 @@
                         <h:panelGrid styleClass="marginTop" columns="2">                         
 
 
-                            <p:commandButton value="#{msg.dsiConfirmar}" action="#{diarioSenalEspecialBBean.eliminarDsi}" ajax="false" />                                    
+                            <p:commandButton value="#{msg.dsiConfirmar}" action="#{diarioSenalEspecialBBean.eliminarDsi}" />                                    
                             <p:commandButton value="#{msg.cancelar}" onclick="confirmation.hide()"/>
 
 
@@ -847,14 +847,14 @@
                 </p:dialog>
 
                 <h:form styleClass="marginTop" rendered="false">   
-                    <p:commandButton ajax="false"  action="#{diarioSenalEspecialBBean.registrar}" value="#{msg.actualizar}"/>                    
+                    <p:commandButton  action="#{diarioSenalEspecialBBean.registrar}" value="#{msg.actualizar}"/>                    
                 </h:form>
 
 
                 <h:form styleClass="marginTop" rendered="#{diarioSenalEspecialBBean.diarioSenalEspecial.dseId==null and diarioSenalEspecialBBean.jornada.joId != null}">  
                     <h:panelGrid columns="2" styleClass="tabla_aviso">
                         <h:outputText value="#{msg.dseAdvertenica}"/>                          
-                        <p:commandButton ajax="false"  action="#{diarioSenalEspecialBBean.registrarDse}" value="#{msg.continuar}"/>                    
+                        <h:commandButton  action="#{diarioSenalEspecialBBean.registrarDse}" value="#{msg.continuar}"/>                    
 
                     </h:panelGrid>
 

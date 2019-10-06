@@ -27,37 +27,37 @@
             <ui:define name="contenido">
                 
                 <h:form>
-
+                    <f:facet name="header" ><h:outputText value="#{msg.filtros}" ></h:outputText></f:facet>
                     <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0" style="width: 60%;">
-                        <f:facet name="header" ><h:outputText value="#{msg.filtros}" ></h:outputText></f:facet>
-                        <xf:selectOneMenu entity="#{diarioSenalBBean.diarioSenalFiltro.dependencia.depcategoria}" label="depCategoria"  fieldName="dcId"
+                        <h:outputText value="#{msg.depCategoria}" rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel == 1 or loginBBean.funcionarioTO.funcionario.fuNivel == 8}"/>
+                        <p:selectOneMenu value="#{diarioSenalBBean.diarioSenalFiltro.dependencia.depcategoria.dcId}" id="dcId"
                                           rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel == 1 or loginBBean.funcionarioTO.funcionario.fuNivel == 8}">  
                             <f:selectItems value="#{listadosBBean.listaDepCategoria}" var="dc" itemValue="#{dc.dcId}" itemLabel="#{dc.dcNombre}"/> 
-                        </xf:selectOneMenu> 
-                        
-                        <xf:selectOneMenu  entity="#{diarioSenalBBean.diarioSenalFiltro.dependencia.aeropuerto.regional}"  
-                                           fieldName="regId" rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}">  
+                        </p:selectOneMenu> 
+                        <h:outputText value="#{msg.regId}" rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}"/>
+                        <p:selectOneMenu  value="#{diarioSenalBBean.diarioSenalFiltro.dependencia.aeropuerto.regional.regId}" 
+                                          id="regId" rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}">  
                             <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
                             <p:ajax update="aeId,depId"  
                                     listener="#{diarioSenalBBean.cargarAeropuertoListado}"  />  
-                        </xf:selectOneMenu> 
-
-                        <xf:selectOneMenu entity="#{diarioSenalBBean.diarioSenalFiltro.dependencia.aeropuerto}" fieldName="aeId"
+                        </p:selectOneMenu> 
+                        <h:outputText value="#{msg.aeId}" rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}"/>
+                        <p:selectOneMenu id="aeId" value="#{diarioSenalBBean.diarioSenalFiltro.dependencia.aeropuerto.aeId}"
                                           rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}"  >  
                             <f:selectItems value="#{diarioSenalBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
                             <p:ajax update="depId"  
                                     listener="#{diarioSenalBBean.cargarDependenciaListado}" /> 
-                        </xf:selectOneMenu> 
-
-                        <xf:selectOneMenu entity="#{diarioSenalBBean.diarioSenalFiltro.dependencia}" 
-                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}" fieldName="depId">
+                        </p:selectOneMenu> 
+                        <h:outputText value="#{msg.depId}" rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}"/>
+                        <p:selectOneMenu id="depId" value="#{diarioSenalBBean.diarioSenalFiltro.dependencia.depId}" 
+                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}">
                             <f:selectItems value="#{diarioSenalBBean.listDependencia}" var="reg" itemValue="#{reg.depId}" itemLabel="#{reg.depNombre}"/>
-                        </xf:selectOneMenu>
-                        
-                        <xf:selectOneMenu entity="#{diarioSenalBBean.diarioSenalFiltro.dsTipo}" 
-                                          fieldName="dstId" rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>3 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}">
+                        </p:selectOneMenu>
+                        <h:outputText value="#{msg.dstId}" rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>3 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}"/>
+                        <p:selectOneMenu id="dstId" value="#{diarioSenalBBean.diarioSenalFiltro.dsTipo.dstId}" 
+                                         rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>3 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}">
                             <f:selectItems value="#{diarioSenalBBean.listDsTipo}" var="tp" itemValue="#{tp.dstId}" itemLabel="#{tp.dstNombre}"/>
-                        </xf:selectOneMenu>
+                        </p:selectOneMenu>
                         <h:outputText value="#{msg.lugarSuceso}" rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>3 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}"/>
 
                         <h:panelGroup rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>3 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}">
@@ -90,7 +90,7 @@
                 <br></br>
                 <h:form>
                     <p:dataTable value="#{diarioSenalBBean.lista}" var="item" styleClass="tablaColapsa"
-                                 paginator="true" paginatorPosition="bottom" rows="15"  
+                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
@@ -98,7 +98,7 @@
                                  rowStyleClass="#{item.resaltar?'destacado':null}"
                                 >
                         
-                        <p:column sortBy="#{item.dsenId}" style="text-align:left; width:5%;">
+                        <p:column sortBy="#{item.dsenId}" style="text-align:left; width:8%;">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.dsenId}"/>
                             </f:facet>
@@ -136,19 +136,19 @@
                             </f:facet>
                             <h:outputText value="{item.dsenLugarSuceso}"/>
                         </p:column-->
-                        <p:column sortBy="#{item.dsenDescripcion}" style="text-align:left; width:40%;">
+                        <p:column sortBy="#{item.dsenDescripcion}" style="text-align:left; width:32%;">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.dsenDescripcion}"/>
                             </f:facet>
                             <h:outputText value="#{item.dsenDescripcion}" />
                         </p:column>
-                        <p:column sortBy="#{item.funcionario.funAlias}" style="text-align:left; width:5%;">
+                        <p:column sortBy="#{item.funcionario.funAlias}" style="text-align:left; width:8%;">
                             <f:facet name="header">
-                                <h:outputText value="#{msg.funcionario}"/>
+                                <h:outputText value="Func."/>
                             </f:facet>
                             <h:outputText value="#{item.funcionario.funAlias}"/>
                         </p:column>
-                        <p:column sortBy="#{item.dsenLugarSuceso}" style="text-align:left; width:8%;" rendered="#{diarioSenalBBean.dependencia eq null}">
+                        <p:column sortBy="#{item.dsenLugarSuceso}" style="text-align:left; width:11%;" rendered="#{diarioSenalBBean.dependencia eq null}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.dsenLugarSuceso}"/>
                             </f:facet>

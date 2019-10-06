@@ -47,7 +47,7 @@ public class FuncionarioLazyList  extends LazyDataModel<Funcionario> {
 
     @Override
     public List<Funcionario> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, String> filters) {
+        SortOrder sortOrder, Map<String, Object> filters) {
         lista = funcionarioService.getListaPag(funcionarioFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(funcionarioService.getCount().toString());

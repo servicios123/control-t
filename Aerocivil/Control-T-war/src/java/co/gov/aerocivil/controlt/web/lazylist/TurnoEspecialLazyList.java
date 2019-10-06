@@ -40,7 +40,7 @@ public class TurnoEspecialLazyList extends LazyDataModel<TurnoEspecial> {
 
     @Override
     public List<TurnoEspecial> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, String> filters) {
+        SortOrder sortOrder, Map<String, Object> filters) {
         lista = turnoEspecialService.getLista(turnoEspecialFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(turnoEspecialService.getCount().toString());

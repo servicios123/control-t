@@ -32,32 +32,28 @@
                         <div class="divOverFlow">
                             <p:dataTable value="#{tempVerProgramacionBBean.dynamicCars}" 
                                          var="item" 
-                                         styleClass="tabla_lista"
+                                         styleClass="tabla_lista" style="width: 400%"
                                          paginator="true" paginatorPosition="bottom" rows="15"  
                                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                          currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                          rowsPerPageTemplate="10,15,20,50" id="carTable" draggableColumns="true"
-                                         sortBy="#{item.funcionario.funAlias}"
-                                         emptyMessage="#{msg.emptyList}" >
+                                         emptyMessage="#{msg.emptyList}" 
+                                         scrollWidth="800"
+                                         frozenColumns="1">
 
 
                                 <p:columnGroup type="header">  
                                     <p:row>  
 
-                                        <p:column headerText="Funcionario"  />
+                                        <p:column headerText="Func."  />
                                         <c:forEach items="#{tempVerProgramacionBBean.columnsFecha}" var="fechaVar"  >  
 
-                                            <p:column colspan="2">  
-                                                <f:facet name="header"> 
-                                                    <h:outputLabel value="#{fechaVar.header}">
+                                            <p:column headerText="#{fechaVar.header}" colspan="2">  
 
-                                                    </h:outputLabel>
-
-                                                </f:facet>  
 
                                             </p:column> 
                                         </c:forEach>
-                                        <p:column headerText="Funcionario"  /> 
+                                        <p:column headerText="Func."  /> 
                                         <p:column headerText="THRX"  /> 
 
 
@@ -81,14 +77,14 @@
                         <h:commandButton  action="#{programacionTurnosBBean.listar}" value="#{msg.cancelar}" rendered="#{tempVerProgramacionBBean.flagVal}" />
                         <h:commandButton  action="#{tempVerProgramacionBBean.enviarAprobar}" value="#{msg.enviarAprobar}" rendered="#{tempVerProgramacionBBean.programacion.proEstado==0 and tempVerProgramacionBBean.funcionario.fuNivel == 4 and tempVerProgramacionBBean.isEmptyListPosNoAsig==true}" />            
                         <h:commandButton  action="#{tempVerProgramacionBBean.volverEditar}" value="#{msg.volverEditar}" rendered="#{tempVerProgramacionBBean.programacion.proEstado==2  and tempVerProgramacionBBean.funcionario.fuNivel &lt; 5}" />                       
-                        <h:commandButton action="#{tempVerProgramacionBBean.exportPDF}" value="#{msg.generarReporte}"/>
-                        <h:commandButton action="#{tempVerProgramacionBBean.exportXLS}" value="#{msg.generarReporteXls}"/>
-                        
+                        <h:commandButton action="#{tempVerProgramacionBBean.exportPDF}" value="#{msg.generarReporte}" />
+                        <h:commandButton action="#{tempVerProgramacionBBean.exportXLS}" value="#{msg.generarReporteXls}" />
 
-                        <h:commandButton value="#{msg.descargarLog}" action="#{tempVerProgramacionBBean.descargarUltimoLog}" rendered="#{tempVerProgramacionBBean.funcionario.fuNivel == 1}"/>     
+
+                        <p:commandButton value="#{msg.descargarLog}" action="#{tempVerProgramacionBBean.descargarUltimoLog}" rendered="#{tempVerProgramacionBBean.funcionario.fuNivel == 1}"/>     
                         <br/><br/><br/>
 
-                        
+
                         <h:outputText value="Posiciones No Asignadas" rendered="#{tempVerProgramacionBBean.funcionario.fuNivel &lt; 5}" class="titulo" ></h:outputText>
                         <br/><br/>
                         <p:dataTable value="#{tempVerProgramacionBBean.listPosNoAsig}" 
@@ -102,9 +98,6 @@
                                      rows="40"
                                      rendered="#{tempVerProgramacionBBean.funcionario.fuNivel &lt; 5}"
                                      >
-
-
-
                             <p:column headerText="#{msg.accion}">
                                 <h:commandLink value="#{msg.asignar}"
                                                action="#{posNoAsignadasBBean.asignarPosicion}">
@@ -128,11 +121,6 @@
                                 <h:outputText value="#{item.posicionJornada.pjAlias}"/>
                             </p:column>
                         </p:dataTable>
-
-
-
-
-
                         <br/><br/><br/>
 
                     </h:form>
@@ -149,9 +137,6 @@
                                      rowsPerPageTemplate="10,20,50,100,200"
                                      id="carComprobable"                
                                      emptyMessage="#{msg.emptyList}" >
-
-
-
                             <p:columns value="#{tempVerProgramacionBBean.columnsFechaComprobacion}"  
                                        var="columnComprobacion" columnIndexVar="colComprobacionIndex"> 
                                 <f:facet name="header">
@@ -165,11 +150,6 @@
                     </div>
                     <br/><br/>
                     <!-- <input type="button" value="Imprimir Comprobación" onclick="window.print()"/>-->
-
-
-
-
-
                 </ui:define>
 
             </ui:composition>

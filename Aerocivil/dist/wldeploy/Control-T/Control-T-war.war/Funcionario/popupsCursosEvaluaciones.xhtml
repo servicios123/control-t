@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <h:form prependId="false">
+        <p:dialog widgetVar="cursosPopup2" header="#{msg.cursosRecurrentes}"
+                  id="cursosPopup" showEffect="clip" hideEffect="clip" height="400">  
+            <ui:include src="cursosRecurrentesFuncionario.xhtml">
+                <ui:param name="funcionario" value="#{funcionario}"/>
+            </ui:include>
+        </p:dialog>
+
+        <p:dialog widgetVar="evaluacionPopup2" header="#{msg.evaluaciones}" 
+                  id="evaluacionPopup" showEffect="clip" hideEffect="clip" height="400">  
+            <ui:include src="evaluacionesFuncionario.xhtml">
+                <ui:param name="funcionario" value="#{funcionario}"/>
+            </ui:include>
+        </p:dialog>
+
+    </h:form>
+</html>

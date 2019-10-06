@@ -7,33 +7,36 @@ package co.gov.aerocivil.controlt.web.util;
 import co.gov.aerocivil.controlt.entities.Menu;
 import java.util.List;
 import javax.el.ExpressionFactory;
+import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import javax.faces.component.html.HtmlCommandLink;
+import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import org.primefaces.component.menuitem.MenuItem;
-import org.primefaces.model.DefaultMenuModel;
-import org.primefaces.model.MenuModel;
-import org.primefaces.model.TreeNode;
-import org.primefaces.model.DefaultTreeNode;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.primefaces.event.NodeCollapseEvent;
+import org.primefaces.model.menu.DefaultMenuItem;
+import org.primefaces.model.menu.DefaultMenuModel;
+import org.primefaces.model.menu.DefaultSubMenu;
+import org.primefaces.model.menu.MenuModel;
 
 /**
  *
  * @author Administrador
  */
 @ManagedBean
-@SessionScoped
+@ViewScoped
 public class MenuBBean {
 
     private MenuModel model;
     private FacesContext fc;
     private ExpressionFactory ef;
-    private TreeNode menu;
+    private DefaultSubMenu menu;
     private Menu selectedOption;
     List<Menu> lista;
 
-    public TreeNode getMenu() {
+    public DefaultSubMenu getMenu() {
         return menu;
     }
 
@@ -46,38 +49,42 @@ public class MenuBBean {
         //Submenu submenu = new Submenu();
         lista = JsfUtil.getListadosBBean().getListaMenu(JsfUtil.getFuncionarioSesion().getFuNivel());
 
-        menu = new DefaultTreeNode("Root", null);
-        TreeNode father = null;
+        menu = new DefaultSubMenu();
+        DefaultSubMenu parent = null;
         for (Menu m : lista) {
             if (m.getMenMetodo() == null || "".equals(m.getMenMetodo())) {
-                TreeNode nodo = new DefaultTreeNode(m, menu);
-                father = nodo;
+                if (parent != null) {
+                    model.addElement(parent);
+                }
+                parent = new DefaultSubMenu(m.getMenLabel());
+                parent.setExpanded(false);
             } else {
-
-                HtmlCommandLink edLink = new HtmlCommandLink();
-                edLink.setValueExpression("value", JsfUtil.createValueExpression(m.getMenLabel(), String.class));
-                edLink.setActionExpression(ef.createMethodExpression(fc.getELContext(),
-                        "#{" + m.getMenMetodo() + "}", String.class, new Class<?>[0]));
-                /*edLink.addActionListener(new SetPropertyActionListener(JsfUtil.createValueExpression("#{registroBBean.registro}", RegistroTO.class), 
-                 JsfUtil.createValueExpression("#{registro}", RegistroTO.class)	));*/
-                TreeNode nodo2 = new DefaultTreeNode(m, father);
+                DefaultMenuItem item = createMenuItem(m);
+                parent.addElement(item);
             }
         }
-
-
+        if (parent != null) {
+            model.addElement(parent);
+        }
+//        panelMenu.setModel(model);
     }
 
     public MenuModel getModel() {
         return model;
     }
 
-    private MenuItem createMenuItem(Menu m) {
-        MenuItem item = new MenuItem();
+    private DefaultMenuItem createMenuItem(Menu m) {
+        DefaultMenuItem item = new DefaultMenuItem();
         item.setValue(m.getMenLabel());
-        item.setActionExpression(ef.createMethodExpression(fc.getELContext(),
-                "#{" + m.getMenMetodo() + "}", String.class, new Class<?>[0]));
+//        item.setUrl(ef.createMethodExpression(fc.getELContext(),
+//                "#{" + m.getMenMetodo() + "}", String.class, new Class<?>[0]).getExpressionString());
+        item.setCommand("#{" + m.getMenMetodo() + "}");
         item.setImmediate(true);
         item.setAjax(false);
+        item.setAsync(false);
+        item.setGlobal(false);
+        item.setPartialSubmit(false);
+        item.setResetValues(false);
         return item;
     }
 
@@ -113,17 +120,29 @@ public class MenuBBean {
     }
 
     public String gotoInicio() {
-        List<TreeNode> menuOpt = menu.getChildren();
-        menuOpt.get(0).setExpanded(true);
-        /*List<TreeNode> subMenu = menuOpt.get(0).getChildren();
-         subMenu.get(0).setSelected(true);*/
-        //this.selectedOption
+        DefaultSubMenu main = (DefaultSubMenu) model.getElements().get(0);
+        DefaultMenuItem item = (DefaultMenuItem) main.getElements().get(0);
 
+        main.setExpanded(true);
+        //selectedOption.setMenMetodo("vencimientosBBean.listar"); 
         selectedOption = lista.get(1);
-        //selectedOption.setMenMetodo("vencimientosBBean.listar");            
+//
+        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+        Cookie[] cookies = request.getCookies();
+        Cookie opentoken = null;
+        for (Cookie c : cookies) {
+            if(c.getName().contains("myTree")){
+                opentoken = c;
+                opentoken.setMaxAge(0);
+                opentoken.setValue(""); // it is more elegant to clear the value but not necessary
+                opentoken.setPath("/");
+                response.addCookie(opentoken);
+            }
+        }
         try {
-            String[] regla = selectedOption.getMenMetodo().split("\\.");
-            return JsfUtil.ejecutarNavegacion(regla[0], regla[1]);
+            String[] url = item.getCommand().replaceAll("#", "").replaceAll("\\{", "").replaceAll("}", "").split("\\.");
+            return JsfUtil.ejecutarNavegacion(url[0], url[1]);
         } catch (Exception e) {
             e.printStackTrace();
             return "logedIn";

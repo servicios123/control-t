@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"      
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.editar} #{msg.turnoEspecial}" rendered="#{turnoEspecialBBean.turnoEspecial.teId !=null}" ></h:outputText>
+                <h:outputText value="#{msg.crear} #{msg.turnoEspecial}" rendered="#{turnoEspecialBBean.turnoEspecial.teId==null}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                <h:form id="formTE"><!--readonly="{turnoEspecialBBean.turnoEspecial.teId!=null}" -->
+                    <h:panelGrid styleClass="tabla_formulario" columns="2">
+                        
+                        <xf:inputText entity="#{turnoEspecialBBean.turnoEspecial}" fieldName="teNombre" required="true"  />
+
+                        <xf:inputText entity="#{turnoEspecialBBean.turnoEspecial}" fieldName="teSigla" required="true" />
+                        <xf:timeSelector entity="#{turnoEspecialBBean.turnoEspecial}" fieldName="teHinicio" minFieldName="teMinicio" required="true" />
+                        <xf:timeSelector entity="#{turnoEspecialBBean.turnoEspecial}" fieldName="teHfin" minFieldName="teMfin" required="true" >
+                            <p:ajax event="change" update="tePermiteExtras" immediate="true"/>
+                        </xf:timeSelector>
+                        
+                       <xf:selectOneMenu entity="#{turnoEspecialBBean.turnoEspecial}" fieldName="teEstado" required="true" >  
+                            <f:selectItem itemLabel="Activo" itemValue="Activo" />  
+                            <f:selectItem itemLabel="Inactivo" itemValue="Inactivo" /> 
+                        </xf:selectOneMenu>
+                        <xf:radioButton entity="#{turnoEspecialBBean.turnoEspecial}" fieldName="teComision">  
+                            <f:selectItem itemLabel="Normal" itemValue="" /> 
+                            <f:selectItem itemLabel="Comisión" itemValue="1" />  
+                            <f:selectItem itemLabel="Quita Descanso" itemValue="2" /> 
+                        </xf:radioButton>
+                        <xf:radioButton entity="#{turnoEspecialBBean.turnoEspecial}" fieldName="teHoraLaborada">
+                            <f:selectItem itemLabel="SI" itemValue="#{true}" />  
+                            <f:selectItem itemLabel="NO" itemValue="#{false}" /> 
+                        </xf:radioButton>
+                        
+                         <xf:radioButton entity="#{turnoEspecialBBean.turnoEspecial}" fieldName="tePermiteExtras" disabled="#{!(turnoEspecialBBean.turnoEspecial.teHfin le 17 or turnoEspecialBBean.turnoEspecial.teHfin == null)}">
+                            <f:selectItem itemLabel="SI" itemValue="#{true}" />  
+                            <f:selectItem itemLabel="NO" itemValue="#{false}" /> 
+                        </xf:radioButton>
+                        
+                        <f:facet name="footer">
+                            <h:commandButton  action="#{turnoEspecialBBean.guardar}" value="#{msg.guardar}"  />
+                            <h:commandButton  action="#{turnoEspecialBBean.filtrar}" value="#{msg.cancelar}" immediate="true" />
+                        </f:facet>
+                    </h:panelGrid>
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

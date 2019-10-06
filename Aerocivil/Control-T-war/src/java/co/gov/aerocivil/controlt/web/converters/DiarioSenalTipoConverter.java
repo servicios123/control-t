@@ -6,8 +6,6 @@ package co.gov.aerocivil.controlt.web.converters;
 
 import co.gov.aerocivil.controlt.entities.DiarioSenalTipo;
 import co.gov.aerocivil.controlt.services.DiarioSenalEspecialService;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -15,8 +13,6 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 /**
  *
@@ -43,6 +39,9 @@ public class DiarioSenalTipoConverter implements Converter {
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
+        if(o==null){
+            return null;
+        }
        try{
             long id= ((DiarioSenalTipo) o).getDstId();           
             String s = String.valueOf(id);

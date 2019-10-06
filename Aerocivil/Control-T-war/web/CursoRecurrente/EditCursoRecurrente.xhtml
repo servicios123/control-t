@@ -31,12 +31,18 @@
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20"
-                                 emptyMessage="#{msg.emptyList}" >
-                        <p:column style="width: 20px">
-                            <f:facet name="header"></f:facet>
+                                 emptyMessage="#{msg.emptyList}"
+                                 id="carTable">
+                        <p:column style="width: 8%">
+                            <f:facet name="header">  
+                                <p:selectBooleanCheckbox value="#{funcionarioBBean.seleccionarTodas}" >
+                                    <p:ajax immediate="true" listener="#{funcionarioBBean.seleccionarTodasEvent}" update="carTable"/>
+                                </p:selectBooleanCheckbox>
+                                Todas
+                            </f:facet>
                             <p:selectBooleanCheckbox value="#{item.seleccionado}"/>
                         </p:column>
-                        <p:column>
+                        <p:column style="width: 8%">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.fuAlias}"/>
                             </f:facet>
@@ -48,13 +54,13 @@
                             </f:facet>
                             <h:outputText value="#{item.funNombre}" class="#{item.colorCurso}"/>
                         </p:column>
-                        <p:column>
+                        <p:column style="width: 11%">
                             <f:facet name="header">
                                 <h:outputText value="Nombre Curso"/>
                             </f:facet>
                             <h:outputText value="#{item.cursoRecurrente.curNombre}" class="#{item.colorCurso}"/>
                         </p:column>
-                        <p:column>
+                        <p:column style="width: 11%">
                             <f:facet name="header">
                                 <h:outputText value="Fecha Termina"/>
                             </f:facet>
@@ -62,7 +68,7 @@
                                 <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
                             </h:outputText>
                         </p:column>
-                        <p:column>
+                        <p:column style="width: 10%">
                             <f:facet name="header">
                                 <h:outputText value="Fecha Vence"/>
                             </f:facet>

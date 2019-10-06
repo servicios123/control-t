@@ -26,7 +26,6 @@ import co.gov.aerocivil.controlt.web.enums.SortOrderEnum;
 import co.gov.aerocivil.controlt.web.lazylist.FuncionarioLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 //import com.itextpdf.text.pdf.ArabicLigaturizer;
-import java.io.Serializable;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,12 +36,10 @@ import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import javax.faces.event.ValueChangeEvent;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.model.LazyDataModel;
-import org.primefaces.model.DualListModel;
 import org.primefaces.component.selectonemenu.SelectOneMenu;
-import org.primefaces.event.DateSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.event.RowEditEvent;
 
 /**
@@ -90,6 +87,7 @@ public class FuncionarioBBean {
     private Date fechaRealizaEvaluacion;
     private String evaluacion;
     private String resultado;
+    private boolean seleccionarTodas;
 
     public String crear() {
         funcionario = new Funcionario();
@@ -266,6 +264,19 @@ public class FuncionarioBBean {
         }
         return filtrar();
     }
+    
+    public String listar(String sortField) {
+        funcionarioFiltro = new Funcionario();
+        funcionarioFiltro.setSortField(sortField);
+        funcionarioFiltro.setDependencia(getDependenciaXNivelUsuario());
+        funcionarioFiltro.getDependencia().setDepcategoria(new DepCategoria());
+        //columns = new boolean[3];
+        columns = new boolean[]{true, false, false};
+        if (JsfUtil.getFuncionarioSesion().getFuNivel().equals(RolEnum.NIVEL_A4.getRolId())) {
+            columns[1] = true;
+        }
+        return filtrar();
+    }
 
     public String listar_vencimiento_certificado() {
         funcionarioFiltro = new Funcionario();
@@ -394,6 +405,7 @@ public class FuncionarioBBean {
     }
 
     public void inicializarPickList() {
+        seleccionarTodas = false;
         funcionarioFiltro = new Funcionario();
         funcionarioFiltro.setDependencia(
                 getDependenciaXNivelUsuario());
@@ -445,8 +457,9 @@ public class FuncionarioBBean {
      * @return
      */
     public String filtrarSinPaginar() {
+        this.seleccionarTodas = false;
         this.funcionariosDisponibles = funcionarioService.getListaPag(funcionarioFiltro, null, null,
-                "funFvCurso", SortOrderEnum.DESC.getOrder());
+                "funFvCurso", SortOrderEnum.ASC.getOrder());
         heightList = this.funcionariosDisponibles.size() >= 20 ? "404px"
                 : ((this.funcionariosDisponibles.size() * 28 + 58) + "px");
         JsfUtil.forceRefresh();
@@ -607,12 +620,19 @@ public class FuncionarioBBean {
         JsfUtil.addManualSuccessMessage("Operacion Cancelada");
     }
 
-    public void actualiza(DateSelectEvent evento) {
+     public void actualiza(SelectEvent evento) {
         Calendar c = Calendar.getInstance();
-        c.setTime(evento.getDate());
+        c.setTime((Date)evento.getObject());
         c.add(Calendar.YEAR, 1);
         this.fechaVenceEvaluacion = (c.getTime());
-        this.fechaRealizaEvaluacion = evento.getDate();
+        this.fechaRealizaEvaluacion = (Date)evento.getObject();
+    }
+
+    
+    public void seleccionarTodasEvent(){
+        for(Funcionario f : funcionariosDisponibles){
+            f.setSeleccionado(!this.seleccionarTodas);
+        }
     }
 
     public void cargarFuncionario() {
@@ -799,4 +819,14 @@ public class FuncionarioBBean {
     public void setResultado(String resultado) {
         this.resultado = resultado;
     }
+
+    public boolean isSeleccionarTodas() {
+        return seleccionarTodas;
+    }
+
+    public void setSeleccionarTodas(boolean seleccionarTodas) {
+        this.seleccionarTodas = seleccionarTodas;
+    }
+    
+    
 }

@@ -39,7 +39,7 @@ public class PosicionJornadaLazyList extends LazyDataModel<PosicionJornada>{
 
     @Override
     public List<PosicionJornada> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, String> filters) {
+        SortOrder sortOrder, Map<String, Object> filters) {
         lista = posicionJornadaService.getLista(posicionJornadaFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(posicionJornadaService.getCount().toString());

@@ -57,13 +57,13 @@
                 <br></br>
                 <h:form>
                     <p:dataTable value="#{programacionTurnosBBean.lista}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15"  
+                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
                                  sortBy="#{item.proFechaInicio}" sortOrder="descending"
                                  emptyMessage="#{msg.emptyList}">
-                        <p:column rendered="#{8 != loginBBean.funcionarioTO.funcionario.fuNivel}">
+                        <p:column rendered="#{8 != loginBBean.funcionarioTO.funcionario.fuNivel}" style="width: 8%">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.ver}" rendered="#{programacionTurnosBBean.flag}"/>
                                 <h:outputText value="#{msg.validar}" rendered="#{!programacionTurnosBBean.flag}"/>
@@ -77,7 +77,7 @@
                             </h:commandLink>
                         </p:column>
 
-                        <p:column sortBy="#{item.proFechaInicio}">
+                        <p:column sortBy="#{item.proFechaInicio}" style="width: 10%">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.proFechaInicio}"/>
                             </f:facet>
@@ -85,7 +85,7 @@
                                 <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
                             </h:outputText>
                         </p:column>
-                        <p:column sortBy="#{item.proFechaFin}">
+                        <p:column sortBy="#{item.proFechaFin}" style="width: 10%">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.proFechaFin}"/>
                             </f:facet>
@@ -93,7 +93,7 @@
                                 <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
                             </h:outputText>
                         </p:column>
-                        <p:column sortBy="#{item.dependencia.depAbreviatura}">
+                        <p:column sortBy="#{item.dependencia.depAbreviatura}" style="width: 11%">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.depId}"/>
                             </f:facet>
@@ -111,7 +111,7 @@
                             </f:facet>
                             <h:outputText value="#{item.dependencia.aeropuerto.regional.regNombre}"/>
                         </p:column>
-                        <p:column sortBy="#{item.proEstado}">
+                        <p:column sortBy="#{item.proEstado}" style="width: 10%">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.proEstado}"/>
                             </f:facet>
@@ -130,7 +130,7 @@
                     </p:dataTable>
                     
                     <p:dataTable style="display: none;" value="#{programacionTurnosBBean.lista}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15"  
+                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="exportTable" draggableColumns="true"

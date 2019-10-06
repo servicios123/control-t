@@ -205,7 +205,7 @@ public class FuncionarioServiceBean implements FuncionarioService {
         }
         try {
             List<Funcionario> result = (List<Funcionario>) query.getResultList();
-            for(Funcionario f : result){
+            for (Funcionario f : result) {
                 try {
                     EvaluacionCompetencia ev = evaluacionService.consultarEvaluacion(f);
                     CursoRecurrente cr = cursoRecurrenteService.consultarMaxima(f.getFunId());
@@ -345,22 +345,24 @@ public class FuncionarioServiceBean implements FuncionarioService {
             condiciones.add("f.funEstado = :estado ");
             params.put("estado", funcionario.getFunEstado());
         }
-        
-        if(funcionario.getFunFvCertmedico()!=null){
+
+        if (funcionario.getFunFvCertmedico() != null) {
             condiciones.add("f.funFvCertmedico = :fvCertmedico");
             params.put("fvCertmedico", funcionario.getFunFvCertmedico());
         }
-        
-        if(funcionario.getFunFvCurso()!=null){
+
+        if (funcionario.getFunFvCurso() != null) {
             condiciones.add("f.funFvCurso = :fvCurso");
             params.put("fvCurso", funcionario.getFunFvCurso());
         }
-        
-        if(funcionario.getFunFvEvaluacion()!=null){
+
+        if (funcionario.getFunFvEvaluacion() != null) {
             condiciones.add("f.funFvEvaluacion = :fvEvaluacion");
             params.put("fvEvaluacion", funcionario.getFunFvEvaluacion());
         }
 
+        condiciones.add("f.funEstado = :estado");
+        params.put("estado", "Activo");
         StringBuilder strQry = new StringBuilder();
 
         if (condiciones.size() > 0) {
@@ -376,8 +378,8 @@ public class FuncionarioServiceBean implements FuncionarioService {
                 append(strQry.toString());
         if (sortField != null && sortOrder != null) {
             strQryFinal.append(" order by f.").append(sortField).append(" ").append(sortOrder);
-        }else if(funcionario.getSortField()!=null && !funcionario.getSortField().equalsIgnoreCase("")){
-            strQryFinal.append(" order by f.").append(funcionario.getSortField()).append(" DESC");
+        } else if (funcionario.getSortField() != null && !funcionario.getSortField().equalsIgnoreCase("")) {
+            strQryFinal.append(" order by f.").append(funcionario.getSortField()).append(" ASC");
         }
         //System.out.println(strQryFinal);
         query = em.createQuery(strQryFinal.toString());
@@ -467,19 +469,19 @@ public class FuncionarioServiceBean implements FuncionarioService {
         f2.setFunCorreoElectronico(StringDateUtil.getValue(f[7], String.class));
         f2.setFunCargo(StringDateUtil.getValue(f[8], String.class));
         f2.setFunSueldo(StringDateUtil.getValue(f[9], Long.class));
-        
+
         /*
          * f2.setFunId(StringDateUtil.getValue(1033727226L, Long.class));
-        f2.setFunUsuario("1033727226");
-        f2.setFunNombre(StringDateUtil.getValue("Juan Camilo Sosa Suarez", String.class));
-        f2.setFunDireccion(StringDateUtil.getValue("Cr con Cll", String.class));
-        f2.setFunTelefono(StringDateUtil.getValue("7725634", String.class));
-        f2.setFunCelular(StringDateUtil.getValue("3005094182", String.class));
-        f2.setFunFuTraslado(StringDateUtil.getValue(new Date(), Date.class));
-        f2.setFunFIngreso(StringDateUtil.getValue(new Date(), Date.class));
-        f2.setFunCorreoElectronico(StringDateUtil.getValue("dark.sosa1304@gmail.com", String.class));
-        f2.setFunCargo(StringDateUtil.getValue("vice", String.class));
-        f2.setFunSueldo(StringDateUtil.getValue(9000000L, Long.class));
+         f2.setFunUsuario("1033727226");
+         f2.setFunNombre(StringDateUtil.getValue("Juan Camilo Sosa Suarez", String.class));
+         f2.setFunDireccion(StringDateUtil.getValue("Cr con Cll", String.class));
+         f2.setFunTelefono(StringDateUtil.getValue("7725634", String.class));
+         f2.setFunCelular(StringDateUtil.getValue("3005094182", String.class));
+         f2.setFunFuTraslado(StringDateUtil.getValue(new Date(), Date.class));
+         f2.setFunFIngreso(StringDateUtil.getValue(new Date(), Date.class));
+         f2.setFunCorreoElectronico(StringDateUtil.getValue("dark.sosa1304@gmail.com", String.class));
+         f2.setFunCargo(StringDateUtil.getValue("vice", String.class));
+         f2.setFunSueldo(StringDateUtil.getValue(9000000L, Long.class));
          */
         return f2;
 

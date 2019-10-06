@@ -49,6 +49,7 @@ import javax.faces.el.ValueBinding;
 import javax.faces.model.SelectItem;
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -169,6 +170,17 @@ public class JsfUtil {
 
     public static void forceRefresh() {
         FacesContext context = getFacesContext();
+//         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+//        HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+//        Cookie[] cookies = request.getCookies();
+//        Cookie opentoken = null;
+//        for (Cookie c : cookies) {
+//                opentoken = c;
+//                opentoken.setMaxAge(0);
+//                opentoken.setValue(""); // it is more elegant to clear the value but not necessary
+//                opentoken.setPath("/");
+//                response.addCookie(opentoken);
+//        }
         String viewId = context.getViewRoot().getViewId();
         ViewHandler handler = context.getApplication().getViewHandler();
         UIViewRoot root = handler.createView(context, viewId);
