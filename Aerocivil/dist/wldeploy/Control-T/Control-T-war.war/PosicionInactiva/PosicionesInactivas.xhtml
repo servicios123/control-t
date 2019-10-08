@@ -34,9 +34,9 @@
                                 rightHeaderTemplate="" transient="true" 
                                 initialDate="#{posicionInactivaBBean.iniDate}" >
                         <p:ajax event="dateSelect" listener="#{posicionInactivaBBean.onDateSelect}" 
-                                update="eventDetails,popupEvent,mainform" oncomplete="PF('myschedule').update();" />
+                                update="eventDetails,popupEvent,mainform" oncomplete="PF('myschedule').update();PF('eventDialog').show();" />
                         <p:ajax event="eventSelect" listener="#{posicionInactivaBBean.onEventSelect}" 
-                                update="eventDetails,popupEvent,mainform" oncomplete="PF('myschedule').update();" />
+                                update="eventDetails,popupEvent,mainform" oncomplete="PF('myschedule').update();PF('eventDialog').show();" />
                     </p:schedule>  
                     <!--p:dataGrid value="{posicionInactivaBBean.diasPosiciones}" var="item" columns="7"
                                 rows="6">

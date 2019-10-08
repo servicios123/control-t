@@ -14,10 +14,10 @@
         <h:outputText id="#{fieldName}_ou" value="#{entity[fieldName]}" rendered="${readonly}"/>
         <h:panelGroup rendered="${!readonly}">
             <c:if test="${maxlength!=null}">
-                <p:inputTextarea rows="#{rows}" cols="#{cols}"  value="#{entity[fieldName]}" required="${required}" maxlength="${maxlength}"/>  
+                <p:inputTextarea rows="#{rows}" cols="#{cols}"  value="#{entity[fieldName]}" required="${required}" maxlength="${maxlength}" style="background: #fff; color: #253979;" />  
             </c:if>
             <c:if test="${maxlength==null}">
-                <p:inputTextarea rows="#{rows}" cols="#{cols}"  value="#{entity[fieldName]}" required="${required}" />  
+                <p:inputTextarea rows="#{rows}" cols="#{cols}"  value="#{entity[fieldName]}" required="${required}" style="background: #fff; color: #253979;" />  
             </c:if>
             <br/>
             <h:message id="${id}Message" 

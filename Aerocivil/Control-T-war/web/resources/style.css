@@ -541,12 +541,7 @@ button[type="reset"], input[type="reset"], input[type="reset"] {
     color: #222222;
 }*/
 
-.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus {
-    border: 1px solid #2293f7;
-    background: #e69700 !important;
-    font-weight: bold;
-    color: #ffffff;
-}
+
 
 .ui-inputfield, .ui-widget-content .ui-inputfield, .ui-widget-header .ui-inputfield {
     color: #253979;
@@ -557,3 +552,7 @@ button[type="reset"], input[type="reset"], input[type="reset"] {
     text-transform: uppercase;
     font-size: 0.8em !important;
 }
+
+.ui-inputfield .ui-inputtextarea .ui-state-hover{
+    background: #fff !important;
+} 
