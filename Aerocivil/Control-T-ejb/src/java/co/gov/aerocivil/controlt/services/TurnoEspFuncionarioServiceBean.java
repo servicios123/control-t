@@ -247,7 +247,7 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
             return false;
         }
         
-        if(qty>0 && (tef.getTurnoEspecial()!= null && tef.getTurnoEspecial().getTeHinicio()==6 && tef.getTurnoEspecial().getTeHfin()==23)){
+        if(qty>0 && (tef.getTurnoEspecial()!= null && (tef.getTurnoEspecial().getTeHinicio()==6 || tef.getTurnoEspecial().getTeHinicio()==0) && tef.getTurnoEspecial().getTeHfin()==23)){
             return false;
         }
 

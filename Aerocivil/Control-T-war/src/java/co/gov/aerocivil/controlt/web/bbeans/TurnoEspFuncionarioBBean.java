@@ -699,11 +699,7 @@ public class TurnoEspFuncionarioBBean {
         Calendar evDate = Calendar.getInstance();
         evDate.setTime((Date)selectEvent.getObject());
         evDate = DateUtil.setCeroHoras(evDate);
-
-        if (!turnoEspFuncionarioService.validarDisponibilidadTurno(evDate.getTime(), funcionario).equals("OK")) {
-            JsfUtil.addWarningMessage("fechaOcupada");
-            return;
-        }
+        evDate.add(Calendar.DAY_OF_MONTH, 1);
 
         if (turnoEspFuncionario.getFuncionario() == null || turnoEspFuncionario.getTurnoEspecial() == null || turnoEspFuncionario.getFuncionario().getFunId() == null || turnoEspFuncionario.getTurnoEspecial().getTeId() == null) {
             JsfUtil.addManualWarningMessage("Por favor diligencie la información requerida");
@@ -711,6 +707,7 @@ public class TurnoEspFuncionarioBBean {
         }
         boolean assigned = false;
 
+        /*
         for (ScheduleEvent ev : eventModel.getEvents()) {
             //System.out.println("entra");
             Calendar c = Calendar.getInstance();
@@ -723,7 +720,7 @@ public class TurnoEspFuncionarioBBean {
                 //System.out.println("exit");
                 break;
             }
-        }
+        }*/
         if (!assigned) {
             Calendar c = Calendar.getInstance();
             c.setTime((Date)selectEvent.getObject());
