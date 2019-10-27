@@ -191,9 +191,9 @@ public class TempVerProgramacionBBean {
             listPosNoAsig = JsfUtil.getListadosBBean().getListaPosNoAsig(logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId(), 
                 programacion.getProId());  
         }
-        
+        resumenList = null;
         isEmptyListPosNoAsig=false; 
-        if(listPosNoAsig.size()==0) 
+        if(listPosNoAsig.isEmpty()) 
         { 
             isEmptyListPosNoAsig=true; 
         } 
@@ -201,12 +201,13 @@ public class TempVerProgramacionBBean {
         
         return "verProgramacion"; 
     } 
+    
+    public void obtenerResumen(){
+        resumenList = tempVerProgramacionService.obtenerResumen(programacion.getProId());
+    }
 
     public String validarProgramacion() 
     { 
-
-
-
         ProgramacionTurnosBBean bbean = ((ProgramacionTurnosBBean) JsfUtil.getManagedBean(ProgramacionTurnosBBean.class)); 
         bbean.setProgramacion(programacion); 
 

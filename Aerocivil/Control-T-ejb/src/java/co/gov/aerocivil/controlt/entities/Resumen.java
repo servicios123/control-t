@@ -36,46 +36,26 @@ public class Resumen implements Serializable {
     private Long programacion;
     @Column(name = "RES_FUN_ALIAS")
     private String funAlias;
-    @Column(name = "RES_DIURNASLS_ORD")
-    private Long diurnasLsOrd;
-    @Column(name = "RES_DIURNASLS_EXT")
-    private Long diurnasLsExt;
-    @Column(name = "RES_DIURNASDF_ORD")
-    private Long diurnasDfOrd;
-    @Column(name = "RES_DIURNASDF_EXT")
-    private Long diurnasDfExt;
-    @Column(name = "RES_NOCTURNASLS_ORD")
-    private Long nocturnasLsOrd;
-    @Column(name = "RES_NOCTURNASLS_EXT")
-    private Long nocturnasLsExt;
-    @Column(name = "RES_NOCTURNASDF_ORD")
-    private Long nocturnasDfOrd;
-    @Column(name = "RES_NOCTURNASDF_EXT")
-    private Long nocturnasDfExt;
-    @Column(name = "RES_AMANECELS_ORD")
-    private Long amaneceLsOrd;
-    @Column(name = "RES_AMANECEDF_ORD")
-    private Long amaneceDfOrd;
-    @Column(name = "RES_DIU_ESP_LS_ORD")
-    private Long diurnasEspLsOrd;
-    @Column(name = "RES_DIU_ESP_LS_EXT")
-    private Long diurnasEspLsExt;
-    @Column(name = "RES_DIU_ESP_DF_ORD")
-    private Long diurnasEspDfOrd;
-    @Column(name = "RES_DIU_ESP_DF_EXT")
-    private Long diurnasEspDfExt;
-    @Column(name = "RES_NOC_ESP_LS_ORD")
-    private Long nocturnasEspLsOrd;
-    @Column(name = "RES_NOC_ESP_LS_EXT")
-    private Long nocturnasEspLsExt;
-    @Column(name = "RES_NOC_ESP_DF_ORD")
-    private Long nocturnasEspDfOrd;
-    @Column(name = "RES_NOC_ESP_DF_EXT")
-    private Long nocturnasEspDfExt;
-    @Column(name = "RES_AMA_ESP_LS_ORD")
-    private Long amaneceEspLsOrd;
-    @Column(name = "RES_AMA_ESP_DF_ORD")
-    private Long amaneceEspDfOrd;
+    @Column(name = "RES_MORD_LD")
+    private Long mold;//Mañanas ordinarias L-D
+    @Column(name = "RES_TORD_LD")
+    private Long told;//TArdes ordinarias L-D
+    @Column(name = "RES_TEXT_LS")
+    private Long tels;//Tarde extra lunes a sabado
+    @Column(name = "RES_TEXT_DF")
+    private Long tedf;//tarde extra D-F
+    @Column(name = "RES_NORD_LS")
+    private Long nols;
+    @Column(name = "RES_NORD_DF")
+    private Long nodf;
+    @Column(name = "RES_NEXT_LS")
+    private Long nels;
+    @Column(name = "RES_NEXT_DF")
+    private Long nedf;
+    @Column(name = "RES_AORD_LS")
+    private Long aols;
+    @Column(name = "RES_AORD_DF")
+    private Long aodf;
 
     public Long getResId() {
         return resId;
@@ -101,165 +81,83 @@ public class Resumen implements Serializable {
         this.funAlias = funAlias;
     }
 
-    public Long getDiurnasLsOrd() {
-        return diurnasLsOrd;
+    public Long getMold() {
+        return mold;
     }
 
-    public void setDiurnasLsOrd(Long diurnasLsOrd) {
-        this.diurnasLsOrd = diurnasLsOrd;
+    public void setMold(Long mold) {
+        this.mold = mold;
     }
 
-    public Long getDiurnasLsExt() {
-        return diurnasLsExt;
+    public Long getTold() {
+        return told;
     }
 
-    public void setDiurnasLsExt(Long diurnasLsExt) {
-        this.diurnasLsExt = diurnasLsExt;
+    public void setTold(Long told) {
+        this.told = told;
     }
 
-    public Long getDiurnasDfOrd() {
-        return diurnasDfOrd;
+    public Long getTels() {
+        return tels;
     }
 
-    public void setDiurnasDfOrd(Long diurnasDfOrd) {
-        this.diurnasDfOrd = diurnasDfOrd;
+    public void setTels(Long tels) {
+        this.tels = tels;
     }
 
-    public Long getDiurnasDfExt() {
-        return diurnasDfExt;
+    public Long getTedf() {
+        return tedf;
     }
 
-    public void setDiurnasDfExt(Long diurnasDfExt) {
-        this.diurnasDfExt = diurnasDfExt;
+    public void setTedf(Long tedf) {
+        this.tedf = tedf;
     }
 
-    public Long getNocturnasLsOrd() {
-        return nocturnasLsOrd;
+    public Long getNols() {
+        return nols;
     }
 
-    public void setNocturnasLsOrd(Long nocturnasLsOrd) {
-        this.nocturnasLsOrd = nocturnasLsOrd;
+    public void setNols(Long nols) {
+        this.nols = nols;
     }
 
-    public Long getNocturnasLsExt() {
-        return nocturnasLsExt;
+    public Long getNodf() {
+        return nodf;
     }
 
-    public void setNocturnasLsExt(Long nocturnasLsExt) {
-        this.nocturnasLsExt = nocturnasLsExt;
+    public void setNodf(Long nodf) {
+        this.nodf = nodf;
     }
 
-    public Long getNocturnasDfOrd() {
-        return nocturnasDfOrd;
+    public Long getNels() {
+        return nels;
     }
 
-    public void setNocturnasDfOrd(Long nocturnasDfOrd) {
-        this.nocturnasDfOrd = nocturnasDfOrd;
+    public void setNels(Long nels) {
+        this.nels = nels;
     }
 
-    public Long getNocturnasDfExt() {
-        return nocturnasDfExt;
+    public Long getNedf() {
+        return nedf;
     }
 
-    public void setNocturnasDfExt(Long nocturnasDfExt) {
-        this.nocturnasDfExt = nocturnasDfExt;
+    public void setNedf(Long nedf) {
+        this.nedf = nedf;
     }
 
-    public Long getAmaneceLsOrd() {
-        return amaneceLsOrd;
+    public Long getAols() {
+        return aols;
     }
 
-    public void setAmaneceLsOrd(Long amaneceLsOrd) {
-        this.amaneceLsOrd = amaneceLsOrd;
+    public void setAols(Long aols) {
+        this.aols = aols;
     }
 
-    public Long getAmaneceDfOrd() {
-        return amaneceDfOrd;
+    public Long getAodf() {
+        return aodf;
     }
 
-    public void setAmaneceDfOrd(Long amaneceDfOrd) {
-        this.amaneceDfOrd = amaneceDfOrd;
+    public void setAodf(Long aodf) {
+        this.aodf = aodf;
     }
-
-    public Long getDiurnasEspLsOrd() {
-        return diurnasEspLsOrd;
-    }
-
-    public void setDiurnasEspLsOrd(Long diurnasEspLsOrd) {
-        this.diurnasEspLsOrd = diurnasEspLsOrd;
-    }
-
-    public Long getDiurnasEspLsExt() {
-        return diurnasEspLsExt;
-    }
-
-    public void setDiurnasEspLsExt(Long diurnasEspLsExt) {
-        this.diurnasEspLsExt = diurnasEspLsExt;
-    }
-
-    public Long getDiurnasEspDfOrd() {
-        return diurnasEspDfOrd;
-    }
-
-    public void setDiurnasEspDfOrd(Long diurnasEspDfOrd) {
-        this.diurnasEspDfOrd = diurnasEspDfOrd;
-    }
-
-    public Long getDiurnasEspDfExt() {
-        return diurnasEspDfExt;
-    }
-
-    public void setDiurnasEspDfExt(Long diurnasEspDfExt) {
-        this.diurnasEspDfExt = diurnasEspDfExt;
-    }
-
-    public Long getNocturnasEspLsOrd() {
-        return nocturnasEspLsOrd;
-    }
-
-    public void setNocturnasEspLsOrd(Long nocturnasEspLsOrd) {
-        this.nocturnasEspLsOrd = nocturnasEspLsOrd;
-    }
-
-    public Long getNocturnasEspLsExt() {
-        return nocturnasEspLsExt;
-    }
-
-    public void setNocturnasEspLsExt(Long nocturnasEspLsExt) {
-        this.nocturnasEspLsExt = nocturnasEspLsExt;
-    }
-
-    public Long getNocturnasEspDfOrd() {
-        return nocturnasEspDfOrd;
-    }
-
-    public void setNocturnasEspDfOrd(Long nocturnasEspDfOrd) {
-        this.nocturnasEspDfOrd = nocturnasEspDfOrd;
-    }
-
-    public Long getNocturnasEspDfExt() {
-        return nocturnasEspDfExt;
-    }
-
-    public void setNocturnasEspDfExt(Long nocturnasEspDfExt) {
-        this.nocturnasEspDfExt = nocturnasEspDfExt;
-    }
-
-    public Long getAmaneceEspLsOrd() {
-        return amaneceEspLsOrd;
-    }
-
-    public void setAmaneceEspLsOrd(Long amaneceEspLsOrd) {
-        this.amaneceEspLsOrd = amaneceEspLsOrd;
-    }
-
-    public Long getAmaneceEspDfOrd() {
-        return amaneceEspDfOrd;
-    }
-
-    public void setAmaneceEspDfOrd(Long amaneceEspDfOrd) {
-        this.amaneceEspDfOrd = amaneceEspDfOrd;
-    }
-    
-    
 }

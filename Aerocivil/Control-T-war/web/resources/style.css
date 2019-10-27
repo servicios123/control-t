@@ -112,7 +112,7 @@ label{
 button[type="submit"],input[type="submit"],input[type="button"]{
     font-family: Calibri !important;
     font-size: 12pt !important;
-    background-color:#808080 !important;
+    background:#808080 !important;
     border: 1px #C0C0C0 solid !important;
     color: #ffffff !important;
     padding: 4px !important;
@@ -506,7 +506,7 @@ button[type="submit"], input[type="submit"], input[type="button"] {
 button[type="reset"], input[type="reset"], input[type="reset"] {
     font-family: Calibri !important;
     font-size: 12pt !important;
-    background-color: #253979 !important;
+    background: #253979 !important;
     border: 1px #253979 solid !important;
     color: #ffffff !important;
     padding: 4px !important;
@@ -556,3 +556,9 @@ button[type="reset"], input[type="reset"], input[type="reset"] {
 .ui-inputfield .ui-inputtextarea .ui-state-hover{
     background: #fff !important;
 } 
+
+.ui-widget-overlay {
+    background: #253979 !important;
+    opacity: .10;
+    filter: Alpha(Opacity=10);
+}

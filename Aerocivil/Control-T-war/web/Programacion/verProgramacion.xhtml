@@ -77,7 +77,8 @@
                         <h:commandButton  action="#{tempVerProgramacionBBean.enviarAprobar}" value="#{msg.enviarAprobar}" rendered="#{tempVerProgramacionBBean.programacion.proEstado==0 and tempVerProgramacionBBean.funcionario.fuNivel == 4 and tempVerProgramacionBBean.isEmptyListPosNoAsig==true}" />            
                         <h:commandButton  action="#{tempVerProgramacionBBean.volverEditar}" value="#{msg.volverEditar}" rendered="#{tempVerProgramacionBBean.programacion.proEstado==2  and tempVerProgramacionBBean.funcionario.fuNivel &lt; 5}" />                       
                         <h:commandButton action="#{tempVerProgramacionBBean.exportPDF}" value="#{msg.generarReporte}" />
-                        <h:commandButton action="#{tempVerProgramacionBBean.exportXLS}" value="#{msg.generarReporteXls}" />
+                        <h:commandButton  action="#{tempVerProgramacionBBean.exportXLS}" value="#{msg.generarReporteXls}" />
+                        <p:commandButton actionListener="#{tempVerProgramacionBBean.obtenerResumen}" oncomplete="PF('wdgResumen').show()" update="resumen" value="Consolidado" style="background: #253979 !important;border: 1px #253979 solid !important;"/>
 
 
                         <p:commandButton value="#{msg.descargarLog}" action="#{tempVerProgramacionBBean.descargarUltimoLog}" rendered="#{tempVerProgramacionBBean.funcionario.fuNivel == 1}"/>     
@@ -121,6 +122,80 @@
                             </p:column>
                         </p:dataTable>
                         <br/><br/><br/>
+
+                        <p:dialog header="Consolidado de la programación" showEffect="fade" hideEffect="fade"
+                                  closable="true" modal="true" widgetVar="wdgResumen">
+                            <p:dataTable value="#{tempVerProgramacionBBean.resumenList}" 
+                                         var="item" styleClass="tabla_lista"
+                                         paginator="true" paginatorPosition="bottom" rows="15"  
+                                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                         currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                         rowsPerPageTemplate="10,15,20,50" id="resumen" 
+                                         emptyMessage="#{msg.emptyList}">
+                                <p:columnGroup type="header">
+                                    <p:row>
+                                        <p:column rowspan="3" headerText="Funcionario" />
+                                        <p:column headerText="Mañana M" />
+                                        <p:column colspan="3" headerText="Tarde T" />
+                                        <p:column colspan="4" headerText="Noche N" />
+                                        <p:column colspan="2" headerText="Amanece A" />
+                                    </p:row>
+                                    <p:row>
+                                        <p:column headerText="Ordinarias" />
+                                        <p:column headerText="Ordinarias" />
+                                        <p:column colspan="2" headerText="Extra" />
+                                        <p:column colspan="2" headerText="Ordinarias" />
+                                        <p:column colspan="2" headerText="Extra" />
+                                        <p:column colspan="2" headerText="Ordinarias" />
+                                    </p:row>
+                                    <p:row>
+                                        <p:column headerText="L - D" />
+                                        <p:column headerText="L - D" />
+                                        <p:column headerText="L - S" />
+                                        <p:column headerText="D - F" />
+                                        <p:column headerText="L - S" />
+                                        <p:column headerText="D - F" />
+                                        <p:column headerText="L - S" />
+                                        <p:column headerText="D - F" />
+                                        <p:column headerText="L - S" />
+                                        <p:column headerText="D - F" />
+                                    </p:row>
+                                </p:columnGroup>
+                                <p:column>
+                                    <h:outputText value="#{item.funAlias}" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{item.mold}" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{item.told}" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{item.tels}" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{item.tedf}" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{item.nols}" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{item.nodf}" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{item.nels}" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{item.nedf}" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{item.aols}" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{item.aodf}" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:dialog>
 
                     </h:form>
 

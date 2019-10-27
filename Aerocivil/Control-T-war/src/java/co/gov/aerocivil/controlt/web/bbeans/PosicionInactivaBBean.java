@@ -220,7 +220,10 @@ public class PosicionInactivaBBean {
     }
 
     public void onDateSelect(SelectEvent selectEvent) {
-        Calendar hoy = DateUtil.setCeroHoras(Calendar.getInstance());
+        Calendar seleccionada = Calendar.getInstance();
+        seleccionada.setTime((Date) selectEvent.getObject());
+        seleccionada = DateUtil.setCeroHoras(seleccionada);
+        seleccionada.add(Calendar.DATE, 1);
 
         Calendar evDate = Calendar.getInstance();
         evDate.setTime((Date) selectEvent.getObject());
@@ -233,7 +236,7 @@ public class PosicionInactivaBBean {
         setPopupVisible(true);
         boolean assigned = false;
 
-        titlePopUp = DateUtil.formatDate(evDate.getTime());
+        titlePopUp = DateUtil.formatDate(seleccionada.getTime());
 
         for (ScheduleEvent ev : eventModel.getEvents()) {
             //System.out.println("entra");
