@@ -63,20 +63,20 @@
                 <br></br>
                 <h:form>
                     <p:dataTable value="#{posicionHabilitadaBBean.lista}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
+                                 paginator="true" paginatorPosition="bottom" rows="15"  
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
                                  sortBy="#{item.phId}" paginatorAlwaysVisible="false"
-                                 emptyMessage="#{msg.emptyList}" >
+                                 emptyMessage="#{msg.emptyList}">
 
-                        <p:column sortBy="#{item.funcionario.funId}" style="width: 11%">
+                        <p:column sortBy="#{item.funcionario.funId}" >
                             <f:facet name="header">
-                                <h:outputText value="Identificación"/>
+                                <h:outputText value="#{msg.funId}"/>
                             </f:facet>
                             <h:outputText value="#{item.funcionario.funId}"/>
                         </p:column>
-                        <p:column sortBy="#{item.funcionario.funAlias}" style="width: 9%">
+                        <p:column sortBy="#{item.funcionario.funAlias}" >
                             <f:facet name="header">
                                 <h:outputText value="#{msg.funAlias}"/>
                             </f:facet>
@@ -89,7 +89,7 @@
                             <h:outputText value="#{item.funcionario.funNombre}" />
                         </p:column>
 
-                        <p:column sortBy="#{item.posicion.posicionNacional.pnAlias}" style="width: 8%">
+                        <p:column sortBy="#{item.posicion.posicionNacional.pnAlias}" >
                             <f:facet name="header">
                                 <h:outputText value="#{msg.posicion}"/>
                             </f:facet>
@@ -97,7 +97,7 @@
                         </p:column>
 
 
-                        <p:column sortBy="#{item.posicion.dependencia.aeropuerto.regional.regNombre}" style="width: 13%">
+                        <p:column sortBy="#{item.posicion.dependencia.aeropuerto.regional.regNombre}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.regional}"/>
                             </f:facet>

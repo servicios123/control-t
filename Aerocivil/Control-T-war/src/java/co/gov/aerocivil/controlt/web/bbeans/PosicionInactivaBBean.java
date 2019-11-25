@@ -13,6 +13,8 @@ import co.gov.aerocivil.controlt.services.PosicionInactivaService;
 import co.gov.aerocivil.controlt.services.ProgramacionTurnosSession;
 import co.gov.aerocivil.controlt.web.util.DateUtil;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,13 +23,15 @@ import java.util.Map;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.component.schedule.Schedule;
-import org.primefaces.event.SelectEvent;
+import javax.faces.event.ActionEvent;
+import org.primefaces.event.DateSelectEvent;
+import org.primefaces.event.ScheduleEntrySelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
-import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.LazyScheduleModel;
+import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
+import org.primefaces.component.schedule.Schedule;
 
 /**
  *
@@ -36,23 +40,27 @@ import org.primefaces.model.ScheduleModel;
 @ManagedBean
 @SessionScoped
 public class PosicionInactivaBBean {
-
     @EJB
-    private PosicionInactivaService service;
+    private PosicionInactivaService service; 
     @EJB
-    private ProgramacionTurnosSession serviceProg;
+    private ProgramacionTurnosSession serviceProg; 
+    
     private ScheduleModel eventModel;
+
     private ScheduleEvent event = new DefaultScheduleEvent();
+
     List<PosicionInactiva> posInactivas;
     List<PosicionJornada> posJornadas;
     private Integer[] arrayInactivas;
     private String titlePopUp;
-    private Map<String, Integer[]> mapa;
-    private Map<String, Integer[]> mapaToSave;
+
+    private Map<String,Integer[]> mapa;
+    private Map<String,Integer[]> mapaToSave;
     Dependencia dependencia = JsfUtil.getFuncionarioSesion().getDependencia();
     int cantidadPos;
     private boolean modificando;
     //private List<DiaFestivo> listaDiaFestivo;
+    
     private int corrimiento;
     private String jqueryScript;
     private int[] festivos;
@@ -63,9 +71,9 @@ public class PosicionInactivaBBean {
         return iniDate;
     }
 
-    public String getJqueryScript() {
+    public String getJqueryScript(){        
         Schedule sc = new Schedule();
-        for (String s : sc.getEventNames()) {
+        for(String s:sc.getEventNames()){
             //System.out.println(s);
         }
         return jqueryScript;
@@ -74,96 +82,99 @@ public class PosicionInactivaBBean {
     public int[] getFestivos() {
         return festivos;
     }
-
-    public String listarCopia() {
+    
+    public String listarCopia(){        
         posJornadas = JsfUtil.getListadosBBean().getListaPosicionJornadaXDependencia(dependencia.getDepId());
         //eventModel = new DefaultScheduleModel();
-
+        
         eventModel = new LazyScheduleModel() {
+            
             @Override
             public void loadEvents(Date start, Date end) {
                 /*boolean setearFestivos = true;
-                 if (!modificando) {
-                 if (!mapa.containsKey(getKey(start))) {*/
-                //setearFestivos=false;
-                Date start2 = getFirstDayMonth(start);
-                corrimiento = DateUtil.daysBetween(start2, start).intValue();
+                if (!modificando) {
+                    if (!mapa.containsKey(getKey(start))) {*/
+                        //setearFestivos=false;
+                        Date start2 = getFirstDayMonth(start);
+                        corrimiento = DateUtil.daysBetween(start2, start).intValue();
 
-                end = getLastDayMonth(start2);
-                posInactivas = service.getLista(dependencia, start2, end);
-                cargarFestivos(start2, end);
+                        end = getLastDayMonth(start2);
+                        posInactivas = service.getLista(dependencia, start2, end);
+                        cargarFestivos(start2, end);
+                        
+                        
 
+                        cantidadPos = posJornadas.size();
 
-
-                cantidadPos = posJornadas.size();
-
-                mapa = new HashMap<String, Integer[]>();
-                mapaToSave = new HashMap<String, Integer[]>();
-                //List<PosicionInactiva> listaDate = new ArrayList<PosicionInactiva>();
+                        mapa = new HashMap<String, Integer[]>();
+                        mapaToSave = new HashMap<String, Integer[]>();
+                        //List<PosicionInactiva> listaDate = new ArrayList<PosicionInactiva>();
 //ELIMINAR?????????????
-                Integer[] arrayInactivas = new Integer[cantidadPos];
-                int prevDay = 0;
-                Date prevDate = null;
-                StringBuilder sb = new StringBuilder();
-                int i = 0;
-                int c = 0;
-                for (PosicionInactiva posIn : posInactivas) {
-                    if (prevDate == null) {
-                        prevDate = posIn.getFecha();
-                    }
-                    String yearMonthKey = DateUtil.formatDate(prevDate);
-                    //if (!mapa.containsKey(yearMonthKey)) {
-                    if (prevDay != posIn.getFecha().getDate()) {
-                        i = 0;
-                        if (prevDay > 0) {
-                            String s = sb.toString();
-                            eventModel.addEvent(new DefaultScheduleEvent(s.substring(0, s.length() - 2),
-                                    prevDate, prevDate, true));
-                            //si no existe la clave en el mapa la crea
-                            mapa.put(yearMonthKey, arrayInactivas);
-                        }
-                        sb = new StringBuilder();
-                        arrayInactivas = new Integer[cantidadPos];
-                        prevDay = posIn.getFecha().getDate();
-                        prevDate = posIn.getFecha();
-                    }
-                    arrayInactivas[i++] = posIn.getPosicionJornada().getPjId().intValue();
-                    sb.append(posIn.getPosicionJornada().getPjAlias()).append(", ");
-                    c++;
-                    if (c == posInactivas.size()) {
-                        eventModel.addEvent(new DefaultScheduleEvent(sb.toString(),
+Integer[] arrayInactivas = new Integer[cantidadPos];
+                        int prevDay = 0;
+                        Date prevDate = null;
+                        StringBuilder sb = new StringBuilder();
+                        int i=0;
+                        int c=0;
+                        for(PosicionInactiva posIn : posInactivas){
+                            if(prevDate==null){
+                                prevDate = posIn.getFecha();
+                            }
+                            String yearMonthKey = DateUtil.formatDate(prevDate);
+                            //if (!mapa.containsKey(yearMonthKey)) {
+                            if(prevDay!=posIn.getFecha().getDate()){
+                                i=0;
+                                if(prevDay>0){                            
+                                    String s = sb.toString();
+                                    eventModel.addEvent(new DefaultScheduleEvent(s.substring(0,s.length()-2), 
+                                            prevDate, prevDate,true));                        
+                                    //si no existe la clave en el mapa la crea
+                                    mapa.put(yearMonthKey,arrayInactivas);
+                                }
+                                sb = new StringBuilder();
+                                arrayInactivas = new Integer[cantidadPos];
+                                prevDay=posIn.getFecha().getDate();                        
+                                prevDate=posIn.getFecha();
+                            }
+                            arrayInactivas[i++]=posIn.getPosicionJornada().getPjId().intValue();
+                            sb.append(posIn.getPosicionJornada().getPjAlias()).append(", ");
+                            c++;
+                            if(c==posInactivas.size()){
+                                eventModel.addEvent(new DefaultScheduleEvent(sb.toString(),
                                 posIn.getFecha(), posIn.getFecha(), true));
-                        mapa.put(DateUtil.formatDate(posIn.getFecha()), arrayInactivas);
-                    }
-                }
-
+                                mapa.put(DateUtil.formatDate(posIn.getFecha()),arrayInactivas);
+                            }
+                        }
+                        
                 //si no existe la clave en el mapa la crea
                 //mapa.put(getKey(prevDate), arrayInactivas);
                     /*}
-                 }
-                 if (setearFestivos) {
-                 for (Map.Entry e : mapa.entrySet()) {
-                 Date d = convertToDate(e.getKey().toString());
-                 addEvent(new DefaultScheduleEvent(e.getValue().toString(), d, d, true));
-                 }
-                 }
-                 modificando = false;*/
-                JsfUtil.forceRefresh();
+                }
+                if (setearFestivos) {
+                    for (Map.Entry e : mapa.entrySet()) {
+                        Date d = convertToDate(e.getKey().toString());
+                        addEvent(new DefaultScheduleEvent(e.getValue().toString(), d, d, true));
+                    }
+                }
+                modificando = false;*/
+                        JsfUtil.forceRefresh();
             }
+
+
         };
         return "listPosicionesInactivas";
     }
-
+ 
     private void cargarFestivos(Date start2, Date end) {
         List<DiaFestivo> listaDiaFestivo = JsfUtil.getListadosBBean().getListaFestivos(start2, end);
         festivos = new int[listaDiaFestivo.size()];
-        int i = 0;
-        for (DiaFestivo df : listaDiaFestivo) {
-            festivos[i] = df.getDfFecha().getDate() + corrimiento - 1;
-            //System.out.println(festivos[i]);
-            //jqueryScript+="$(\".fc-day"+festivos[i]+"\").css(\"background-color\",\"lightBlue\"); ";
-            i++;
-        }
+            int i=0;
+            for(DiaFestivo df:listaDiaFestivo ){
+                festivos[i]=df.getDfFecha().getDate()+corrimiento-1;        
+                //System.out.println(festivos[i]);
+                //jqueryScript+="$(\".fc-day"+festivos[i]+"\").css(\"background-color\",\"lightBlue\"); ";
+                i++;
+            }
     }
 
     private Date getFirstDayMonth(Date start) {
@@ -171,7 +182,7 @@ public class PosicionInactivaBBean {
         c.setTime(start);
         //Esto es para garantizar que va a guardar en la clave el mes-año que se está visualizando
         c.add(Calendar.DATE, 10);
-
+        
         c.set(Calendar.DATE, 1);
         c = DateUtil.setCeroHoras(c);
         return c.getTime();
@@ -181,13 +192,14 @@ public class PosicionInactivaBBean {
         Calendar c = Calendar.getInstance();
         c.setTime(date);
         int maxDay = c.getActualMaximum(Calendar.DAY_OF_MONTH);
-
+        
         //Esto es para garantizar que va a guardar en la clave el mes-año que se está visualizando
         c.set(Calendar.DATE, maxDay);
         return c.getTime();
 
     }
 
+    
     public List<PosicionJornada> getPosJornadas() {
         return posJornadas;
     }
@@ -195,58 +207,56 @@ public class PosicionInactivaBBean {
     public void setPosJornadas(List<PosicionJornada> posJornadas) {
         this.posJornadas = posJornadas;
     }
-
-    public void onEventSelect(SelectEvent selectEvent) {
+    
+    public void onEventSelect(ScheduleEntrySelectEvent selectEvent) {
         Calendar hoy = DateUtil.setCeroHoras(Calendar.getInstance());
         hoy.set(Calendar.HOUR_OF_DAY, 12);
-
+        
         Calendar evDate = Calendar.getInstance();
-        evDate.setTime(((ScheduleEvent) selectEvent.getObject()).getStartDate());
+        evDate.setTime(selectEvent.getScheduleEvent().getStartDate());
         evDate = DateUtil.setCeroHoras(evDate);
         evDate.set(Calendar.HOUR_OF_DAY, 12);
-
+        
         //System.out.println(evDate.getTime());
         //System.out.println("hoy: " + hoy.getTime());
         //System.out.println("evDate.compareTo(hoy)<0:" + (evDate.compareTo(hoy) < 0));
-        if (evDate.compareTo(hoy) < 0
+        if (evDate.compareTo(hoy) < 0 
                 || serviceProg.isFechaProgramada(evDate.getTime(), dependencia.getDepId(), EstadoProgramacion.PROGRAMADA)) {
             return;
         }
         setPopupVisible(true);
-        titlePopUp = DateUtil.formatDate(evDate.getTime());
+        titlePopUp=DateUtil.formatDate(evDate.getTime());
         //popupVisible = true;
         arrayInactivas = mapa.get(titlePopUp);
-        event = ((ScheduleEvent) selectEvent.getObject());
+        event = selectEvent.getScheduleEvent();
     }
+    
 
-    public void onDateSelect(SelectEvent selectEvent) {
-        Calendar seleccionada = Calendar.getInstance();
-        seleccionada.setTime((Date) selectEvent.getObject());
-        seleccionada = DateUtil.setCeroHoras(seleccionada);
-        seleccionada.add(Calendar.DATE, 1);
-
+    public void onDateSelect(DateSelectEvent selectEvent) {
+        Calendar hoy = DateUtil.setCeroHoras(Calendar.getInstance());
+        
         Calendar evDate = Calendar.getInstance();
-        evDate.setTime((Date) selectEvent.getObject());
+        evDate.setTime(selectEvent.getDate());
         evDate = DateUtil.setCeroHoras(evDate);
-        /*
-         if (evDate.before(hoy)
-         || serviceProg.isFechaProgramada(evDate.getTime(), dependencia.getDepId(), EstadoProgramacion.PROGRAMADA)) {            
-         return;
-         }*/
+/*
+        if (evDate.before(hoy)
+                || serviceProg.isFechaProgramada(evDate.getTime(), dependencia.getDepId(), EstadoProgramacion.PROGRAMADA)) {            
+            return;
+        }*/
         setPopupVisible(true);
         boolean assigned = false;
-
-        titlePopUp = DateUtil.formatDate(seleccionada.getTime());
+        
+        titlePopUp=DateUtil.formatDate(evDate.getTime());
 
         for (ScheduleEvent ev : eventModel.getEvents()) {
             //System.out.println("entra");
             Calendar c = Calendar.getInstance();
             c.setTime(ev.getStartDate());
             c = DateUtil.setCeroHoras(c);
-
+            
             if (evDate.getTime().equals(c.getTime())) {
-                event = ev;
-
+                event = ev;                
+                
 
                 arrayInactivas = mapa.get(titlePopUp);
                 assigned = true;
@@ -254,9 +264,9 @@ public class PosicionInactivaBBean {
                 break;
             }
         }
-        if (!assigned) {
+        if(!assigned){
             //popupVisible = true;
-            event = new DefaultScheduleEvent("Festivo", evDate.getTime(), evDate.getTime());
+            event = new DefaultScheduleEvent("Festivo", selectEvent.getDate(), selectEvent.getDate());
             arrayInactivas = new Integer[this.cantidadPos];
         }
     }
@@ -277,24 +287,25 @@ public class PosicionInactivaBBean {
         this.eventModel = eventModel;
     }
 
-    public String registrarPosiciones() {
+    public String registrarPosiciones(){
         Calendar hoy = DateUtil.setCeroHoras(Calendar.getInstance());
 
-        if (event.getId() == null) {
+        if (event.getId()==null){
             eventModel.addEvent(event);
-        } else {
+        }
+        else{
             eventModel.updateEvent(event);
         }
         String key = DateUtil.formatDate(event.getStartDate());
         //System.out.println("key: " + key);
-        mapa.put(key, arrayInactivas);
+        mapa.put(key,arrayInactivas);
         mapaToSave = new HashMap<String, Integer[]>();
-        mapaToSave.put(key, arrayInactivas);
+        mapaToSave.put(key,arrayInactivas);
         service.guardarPosiciones(mapaToSave, JsfUtil.getFuncionarioSesion());
         arrayInactivas = new Integer[this.cantidadPos];
         modificando = true;
 
-        moveValue = 0;
+        moveValue=0;
         nextPrevious();
         if (serviceProg.isFechaProgramada(event.getStartDate(), dependencia.getDepId(), EstadoProgramacion.GENERADA)) {
             JsfUtil.addWarningMessage("warningProgramacionPendiente");
@@ -304,8 +315,8 @@ public class PosicionInactivaBBean {
         }
         return "listPosicionesInactivas";
     }
-
-    public String guardar() {
+    
+    public String guardar(){
         service.guardarPosiciones(mapaToSave, JsfUtil.getFuncionarioSesion());
         return null;
     }
@@ -314,11 +325,12 @@ public class PosicionInactivaBBean {
         Calendar c = Calendar.getInstance();
         String[] arrDate = toString.split("/");
         c.set(Integer.parseInt(arrDate[2]),
-                Integer.parseInt(arrDate[1]) - 1,
+                Integer.parseInt(arrDate[1])-1, 
                 Integer.parseInt(arrDate[0]));
         return c.getTime();
     }
-
+    
+    
     public ScheduleEvent getEvent() {
         return event;
     }
@@ -336,12 +348,15 @@ public class PosicionInactivaBBean {
     }
 
     private void setPopupVisible(boolean visible) {
-        if (visible) {
+        if(visible){
             JsfUtil.getRequestContext().execute("eventDialog.show()");
-        } else {
+        }
+        else{
             JsfUtil.getRequestContext().execute("eventDialog.hide()");
         }
     }
+
+    
 
     public int getMoveValue() {
         return moveValue;
@@ -350,16 +365,16 @@ public class PosicionInactivaBBean {
     public void setMoveValue(int moveValue) {
         this.moveValue = moveValue;
     }
-
+    
     public String nextPrevious() {
         eventModel = new DefaultScheduleModel();
         iniDate = DateUtil.addMonth(iniDate, moveValue);
         loadEvents(iniDate, iniDate);
-
+        
         return "listPosicionesInactivas";
     }
-
-    public String listar() {
+    
+    public String listar(){        
         posJornadas = JsfUtil.getListadosBBean().getListaPosicionJornadaXDependencia(dependencia.getDepId());
         eventModel = new DefaultScheduleModel();
         Calendar cal = Calendar.getInstance();
@@ -369,7 +384,7 @@ public class PosicionInactivaBBean {
         loadEvents(iniDate, iniDate);
         return "listPosicionesInactivas";
     }
-
+        
     public void loadEvents(Date start, Date end) {
 
         Date start2 = getFirstDayMonth(start);
@@ -377,14 +392,14 @@ public class PosicionInactivaBBean {
         {
             Calendar cal = Calendar.getInstance();
             cal.setTime(start2);
-            corrimiento = cal.get(Calendar.DAY_OF_WEEK) - 1;
+            corrimiento = cal.get(Calendar.DAY_OF_WEEK)-1;
         }
 
         end = getLastDayMonth(start2);
         Calendar end2 = Calendar.getInstance();
         end2.setTime(end);
         end2.add(Calendar.DATE, 1);
-
+        
         posInactivas = service.getLista(dependencia, start2, end2.getTime());
         cargarFestivos(start2, end);
 
@@ -393,40 +408,42 @@ public class PosicionInactivaBBean {
         mapa = new HashMap<String, Integer[]>();
         mapaToSave = new HashMap<String, Integer[]>();
 //ELIMINAR?????????????
-        Integer[] arrayInactivasAux = new Integer[cantidadPos];
+Integer[] arrayInactivasAux = new Integer[cantidadPos];
         int prevDay = 0;
         Date prevDate = null;
         StringBuilder sb = new StringBuilder();
-        int i = 0;
-        int c = 0;
-        for (PosicionInactiva posIn : posInactivas) {
-            if (prevDate == null) {
+        int i=0;
+        int c=0;
+        for(PosicionInactiva posIn : posInactivas){
+            if(prevDate==null){
                 prevDate = posIn.getFecha();
             }
             String yearMonthKey = DateUtil.formatDate(prevDate);
             //if (!mapa.containsKey(yearMonthKey)) {
-            if (prevDay != posIn.getFecha().getDate()) {
-                i = 0;
-                if (prevDay > 0) {
+            if(prevDay!=posIn.getFecha().getDate()){
+                i=0;
+                if(prevDay>0){                            
                     String s = sb.toString();
-                    eventModel.addEvent(new DefaultScheduleEvent(s.substring(0, s.length() - 2),
-                            prevDate, prevDate, true));
+                    eventModel.addEvent(new DefaultScheduleEvent(s.substring(0,s.length()-2), 
+                            prevDate, prevDate,true));                        
                     //si no existe la clave en el mapa la crea
-                    mapa.put(yearMonthKey, arrayInactivasAux);
+                    mapa.put(yearMonthKey,arrayInactivasAux);
                 }
                 sb = new StringBuilder();
                 arrayInactivasAux = new Integer[cantidadPos];
-                prevDay = posIn.getFecha().getDate();
-                prevDate = posIn.getFecha();
+                prevDay=posIn.getFecha().getDate();                        
+                prevDate=posIn.getFecha();
             }
-            arrayInactivasAux[i++] = posIn.getPosicionJornada().getPjId().intValue();
+            arrayInactivasAux[i++]=posIn.getPosicionJornada().getPjId().intValue();
             sb.append(posIn.getPosicionJornada().getPjAlias()).append(", ");
             c++;
-            if (c == posInactivas.size()) {
+            if(c==posInactivas.size()){
                 eventModel.addEvent(new DefaultScheduleEvent(sb.toString(),
-                        posIn.getFecha(), posIn.getFecha(), true));
-                mapa.put(DateUtil.formatDate(posIn.getFecha()), arrayInactivasAux);
+                posIn.getFecha(), posIn.getFecha(), true));
+                mapa.put(DateUtil.formatDate(posIn.getFecha()),arrayInactivasAux);
             }
-        }
-    }
+        }        
+    }        
+ 
+
 }

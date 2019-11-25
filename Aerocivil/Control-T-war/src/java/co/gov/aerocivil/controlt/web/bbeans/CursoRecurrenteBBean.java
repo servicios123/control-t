@@ -16,11 +16,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.event.SelectEvent;
+import org.primefaces.event.DateSelectEvent;
 
 /**
  *
@@ -40,25 +40,21 @@ public class CursoRecurrenteBBean {
     @EJB
     private ParametroDependenciaService dependenciaService;
     private List<ParametrosDependencia> parametros;
-    
+    @ManagedProperty(value = "#{menuBBean.selectedOption.menLabel}")
     private String idMenu;
     
-    CursoRecurrente curso;
     
-    @PostConstruct
-    public void setMenu(){
-        idMenu = "Curso Recurrente";
-    }
+    CursoRecurrente curso;
 
     public CursoRecurrente getCurso() {
         return curso;
     }
-    public void actualiza(SelectEvent evento)
+    public void actualiza(DateSelectEvent evento)
     {
        Calendar c = Calendar.getInstance();
-       c.setTime((Date)evento.getObject());
+       c.setTime(evento.getDate());
        c.add(Calendar.YEAR, 2);        
-       Date date= (Date) evento.getObject();  
+       Date date= evento.getDate();  
        curso.setCurFechaVencimiento(c.getTime());      
     }
             

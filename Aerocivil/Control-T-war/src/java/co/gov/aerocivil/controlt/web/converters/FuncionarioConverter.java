@@ -5,6 +5,7 @@
 package co.gov.aerocivil.controlt.web.converters;
 
 import co.gov.aerocivil.controlt.entities.Funcionario;
+import co.gov.aerocivil.controlt.services.FuncionarioService;
 import co.gov.aerocivil.controlt.services.ListasService;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
@@ -39,9 +40,7 @@ public class FuncionarioConverter implements Converter {
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-      if(value==null){
-          return null;
-      }
+      
        try{
                      
             long id= ((Funcionario) value).getFunId();          

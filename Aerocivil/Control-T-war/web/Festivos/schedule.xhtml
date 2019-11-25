@@ -21,12 +21,12 @@
                     <p:growl id="messages" showDetail="true" />  
 
                     <p:schedule value="#{scheduleController.eventModel}"  
-                                 widgetVar="myschedule" 
+                                editable="true" widgetVar="myschedule" 
                                 resizable="false" draggable="false" 
                                 rightHeaderTemplate="" 
                                 >
-                        <p:ajax event="dateSelect" listener="#{scheduleController.onDateSelect}" update="eventDetails" oncomplete="PF('myschedule').update();" />
-                        <p:ajax event="eventSelect" listener="#{scheduleController.onEventSelect}" update="eventDetails" oncomplete="PF('myschedule').update();" />                        
+                        <p:ajax event="dateSelect" listener="#{scheduleController.onDateSelect}" update="eventDetails" oncomplete="myschedule.update();" />
+                        <p:ajax event="eventSelect" listener="#{scheduleController.onEventSelect}" update="eventDetails" oncomplete="myschedule.update();" />                        
                     </p:schedule>  
 
                     <p:dialog widgetVar="eventDialog" header="Event Details" showEffect="clip" hideEffect="clip">  
@@ -52,7 +52,7 @@
 
                             <p:commandButton type="reset" value="Reset" />  
                             <p:commandButton value="Save"  
-                                             oncomplete="PF('myschedule').update();eventDialog.hide();"  
+                                             oncomplete="myschedule.update();eventDialog.hide();"  
                                              actionListener="#{scheduleController.addEvent}" />  
                         </h:panelGrid>  
                     </p:dialog>  

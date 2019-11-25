@@ -39,7 +39,7 @@ public class DiarioSenalLazyList extends LazyDataModel<DiarioSenal>{
 
     @Override
     public List<DiarioSenal> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         //System.out.println("sortField = " + sortField);
         lista = diarioSenalService.getLista(diarioSenalFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));

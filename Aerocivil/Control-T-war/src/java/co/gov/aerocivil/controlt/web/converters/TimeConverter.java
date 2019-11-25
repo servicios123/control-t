@@ -26,9 +26,6 @@ public class TimeConverter extends DateTimeConverter{
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        if(value==null){
-            return null;
-        }
         //setPattern((String) component.getAttributes().get("pattern"));
         setPattern("HH:mm");
         if (component.getAttributes().get("pattern")!=null){

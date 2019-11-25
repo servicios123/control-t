@@ -8,8 +8,10 @@ import co.gov.aerocivil.controlt.entities.Aeropuerto;
 import co.gov.aerocivil.controlt.entities.DepCategoria;
 import co.gov.aerocivil.controlt.entities.Dependencia;
 import co.gov.aerocivil.controlt.entities.Funcionario;
+
 import co.gov.aerocivil.controlt.entities.PosicionJornada;
 import co.gov.aerocivil.controlt.entities.Regional;
+import co.gov.aerocivil.controlt.entities.RestriccionDependencia;
 import co.gov.aerocivil.controlt.entities.Solicitud;
 import co.gov.aerocivil.controlt.entities.Vistaprogramacion;
 import co.gov.aerocivil.controlt.enums.ParametrosEnum;
@@ -20,6 +22,7 @@ import co.gov.aerocivil.controlt.services.ProgramacionTurnosSession;
 import co.gov.aerocivil.controlt.services.RestriccionesService;
 import co.gov.aerocivil.controlt.services.SolicitudService;
 import co.gov.aerocivil.controlt.web.enums.SortOrderEnum;
+import co.gov.aerocivil.controlt.web.lazylist.SolicitudLazyList;
 import co.gov.aerocivil.controlt.web.util.DateUtil;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import co.gov.aerocivil.controlt.web.util.MailUtil;
@@ -29,8 +32,9 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.event.SelectEvent;
+import org.primefaces.event.DateSelectEvent;
 
+import org.primefaces.model.LazyDataModel;
 
 /**
  *
@@ -76,7 +80,7 @@ public class SolicitudBBean {
     //private PosicionJornada turno_reem;
     private Solicitud solicitud;
     private Solicitud solicitudFiltro;
-    private List<Solicitud> lista;
+    private LazyDataModel<Solicitud> lista;
     private List<PosicionJornada> listTurno;
     private List<PosicionJornada> listTurnoReemp;
     private Funcionario funcionario_reem;
@@ -134,9 +138,9 @@ public class SolicitudBBean {
         return "crearSolicitud";
     }
     
-    public void cambioFechaSol(SelectEvent ev)
+    public void cambioFechaSol(DateSelectEvent ev)
     {
-        solicitud.setSolFechaCambio((Date)ev.getObject());
+        solicitud.setSolFechaCambio(ev.getDate());
         Calendar c = Calendar.getInstance();
         c.setTime(solicitud.getSolFechaCambio());
         //System.out.println("Entra\t"+c.get(Calendar.DATE)+"/"+c.get(Calendar.MONTH)); 
@@ -370,7 +374,7 @@ public String editarPropias() {
     public String filtrar() {
         /*cargarAeropuerto();
          cargarDependencia();*/
-        lista = solicitudService.getLista(solicitudFiltro, 0, 0, null, null);
+        lista = new SolicitudLazyList(solicitudService, solicitudFiltro);
 
         return "listarSolicitud";
     }
@@ -378,7 +382,7 @@ public String editarPropias() {
     public String filtrarPropias() {
         /*cargarAeropuerto();
          cargarDependencia();*/
-        lista = solicitudService.getLista(solicitudFiltro, 0, 0, null, null);
+        lista = new SolicitudLazyList(solicitudService, solicitudFiltro);
 
         return "listarSolicitudPropias";
     }
@@ -485,11 +489,11 @@ public String editarPropias() {
         this.solicitudService = solicitudService;
     }
 
-    public List<Solicitud> getLista() {
+    public LazyDataModel<Solicitud> getLista() {
         return lista;
     }
 
-    public void setLista(List<Solicitud> lista) {
+    public void setLista(LazyDataModel<Solicitud> lista) {
         this.lista = lista;
     }
 

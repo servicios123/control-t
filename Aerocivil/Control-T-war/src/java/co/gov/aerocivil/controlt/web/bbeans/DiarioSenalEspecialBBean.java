@@ -6,7 +6,6 @@ package co.gov.aerocivil.controlt.web.bbeans;
 
 import co.gov.aerocivil.controlt.entities.Dependencia;
 import co.gov.aerocivil.controlt.entities.DiarioSenalCategoria;
-import co.gov.aerocivil.controlt.entities.DiarioSenalCierreTurno;
 import co.gov.aerocivil.controlt.entities.DiarioSenalEspecial;
 import co.gov.aerocivil.controlt.entities.DiarioSenalFuncionario;
 import co.gov.aerocivil.controlt.entities.DiarioSenalInfo;
@@ -15,11 +14,9 @@ import co.gov.aerocivil.controlt.entities.DiarioSenalTipo;
 import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.entities.Jornada;
 import co.gov.aerocivil.controlt.entities.Posicion;
-import co.gov.aerocivil.controlt.entities.Turno;
-import co.gov.aerocivil.controlt.entities.Vistaprogramacion;
-import co.gov.aerocivil.controlt.enums.ParametrosEnum;
 import co.gov.aerocivil.controlt.services.DiarioSenalEspecialService;
 import co.gov.aerocivil.controlt.services.ListasService;
+import co.gov.aerocivil.controlt.services.PosicionService;
 import co.gov.aerocivil.controlt.web.lazylist.DiarioSenalEspecialLazyList;
 import co.gov.aerocivil.controlt.web.util.DateUtil;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
@@ -28,17 +25,10 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.primefaces.model.LazyDataModel;
 
 /**
@@ -53,6 +43,8 @@ public class DiarioSenalEspecialBBean {
     private DiarioSenalEspecialService diarioSenalEspecialService;
     @EJB
     private ListasService listasService;
+    @EJB
+    private PosicionService posicionService;
     /* -- / Registro / ---*/
     private DiarioSenalEspecial diarioSenalEspecial;
     private DiarioSenalFuncionario diarioSenalFuncionario;
@@ -100,8 +92,10 @@ public class DiarioSenalEspecialBBean {
     private List<DiarioSenalInfo> verDsiPorDti7;
     private List<Object[]> verListaCierreTurno;
     private DiarioSenalFuncionario verDsf;
+    private boolean otroTurno;
 
     public DiarioSenalEspecialBBean() {
+        
     }
 
     public String exportPDF() {
@@ -155,11 +149,11 @@ public class DiarioSenalEspecialBBean {
         func.addCell(JsfUtil.celdaSubTitulo("Posicion"));
         func.addCell(JsfUtil.celdaSubTitulo("H. Llegada"));
         /*func.addCell(JsfUtil.celdaSubTitulo("H. Receso"));
-        func.addCell(JsfUtil.celdaSubTitulo("H. Regreso"));
-        func.addCell(JsfUtil.celdaSubTitulo("H. Salida"));
-        func.addCell(JsfUtil.celdaSubTitulo("Obs. Entrada"));
-        func.addCell(JsfUtil.celdaSubTitulo("Obs. Salida"));
-        func.addCell(JsfUtil.celdaSubTitulo("Estado"));*/
+         func.addCell(JsfUtil.celdaSubTitulo("H. Regreso"));
+         func.addCell(JsfUtil.celdaSubTitulo("H. Salida"));
+         func.addCell(JsfUtil.celdaSubTitulo("Obs. Entrada"));
+         func.addCell(JsfUtil.celdaSubTitulo("Obs. Salida"));
+         func.addCell(JsfUtil.celdaSubTitulo("Estado"));*/
         back = true;
         if (verFuncionarios.size() > 0) {
             for (int i = 0; i < verFuncionarios.size(); i++) {
@@ -167,12 +161,12 @@ public class DiarioSenalEspecialBBean {
                 func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfFuncionario().getFunAlias(), back));
                 func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfPosicion().getPosicionNacional().getPnAlias(), back));
                 func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfHoraEntrada(), back));/*
-                func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfHoraReceso(), back));
-                func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfHoraRegreso(), back));
-                func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfHoraSalida(), back));
-                func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfObservacionEntrada(), back));
-                func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfObservacionSalida(), back));
-                func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfEstado(), back));*/
+                 func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfHoraReceso(), back));
+                 func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfHoraRegreso(), back));
+                 func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfHoraSalida(), back));
+                 func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfObservacionEntrada(), back));
+                 func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfObservacionSalida(), back));
+                 func.addCell(JsfUtil.celda(verFuncionarios.get(i).getDsfEstado(), back));*/
             }
         } else {
             PdfPCell celda = JsfUtil.celda("No hay registros", false);
@@ -420,8 +414,8 @@ public class DiarioSenalEspecialBBean {
 
         return null;
     }
-    
-    public String diariosOtrasDependencias(){
+
+    public String diariosOtrasDependencias() {
         DiarioSenalBBean dse = (DiarioSenalBBean) JsfUtil.getManagedBean(DiarioSenalBBean.class);
         return dse.listarTodas();
     }
@@ -587,6 +581,7 @@ public class DiarioSenalEspecialBBean {
         return registrar();
     }
 
+    
     public String registrar() {
         reiniciar();
         actualizarPrincipales();
@@ -681,7 +676,10 @@ public class DiarioSenalEspecialBBean {
     public String entradaDsf() {
         validar();
         if (dseAuxiliar.getDseEstado().equals("ABIERTO")) {
-
+            if(otroTurno){
+                Posicion p = (Posicion) posicionService.getPorId(0);
+                diarioSenalFuncionario.setDsfPosicion(p);
+            }
             Calendar actual = Calendar.getInstance();
             diarioSenalFuncionario.setDsfHoraEntrada(convertirHora(actual));
             diarioSenalFuncionario.setDsfEstado("ABIERTO");
@@ -881,6 +879,14 @@ public class DiarioSenalEspecialBBean {
                             dsi.setDsiSerie("B" + dsi.getDsiSerieB());
                         } else {
                             dsi.setDsiSerie(dsi.getDsiSerie() + " - B" + dsi.getDsiSerieB());
+                        }
+                    }
+                    
+                    if (dsi.getDsiSerieD() != null && dsi.getDsiSerieD().length() != 0) {
+                        if (dsi.getDsiSerie() == null) {
+                            dsi.setDsiSerie("D" + dsi.getDsiSerieD());
+                        } else {
+                            dsi.setDsiSerie(dsi.getDsiSerie() + " - D" + dsi.getDsiSerieD());
                         }
                     }
 
@@ -1467,7 +1473,7 @@ public class DiarioSenalEspecialBBean {
         if (inicio > fin) {
             fin = (jornada.getJoHoraFin() + 5);
             for (int i = inicio; i <= fin; i++) {
-                int hora = i%24;
+                int hora = i % 24;
                 if (hora < 10) {
                     horasUTC.add("0" + hora);
                 } else {
@@ -1579,5 +1585,29 @@ public class DiarioSenalEspecialBBean {
             setDisabled(true);
         }
 
+    }
+
+    public DiarioSenalEspecial getDseAuxiliar() {
+        return dseAuxiliar;
+    }
+
+    public void setDseAuxiliar(DiarioSenalEspecial dseAuxiliar) {
+        this.dseAuxiliar = dseAuxiliar;
+    }
+
+    public DiarioSenalFuncionario getDsfAuxiliar() {
+        return dsfAuxiliar;
+    }
+
+    public void setDsfAuxiliar(DiarioSenalFuncionario dsfAuxiliar) {
+        this.dsfAuxiliar = dsfAuxiliar;
+    }
+
+    public boolean isOtroTurno() {
+        return otroTurno;
+    }
+
+    public void setOtroTurno(boolean otroTurno) {
+        this.otroTurno = otroTurno;
     }
 }

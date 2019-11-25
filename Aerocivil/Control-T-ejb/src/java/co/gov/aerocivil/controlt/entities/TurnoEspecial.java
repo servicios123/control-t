@@ -37,7 +37,7 @@ import javax.persistence.Table;
     @NamedQuery(name = "TurnoEspecial.findByTeMfin", query = "SELECT t FROM TurnoEspecial t WHERE t.teMfin = :teMfin"),
     @NamedQuery(name = "TurnoEspecial.findByTeEstado", query = "SELECT t FROM TurnoEspecial t WHERE t.teEstado = :teEstado"),
     @NamedQuery(name = "TurnoEspecial.findByTeSigla", query = "SELECT t FROM TurnoEspecial t WHERE t.teSigla = :teSigla and t.dependencia.depId = :depId"),
-    @NamedQuery(name = "TurnoEspecial.findByDependencia", query = "SELECT t FROM TurnoEspecial t WHERE t.dependencia.depId = :dep order by t.teSigla asc")})
+    @NamedQuery(name = "TurnoEspecial.findByDependencia", query = "SELECT t FROM TurnoEspecial t WHERE t.dependencia.depId = :dep")})
 public class TurnoEspecial implements Serializable {
 
     private static final long serialVersionUID = 1L;

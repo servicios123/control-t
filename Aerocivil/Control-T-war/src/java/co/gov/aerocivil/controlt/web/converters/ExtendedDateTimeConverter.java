@@ -30,9 +30,6 @@ public class ExtendedDateTimeConverter extends DateTimeConverter {
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        if(value==null){
-            return null;
-        }
         //setPattern((String) component.getAttributes().get("pattern"));
         setPattern("dd/MM/yyyy HH:mm");
         if (component.getAttributes().get("pattern")!=null){

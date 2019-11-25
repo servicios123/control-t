@@ -39,7 +39,7 @@ public class VistaProgramacionLazyList extends LazyDataModel<Vistaprogramacion> 
 
     @Override
     public List<Vistaprogramacion> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = vistaProgramacionService.getLista(vistaProgramacionFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(vistaProgramacionService.getCount().toString());

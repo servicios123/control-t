@@ -40,7 +40,7 @@ public class PosicionLazyList  extends LazyDataModel<Posicion> {
 
     @Override
     public List<Posicion> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = posicionService.getLista(posicionFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(posicionService.getCount().toString());

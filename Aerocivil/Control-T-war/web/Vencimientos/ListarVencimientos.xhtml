@@ -186,14 +186,14 @@
                                          style="height: 100% !important; width: 85% !important;"
                                          rendered="#{vencimientosBBean.posicionesCnt>0}">
 
-                                <p:column sortBy="#{item.funcionario.funNombre}" style="width: 255px">
+                                <p:column sortBy="#{item.funcionario.funNombre}" style="width: 300px">
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.nombre}"/>
                                     </f:facet>
                                     <h:outputText value="#{item.funcionario.funNombre}"/>
                                 </p:column>
 
-                                <p:column sortBy="#{item.posicion.posicionNacional.pnAlias}" style="width: 35px;">
+                                <p:column sortBy="#{item.posicion.posicionNacional.pnAlias}" style="width: 30px;">
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.pnAlias}"/>
                                     </f:facet>

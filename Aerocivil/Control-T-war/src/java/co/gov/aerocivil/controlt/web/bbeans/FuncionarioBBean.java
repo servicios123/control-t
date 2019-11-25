@@ -39,7 +39,7 @@ import javax.faces.bean.SessionScoped;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.component.selectonemenu.SelectOneMenu;
-import org.primefaces.event.SelectEvent;
+import org.primefaces.event.DateSelectEvent;
 import org.primefaces.event.RowEditEvent;
 
 /**
@@ -620,12 +620,12 @@ public class FuncionarioBBean {
         JsfUtil.addManualSuccessMessage("Operacion Cancelada");
     }
 
-     public void actualiza(SelectEvent evento) {
+     public void actualiza(DateSelectEvent evento) {
         Calendar c = Calendar.getInstance();
-        c.setTime((Date)evento.getObject());
+        c.setTime(evento.getDate());
         c.add(Calendar.YEAR, 1);
         this.fechaVenceEvaluacion = (c.getTime());
-        this.fechaRealizaEvaluacion = (Date)evento.getObject();
+        this.fechaRealizaEvaluacion = evento.getDate();
     }
 
     

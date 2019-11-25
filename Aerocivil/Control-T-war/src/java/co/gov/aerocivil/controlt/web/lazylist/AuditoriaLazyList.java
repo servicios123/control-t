@@ -6,6 +6,7 @@ package co.gov.aerocivil.controlt.web.lazylist;
 
 import co.gov.aerocivil.controlt.entities.Auditoria;
 import co.gov.aerocivil.controlt.services.AuditoriaService;
+import co.gov.aerocivil.controlt.services.PermisoService;
 import co.gov.aerocivil.controlt.web.enums.SortOrderEnum;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class AuditoriaLazyList extends LazyDataModel<Auditoria> {
     
     @Override
     public List<Auditoria> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = service.getLista(auditoriaFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         this.setRowCount(service.getCount().intValue());

@@ -40,7 +40,7 @@ public class SecuenciaLazyList  extends LazyDataModel<Secuencia>{
 
      @Override
     public List<Secuencia> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = secuenciaService.getLista(secuenciaFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(secuenciaService.getCount().toString());

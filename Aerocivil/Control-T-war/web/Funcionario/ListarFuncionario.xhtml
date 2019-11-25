@@ -23,7 +23,7 @@
                     <ui:include src="filtroFuncionario.xhtml">
                     </ui:include>
                     <p:dataTable value="#{funcionarioBBean.lazyList}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
+                                 paginator="true" paginatorPosition="bottom" rows="15"  
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"

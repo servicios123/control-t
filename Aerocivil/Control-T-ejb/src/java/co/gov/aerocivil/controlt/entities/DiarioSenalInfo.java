@@ -23,6 +23,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "DIARIO_SENAL_INFO")
 public class DiarioSenalInfo implements Serializable {
+
     private static long serialVersionUID = 1L;
 
     /**
@@ -44,7 +45,6 @@ public class DiarioSenalInfo implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_DIARIO_SENAL_INFO")
     @SequenceGenerator(name = "SEQ_DIARIO_SENAL_INFO", sequenceName = "SEQ_DIARIO_SENAL_INFO", allocationSize = 1)
     private Long dsiId;
-    
     @Column(name = "DSI_SERIE_NR")
     private String dsiSerieNr;
     @Column(name = "DSI_SOLICITUD")
@@ -73,17 +73,16 @@ public class DiarioSenalInfo implements Serializable {
     private String dsiProducto;
     @Column(name = "DSI_SERIE")
     private String dsiSerie;
-    
-    
     @Column(name = "DSI_SERIE_A")
     private String dsiSerieA;
     @Column(name = "DSI_SERIE_B")
     private String dsiSerieB;
     @Column(name = "DSI_SERIE_C")
     private String dsiSerieC;
+    @Column(name = "DSI_SERIE_D")
+    private String dsiSerieD;
     @Column(name = "DSI_SERIE_VA")
     private String dsiSerieVa;
-    
     @Column(name = "DSI_CANTIDAD_PUBLICADOS")
     private String dsiCantidadPublicados;
     @Column(name = "DSI_CANT_ERR_INTERNOS")
@@ -105,10 +104,8 @@ public class DiarioSenalInfo implements Serializable {
     @JoinColumn(name = "DSI_DIARIO_SENAL_FUNCIONARIO", referencedColumnName = "DSF_ID")
     @ManyToOne(optional = false)
     private DiarioSenalFuncionario dsiDiarioSenalFuncionario;
-
-    @JoinColumn(name="DSI_CATEGORIA", referencedColumnName="DSC_ID")    
+    @JoinColumn(name = "DSI_CATEGORIA", referencedColumnName = "DSC_ID")
     private DiarioSenalCategoria dsiCategoria;
-    
 
     @Override
     public int hashCode() {
@@ -540,5 +537,12 @@ public class DiarioSenalInfo implements Serializable {
     public void setDsiCategoria(DiarioSenalCategoria dsiCategoria) {
         this.dsiCategoria = dsiCategoria;
     }
-    
+
+    public String getDsiSerieD() {
+        return dsiSerieD;
+    }
+
+    public void setDsiSerieD(String dsiSerieD) {
+        this.dsiSerieD = dsiSerieD;
+    }
 }

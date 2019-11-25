@@ -31,9 +31,9 @@ public interface TurnoEspFuncionarioService {
 
     public void eliminar(TurnoEspFuncionario turno) throws Exception;
 
-   public List<TurnoEspFuncionario> listarTurnosAsignacion(Funcionario funcionario, Date fecha);
+    public List<TurnoEspFuncionario> listarTurnosAsignacion(Funcionario funcionario);
 
-    public boolean turnoEspFunEnProgramacion(TurnoEspFuncionario turnoEspFuncionario);
+    public boolean turnoEspFunEnProgramacion(co.gov.aerocivil.controlt.entities.TurnoEspFuncionario turnoEspFuncionario);
     
     public String validarDisponibilidadTurno(Date date, Funcionario f);
     

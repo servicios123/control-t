@@ -115,14 +115,17 @@ public class TempVerProgramacionServiceBean implements TempVerProgramacionServic
 
     @Override
     public List<Resumen> obtenerResumen(Long programacion) {
-        try {
-            Query createNativeQuery = em.createNativeQuery("begin PKG_RESUMEN_PROGRAMACION.RESUMIR(pro_id=>" + programacion + "); end;");
-            createNativeQuery.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         Query query = em.createQuery("Select r from Resumen r where r.programacion = :proId");
         query.setParameter("proId", programacion);
+        List resultList = query.getResultList();
+        if (resultList == null || resultList.isEmpty()) {
+            try {
+                Query createNativeQuery = em.createNativeQuery("begin PKG_RESUMEN_PROGRAMACION.RESUMIR(pro_id=>" + programacion + "); end;");
+                createNativeQuery.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return query.getResultList();
     }
 }

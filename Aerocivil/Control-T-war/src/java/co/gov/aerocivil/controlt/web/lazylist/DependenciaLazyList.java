@@ -9,6 +9,7 @@ import co.gov.aerocivil.controlt.services.DependenciaService;
 import co.gov.aerocivil.controlt.web.enums.SortOrderEnum;
 import java.util.List;
 import java.util.Map;
+
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 //import org.primefaces.model.SortOrder;
@@ -40,7 +41,7 @@ public class DependenciaLazyList  extends LazyDataModel<Dependencia> {
 
     @Override
     public List<Dependencia> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = dependenciaService.getLista(dependenciaFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(dependenciaService.getCount().toString());

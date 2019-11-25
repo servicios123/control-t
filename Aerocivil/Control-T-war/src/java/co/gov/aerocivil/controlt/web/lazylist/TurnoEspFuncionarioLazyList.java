@@ -5,6 +5,7 @@
 package co.gov.aerocivil.controlt.web.lazylist;
 
 import co.gov.aerocivil.controlt.entities.TurnoEspFuncionario;
+import co.gov.aerocivil.controlt.enums.EstadoProgramacion;
 import co.gov.aerocivil.controlt.services.ProgramacionTurnosSession;
 import co.gov.aerocivil.controlt.services.TurnoEspFuncionarioService;
 import co.gov.aerocivil.controlt.web.enums.SortOrderEnum;
@@ -43,7 +44,7 @@ public class TurnoEspFuncionarioLazyList  extends LazyDataModel<TurnoEspFunciona
 
     @Override
     public List<TurnoEspFuncionario> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = turnoEspFuncionarioService.getLista(turnoEspFuncionarioFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(turnoEspFuncionarioService.getCount().toString());

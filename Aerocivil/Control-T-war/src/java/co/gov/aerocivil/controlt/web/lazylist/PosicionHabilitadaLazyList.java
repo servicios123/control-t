@@ -40,7 +40,7 @@ public class PosicionHabilitadaLazyList  extends LazyDataModel<PosicionHabilitad
 
     @Override
     public List<PosicionHabilitada> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = posicionHabilitadaService.getLista(posicionHabilitadaFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(posicionHabilitadaService.getCount().toString());

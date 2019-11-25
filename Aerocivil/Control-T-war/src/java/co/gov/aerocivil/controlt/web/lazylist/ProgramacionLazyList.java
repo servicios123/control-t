@@ -35,7 +35,7 @@ public class ProgramacionLazyList extends LazyDataModel<Programacion> {
 
     @Override
     public List<Programacion> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = programacionService.getListaPag(programacionFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         

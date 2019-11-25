@@ -112,7 +112,7 @@ label{
 button[type="submit"],input[type="submit"],input[type="button"]{
     font-family: Calibri !important;
     font-size: 12pt !important;
-    background:#808080 !important;
+    background-color:#808080 !important;
     border: 1px #C0C0C0 solid !important;
     color: #ffffff !important;
     padding: 4px !important;
@@ -211,15 +211,15 @@ tr.ui-datatable-odd{
     vertical-align: middle;
     text-align: center;
     padding: 3px;
-    font-size: 8pt;
+    font-size: 10pt;
 }
 .tabla_lista td{
     color:black;
     padding: 3px;
-    font-size: 8pt;
+    font-size: 9pt;
 }
 .tabla_lista a{
-    font-size: 8pt;
+    font-size: 9pt;
     color: #474cc0;
     text-decoration: none;
     font-weight: bold;
@@ -476,89 +476,4 @@ select.selectOneMenu50px{
 
 .top-alignment {
     vertical-align: top;
-}
-
-.ui-widget-header {
-    color: #253979 !important;
-}
-
-.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
-    border: 1px solid #253979;
-    background: #253979;
-    font-weight: bold;
-    color: #ffffff;
-}
-
-button[type="submit"], input[type="submit"], input[type="button"] {
-    font-family: Calibri !important;
-    font-size: 12pt !important;
-    background-color: #253979 !important;
-    border: 1px #253979 solid !important;
-    color: #ffffff !important;
-    padding: 4px !important;
-    padding-bottom: 1px !important;
-    padding-top: 1px !important;
-    margin: 10px !important;
-    -webkit-border-radius: 0 !important;
-    border-radius: 0 !important;
-}
-
-button[type="reset"], input[type="reset"], input[type="reset"] {
-    font-family: Calibri !important;
-    font-size: 12pt !important;
-    background: #253979 !important;
-    border: 1px #253979 solid !important;
-    color: #ffffff !important;
-    padding: 4px !important;
-    padding-bottom: 1px !important;
-    padding-top: 1px !important;
-    margin: 10px !important;
-    -webkit-border-radius: 0 !important;
-    border-radius: 0 !important;
-}
-/*
-.ui-panelmenu-content, .ui-widget-content, .ui-helper-hidden {
-    border: 1px solid #aaaaaa;
-    background: #e69700 !important;
-    color: #222222;
-}
-
-.ui-panelmenu-content .ui-widget-content .ui-helper-hidden {
-    border: 1px solid #aaaaaa;
-    background: #e69700 !important;
-    color: #222222;
-}
-
-.ui-panelmenu-content, .ui-widget-content, .ui-helper-hidden {
-    border: 1px solid #aaaaaa;
-    background: #e69700 !important;
-    color: #222222;
-}
-
-.ui-widget-content {
-    border: 1px solid #aaaaaa;
-    background: #e69700 !important;
-    color: #222222;
-}*/
-
-
-
-.ui-inputfield, .ui-widget-content .ui-inputfield, .ui-widget-header .ui-inputfield {
-    color: #253979;
-}
-
-.ui-datatable thead th .ui-column-title {
-    font-weight:bold;
-    text-transform: uppercase;
-    font-size: 0.8em !important;
-}
-
-.ui-inputfield .ui-inputtextarea .ui-state-hover{
-    background: #fff !important;
-} 
-
-.ui-widget-overlay {
-    background: #253979 !important;
-    opacity: .10;
-    filter: Alpha(Opacity=10);
 }

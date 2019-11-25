@@ -30,7 +30,7 @@ public class EmergenciasLazyList extends LazyDataModel<Emergencias>{
      
      @Override
     public List<Emergencias> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = emergenciasService.getListaPag(emergenciasFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(emergenciasService.getCount().toString());

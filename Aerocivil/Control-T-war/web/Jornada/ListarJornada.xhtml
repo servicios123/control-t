@@ -42,7 +42,7 @@
                         </xf:selectOneMenu>
                         
                         <xf:selectOneMenu entity="#{jornadaBBean.jornadaFiltro}" fieldName="joEstado" >  
-                            <f:selectItem itemLabel="Activo" itemValue="Activo"/>  
+                            <f:selectItem itemLabel="Activo" itemValue="Activo" />  
                             <f:selectItem itemLabel="Inactivo" itemValue="Inactivo" /> 
                         </xf:selectOneMenu>
                         <h:commandButton  action="#{jornadaBBean.filtrar}" value="#{msg.buscar}"  />            
@@ -52,13 +52,13 @@
                 <br></br>
                 <h:form>
                     <p:dataTable value="#{jornadaBBean.lista}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
+                                 paginator="true" paginatorPosition="bottom" rows="15"  
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
                                  sortBy="#{item.joHoraInicio}" paginatorAlwaysVisible="false"
                                  emptyMessage="#{msg.emptyList}">
-                        <p:column rendered="#{loginBBean.funNivel == 4}" style="width: 5%">
+                        <p:column rendered="#{loginBBean.funNivel == 4}">
                             <f:facet name="header" >
                                 <h:outputText value="#{msg.editar}"/>
                             </f:facet>
@@ -66,44 +66,44 @@
                                 <f:setPropertyActionListener value="#{item}" target="#{jornadaBBean.jornada}"/>
                             </h:commandLink>
                         </p:column>
-                        <p:column sortBy="#{item.joAlias}" style="width: 9%; text-align: center;">
+                        <p:column sortBy="#{item.joAlias}" >
                             <f:facet name="header">
                                 <h:outputText value="#{msg.jornada}"/>
                             </f:facet>
                             <h:outputText value="#{item.joAlias}"/>
                         </p:column>
-                        <p:column sortBy="#{item.joHoraInicio}" style="width: 12%; text-align: center;" >
+                        <p:column sortBy="#{item.joHoraInicio}" >
                             <f:facet name="header">
                                 <h:outputText value="#{msg.joHoraInicio}"/>
                             </f:facet>
-                            <h:outputText value="#{item.joHoraInicio}:#{item.joMinutoInicio}" />
+                            <h:outputText value="#{item.joHoraInicio}" />
                         </p:column>
-                        <p:column sortBy="#{item.joHoraFin}" style="width: 12%; text-align: center;">
+                        <p:column sortBy="#{item.joHoraFin}" >
                             <f:facet name="header">
                                 <h:outputText value="#{msg.joHoraFin}"/>
                             </f:facet>
-                            <h:outputText value="#{item.joHoraFin}:#{item.joMinutoFin}" />
+                            <h:outputText value="#{item.joHoraFin}" />
                         </p:column>
                         
-                        <p:column sortBy="#{item.joEstado}" style="width: 12%">
+                        <p:column sortBy="#{item.joEstado}" >
                             <f:facet name="header">
                                 <h:outputText value="#{msg.joEstado}"/>
                             </f:facet>
                             <h:outputText value="#{item.joEstado}"/>
                         </p:column>
-                        <p:column sortBy="#{item.dependencia.aeropuerto.regional.regNombre}" style="width: 15%">
+                        <p:column sortBy="#{item.dependencia.aeropuerto.regional.regNombre}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.regional}"/>
                             </f:facet>
                             <h:outputText value="#{item.dependencia.aeropuerto.regional.regNombre}"/>
                         </p:column>
-                        <p:column sortBy="#{item.dependencia.aeropuerto.aeNombre}" style="width: 18%">
+                        <p:column sortBy="#{item.dependencia.aeropuerto.aeNombre}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.aeropuerto}"/>
                             </f:facet>
                             <h:outputText value="#{item.dependencia.aeropuerto.aeNombre}"/>
                         </p:column>
-                        <p:column sortBy="#{item.dependencia.depNombre}" style="width: 18%">
+                        <p:column sortBy="#{item.dependencia.depNombre}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.dependencia}"/>
                             </f:facet>
@@ -113,6 +113,7 @@
                     </p:dataTable>
                     <br/>
                     <h:commandButton action="#{jornadaBBean.crear}" value="#{msg.crear} #{msg.jornada}" rendered="#{loginBBean.funNivel == 4}"  />
+
                 </h:form>
 
             </ui:define>

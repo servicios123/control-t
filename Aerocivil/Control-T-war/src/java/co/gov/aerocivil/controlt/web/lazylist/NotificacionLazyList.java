@@ -40,7 +40,7 @@ public class NotificacionLazyList extends LazyDataModel<Notificacion>{
 
      @Override
     public List<Notificacion> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = notificacionService.getLista(notificacionFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(notificacionService.getCount().toString());

@@ -13,45 +13,11 @@
         <f:facet name="first">
             <meta http-equiv="X-UA-Compatible" content="IE-Edge"/>
         </f:facet>
-
+        
         <meta http-equiv="X-UA-Compatible" content="IE=7;IE=8;IE=9;IE=10;IE=11"/>
         <link rel="stylesheet" type="text/css" href="#{facesContext.externalContext.requestContextPath}/resources/normalize.css" />
         <link rel="stylesheet" type="text/css" href="#{facesContext.externalContext.requestContextPath}/resources/style.css" />        
-        <title>CONTROL-T 1.0</title>  
-        <style>
-            .ui-panelmenu-panel > .ui-state-hover, .ui-panelmenu-panel > .ui-widget-content .ui-state-hover, .ui-panelmenu-panel >  .ui-widget-header .ui-state-hover, .ui-panelmenu-panel >  .ui-state-focus, .ui-panelmenu-panel > .ui-widget-content .ui-state-focus, .ui-panelmenu-panel >  .ui-widget-header .ui-state-focus {
-                border: 1px solid #2293f7;
-                background: #e69700 ;
-                font-weight: bold;
-                color: #ffffff;
-            }
-            .ui-selectonemenu-items-wrapper > .ui-state-hover, .ui-selectonemenu-items-wrapper > .ui-widget-content .ui-state-hover, .ui-selectonemenu-items-wrapper >  .ui-widget-header .ui-state-hover, .ui-selectonemenu-items-wrapper >  .ui-state-focus, .ui-selectonemenu-items-wrapper > .ui-widget-content .ui-state-focus, .ui-selectonemenu-items-wrapper >  .ui-widget-header .ui-state-focus {
-                border: 1px solid #2293f7;
-                background: #e69700 ;
-                font-weight: bold;
-                color: #ffffff;
-            }
-
-            .ui-datepicker-calendar > .ui-state-hover, .ui-datepicker-calendar > .ui-widget-content .ui-state-hover, .ui-datepicker-calendar >  .ui-widget-header .ui-state-hover, .ui-datepicker-calendar >  .ui-state-focus, .ui-datepicker-calendar > .ui-widget-content .ui-state-focus, .ui-datepicker-calendar >  .ui-widget-header .ui-state-focus {
-                border: 1px solid #2293f7;
-                background: #e69700 ;
-                font-weight: bold;
-                color: #ffffff;
-            }
-
-            .ui-button-text-only .ui-button-text {
-                padding: .0em 1em; 
-            }
-
-            .ui-widget-overlay {
-                background: #253979 !important;
-                opacity: .10;
-                filter: Alpha(Opacity=10);
-            }
-
-
-        </style>
-        <script type="text/javascript" src="#{facesContext.externalContext.requestContextPath}/resources/cookies.js"></script>
+        <title>CONTROL-T 1.0</title>   
         <script type="text/javascript">
             
             PrimeFaces.locales['es'] = {
@@ -80,14 +46,10 @@
                 day: 'Día',
                 allDayText : 'Todo el día'
             };
-            
-            
-            // Remove any that match the pattern
-            
         </script>
     </h:head>
     <h:body id="template_interior" style="margin: 0">
-
+       
         <table width="100%" height="600" cellspacing="0" cellpadding="0" border="1" 
                bordercolordark="#F3F3F3" bordercolorlight="#D2D5DF" align="center">
             <tr>
@@ -99,7 +61,7 @@
                                     <!--f:param value="{menuBBean.selectedOption.menId}" name="#page"/-->
                                 </h:link>
                                 <h:form>
-                                    <h:commandLink actionListener="#{loginBBean.finalizarSesion}" value="#{msg.salir}"/>
+                                     <h:commandLink actionListener="#{loginBBean.finalizarSesion}" value="#{msg.salir}"/>
                                 </h:form>
                             </td>
 
@@ -108,16 +70,27 @@
                             <td class="userStatus" colspan="2">
                                 CONTROL-T 1.0
                                 <div style="float: right;">
+
                                 </div>
+
                             </td>
+
                         </tr-->
                         <tr>
                             <h:form>
                                 <td width="200px" valign="top" class="menuLeft">
                                     <!--MENU-->
-                                    <p:panelMenu stateful="true" model="#{menuBBean.model}" id="myTree" transient="false">
-
-                                    </p:panelMenu>
+                                    <p:treeTable value="#{menuBBean.menu}" var="item" id="myTree" transient="false">
+                                        <p:ajax event="collapse" listener="#{menuBBean.onNodeCollapse}" />
+                                        <p:column id="adf" style="padding-left: 0px" styleClass="menu_lat">                
+                                            <f:facet name="header"><h:outputText value="&#160;" /></f:facet>
+                                            <h:outputText value="#{item}" rendered="#{item.menMetodo == null}"/>
+                                            <p:commandLink action="#{menuBBean.gotoOpcion}" value="#{item}" id="lblNode" 
+                                                           rendered="#{item.menMetodo != null}" ajax="false" styleClass="#{item eq menuBBean.selectedOption?'menulat_sel':'menu_lat'}">  
+                                                <f:setPropertyActionListener target="#{menuBBean.selectedOption}" value="#{item}"/>
+                                            </p:commandLink>                
+                                        </p:column>
+                                    </p:treeTable>
                                     <!--MENU END-->
                                 </td>
                             </h:form>
@@ -148,13 +121,13 @@
                         <tr>
 
                             <td  class="pie" colspan="2">
-                                <h:form>
-                                    <h:outputText value="#{msg.appName} | "/>                                        
-                                    <h:outputText value="#{loginBBean.funcionarioTO.funcionario.funNombre} | "/>
-                                    <h:outputText value="#{loginBBean.funcionarioTO.funcionario.dependencia.depNombre} | "/>
-                                    <h:outputText value="#{loginBBean.funcionarioTO.funcionario.rol.rolNombre} | "/>
-                                    <h:commandLink actionListener="#{loginBBean.finalizarSesion}" value="#{msg.salir}"/>
-                                </h:form>
+                                    <h:form>
+                                        <h:outputText value="#{msg.appName} | "/>                                        
+                                        <h:outputText value="#{loginBBean.funcionarioTO.funcionario.funNombre} | "/>
+                                        <h:outputText value="#{loginBBean.funcionarioTO.funcionario.dependencia.depNombre} | "/>
+                                        <h:outputText value="#{loginBBean.funcionarioTO.funcionario.rol.rolNombre} | "/>
+                                        <h:commandLink actionListener="#{loginBBean.finalizarSesion}" value="#{msg.salir}"/>
+                                    </h:form>
                             </td>
                         </tr>
                     </table>

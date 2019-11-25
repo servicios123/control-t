@@ -66,14 +66,14 @@
                 <br></br>
                 <h:form>
                     <p:dataTable value="#{permisoEspecialBBean.lista}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
+                                 paginator="true" paginatorPosition="bottom" rows="15"  
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
                                  sortBy="#{item.peFechaPermiso}"
                                  emptyMessage="#{msg.emptyList}">
 
-                        <p:column rendered="#{loginBBean.funNivel == 3 || loginBBean.funNivel == 4}" style="width: 7%">
+                        <p:column rendered="#{loginBBean.funNivel == 3 || loginBBean.funNivel == 4}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.aprobar}"/>
                             </f:facet>
@@ -87,7 +87,7 @@
                                 <f:setPropertyActionListener value="#{item}" target="#{permisoEspecialBBean.permiso}"/>
                             </h:commandLink>
                         </p:column>
-                        <p:column sortBy="#{item.peFechaPermiso}" style="width: 18%">
+                        <p:column sortBy="#{item.peFechaPermiso}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.peFechaPermiso}">
                                 
@@ -109,7 +109,7 @@
                             </f:facet>
                             <h:outputText value="#{item.peDescripcion}"/>
                         </p:column>
-                        <p:column sortBy="#{item.peFechaRegistro}" style="width: 11%">
+                        <p:column sortBy="#{item.peFechaRegistro}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.peFechaRegistro}"/>
                             </f:facet>
@@ -117,13 +117,13 @@
                                 <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
                         </h:outputText>
                         </p:column>
-                        <p:column sortBy="#{item.peEstado}" style="width: 8%">
+                        <p:column sortBy="#{item.peEstado}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.peEstado}"/>
                             </f:facet>
                             <h:outputText value="#{item.peEstado}"/>
                         </p:column>
-                        <p:column style="width: 9%">
+                        <p:column>
                             <f:facet name="header">
                                 <h:outputText value="#{msg.jornadas}"/>
                             </f:facet>

@@ -22,7 +22,7 @@
                         <h:outputText value="#{msg.lugarSuceso}"/>
 
                         <h:panelGroup>
-                            <p:selectOneMenu id="depId" value="#{diarioSenalBBean.dependencia}" required="true" >
+                            <p:selectOneMenu id="depId" value="#{diarioSenalBBean.dependencia}" required="true" style="width:100%;">
                                 <f:selectItems value="#{diarioSenalBBean.dependenciaList}" var="ts" itemValue="#{ts.value}" itemLabel="#{ts.label}"/>
                             </p:selectOneMenu>
                             <br/>
@@ -30,10 +30,10 @@
                                        styleClass="error" 
                                        for="depId" />
                         </h:panelGroup>
-                        <h:outputText value="#{msg.lugarSuceso}"/>
-                        <p:selectOneMenu value="#{diarioSenalBBean.diarioSenal.dsTipo.dstId}" required="true">
+                        <xf:selectOneMenu entity="#{diarioSenalBBean.diarioSenal.dsTipo}" 
+                                          fieldName="dstId" required="true">
                             <f:selectItems value="#{diarioSenalBBean.listDsTipo}" var="ts" itemValue="#{ts.dstId}" itemLabel="#{ts.dstNombre}"/>
-                        </p:selectOneMenu>
+                        </xf:selectOneMenu>
                         <xf:calendar entity="#{diarioSenalBBean.diarioSenal}" fieldName="dsenFechaSuceso" required="true" mindate="#{currentDate}"
                                      readonly="true"/>
                         <xf:timeSelectorDSenal entity="#{diarioSenalBBean.diarioSenal}" fieldName="dsenHoraSuceso" minFieldName="dsenMinSuceso" required="true" label="dsenHoraSucesoLbl"/>

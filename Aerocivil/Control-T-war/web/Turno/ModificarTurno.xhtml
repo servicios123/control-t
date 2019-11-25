@@ -3,8 +3,7 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:xf="http://www.xfaces.com/jsf">
+      xmlns:p="http://primefaces.org/ui">
     <body>
         <ui:composition template="../template_interior.xhtml">
 
@@ -173,6 +172,35 @@
                     </h:panelGrid>   
                        <br/><br/><hr/><br/><br/>
                 </h:form>
+                
+                <h:form id="form_anular_ord" rendered="#{loginBBean.funcionarioTO.funcionario.dependencia.depcategoria.dcId == 4}">
+                    <strong><h:outputText value="#{msg.anularOperativo}"/></strong>
+                    <br/><br/>
+                    <h:panelGrid columns="6" styleClass="tabla_formulario" cellpadding="5" cellspacing="0">
+                        <h:outputText value="#{msg.fechaTransporte}"/>
+                        <p:calendar  required="true"  value="#{vistaProgramacionBBean.date_anular_ord}" id="date_anular_ord" >                       
+                            <p:ajax event="dateSelect" listener="#{vistaProgramacionBBean.onDateAnularOrdinary}" update="fun_anular_ord"/>
+                        </p:calendar>
+                        <h:outputText value="#{msg.funcionario}"/>
+                        <p:selectOneMenu  required="true" id="fun_anular_ord" value="#{vistaProgramacionBBean.fun_anular_ord}">    
+                            <f:selectItem itemValue="#{null}" itemLabel="#{msg.selectItemNull}"/>
+                            <f:selectItems value="#{vistaProgramacionBBean.list_fun_anular_ord}" var="fun" itemValue="#{fun}" itemLabel="#{fun.funAlias}"/>   
+                            <f:converter converterId="FuncionarioConverter" binding="#{FuncionarioConverter}"/>
+                            <p:ajax event="change" listener="#{vistaProgramacionBBean.onFunAnularOrd}" update="form_anular_ord"/>
+                        </p:selectOneMenu>
+                        <h:outputText value="#{msg.turno}"/>
+                        <p:selectOneMenu  required="true" id="turn_anular" value="#{vistaProgramacionBBean.turn_anular}">  
+                             <f:selectItem itemValue="#{null}" itemLabel="#{msg.selectItemNull}"/>
+                             <f:selectItems value="#{vistaProgramacionBBean.list_turn_anular_ord}" var="turno" itemValue="#{turno}" itemLabel="#{turno.pjAlias}"/>   
+                            <f:converter converterId="VistaProgramacionConverter" binding="#{VistaProgramacionConverter}"/>
+                        </p:selectOneMenu>   
+                        <h:panelGroup>
+                            <h:commandButton action="#{vistaProgramacionBBean.anular}" value="#{msg.anularOperativo}"/>
+                        </h:panelGroup>
+                    </h:panelGrid>   
+                      <br/><br/><hr/><br/><br/>
+                </h:form>
+                
              
                 
             </ui:define>         

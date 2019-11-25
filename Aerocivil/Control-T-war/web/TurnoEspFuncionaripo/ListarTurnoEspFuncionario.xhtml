@@ -71,7 +71,7 @@
                 <h:form>
                     
                     <p:dataTable value="#{turnoEspFuncionarioBBean.lista}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true" 
+                                 paginator="true" paginatorPosition="bottom" rows="15"  
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
@@ -96,7 +96,7 @@
                                 <f:setPropertyActionListener value="#{item}" target="#{turnoEspFuncionarioBBean.turnoEspFuncionario}"/>
                             </h:commandLink>
                         </p:column>
-                        <p:column sortBy="#{item.funcionario.funAlias}" style="width: 7%">
+                        <p:column sortBy="#{item.funcionario.funAlias}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.sigla}"/> 
                             </f:facet>
@@ -108,7 +108,7 @@
                             </f:facet>
                             <h:outputText value="#{item.funcionario.funNombre}"/>
                         </p:column>
-                        <p:column sortBy="#{item.turnoEspecial.teSigla}" style="width: 8%">
+                        <p:column sortBy="#{item.turnoEspecial.teSigla}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.turno}"/>
                             </f:facet>
@@ -132,13 +132,13 @@
                             
                             </h:outputText>
                         </p:column>
-                        <p:column sortBy="#{item.tefEstado}" style="width: 8%">
+                        <p:column sortBy="#{item.tefEstado}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.tefEstado}"/>
                             </f:facet>
                             <h:outputText value="#{item.tefEstado}"/>
                         </p:column>
-                        <p:column sortBy="#{item.turnoEspecial.dependencia.depAbreviatura}" style="width: 11%">
+                        <p:column sortBy="#{item.turnoEspecial.dependencia.depAbreviatura}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.depId}"/>
                             </f:facet>
@@ -155,7 +155,7 @@
                     </p:dataTable>
                     
                     <p:dataTable style="display: none;" value="#{turnoEspFuncionarioBBean.lista}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true" 
+                                 paginator="true" paginatorPosition="bottom" rows="15"  
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="exportTable" draggableColumns="true"

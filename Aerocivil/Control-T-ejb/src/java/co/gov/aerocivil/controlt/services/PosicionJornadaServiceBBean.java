@@ -73,7 +73,7 @@ public class PosicionJornadaServiceBBean implements PosicionJornadaService {
          Map<String,Object> params = new java.util.HashMap<String, Object>();
         
          if (posicionJornada.getPosicion().getPosicionNacional().getPnAlias() != null && !"".equals(posicionJornada.getPosicion().getPosicionNacional().getPnAlias())) {
-            condiciones.add("(upper(t.posicion.posicionNacional.pnAlias) = :alias or upper(t.pjAlias) = :alias )");
+            condiciones.add("upper(t.posicion.posicionNacional.pnAlias) = :alias ");
             params.put("alias", posicionJornada.getPosicion().getPosicionNacional().getPnAlias().toUpperCase());
         }
         if (posicionJornada.getPjEstado()!= null  && !"".equals(posicionJornada.getPjEstado())) {

@@ -4,8 +4,12 @@
  */
 package co.gov.aerocivil.controlt.web.lazylist;
 
+import co.gov.aerocivil.controlt.entities.Dependencia;
 import co.gov.aerocivil.controlt.entities.DsTipo;
+import co.gov.aerocivil.controlt.entities.ParametrosDependencia;
+import co.gov.aerocivil.controlt.services.DependenciaService;
 import co.gov.aerocivil.controlt.services.DsTipoService;
+import co.gov.aerocivil.controlt.services.ParametroDependenciaService;
 import co.gov.aerocivil.controlt.web.enums.SortOrderEnum;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +43,7 @@ public class DsTipoLazyList extends LazyDataModel<DsTipo>{
 
     @Override
     public List<DsTipo> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = tipoService.getLista(tipoFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(tipoService.getCount().toString());

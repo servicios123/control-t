@@ -5,6 +5,7 @@
 package co.gov.aerocivil.controlt.web.lazylist;
 
 import co.gov.aerocivil.controlt.services.IncapacidadService;
+import co.gov.aerocivil.controlt.services.PermisoService;
 import co.gov.aerocivil.controlt.to.IncapacidadTO;
 import co.gov.aerocivil.controlt.to.IncapacidadVista;
 import co.gov.aerocivil.controlt.web.enums.SortOrderEnum;
@@ -38,7 +39,7 @@ public class IncapacidadLazyList extends LazyDataModel<IncapacidadVista> {
     
     @Override
     public List<IncapacidadVista> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = service.getLista(incapacidadFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder), groupBy);
         this.setRowCount(service.getCount().intValue());

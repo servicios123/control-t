@@ -4,7 +4,9 @@
  */
 package co.gov.aerocivil.controlt.web.lazylist;
 
+import co.gov.aerocivil.controlt.entities.Dependencia;
 import co.gov.aerocivil.controlt.entities.ParametrosDependencia;
+import co.gov.aerocivil.controlt.services.DependenciaService;
 import co.gov.aerocivil.controlt.services.ParametroDependenciaService;
 import co.gov.aerocivil.controlt.web.enums.SortOrderEnum;
 import java.util.List;
@@ -39,7 +41,7 @@ public class ParametroDependenciaLazyList extends LazyDataModel<ParametrosDepend
 
     @Override
     public List<ParametrosDependencia> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = paramDependenciaService.getLista(dependenciaFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(paramDependenciaService.getCount().toString());

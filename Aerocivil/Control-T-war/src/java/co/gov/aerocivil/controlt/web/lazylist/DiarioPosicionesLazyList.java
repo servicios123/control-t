@@ -9,6 +9,7 @@ import co.gov.aerocivil.controlt.services.ControlDiarioPosicionesService;
 import co.gov.aerocivil.controlt.web.enums.SortOrderEnum;
 import java.util.List;
 import java.util.Map;
+
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 //import org.primefaces.model.SortOrder;
@@ -44,7 +45,7 @@ public class DiarioPosicionesLazyList  extends LazyDataModel<DiarioPosicion> {
 
     @Override
     public List<DiarioPosicion> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = service.getLista(filtro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         Integer dataSize = Integer.valueOf(service.getCount().toString());

@@ -19,13 +19,16 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
+import org.primefaces.event.DateSelectEvent;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 import org.primefaces.model.LazyScheduleModel;
 import org.primefaces.model.DefaultScheduleEvent;
+import org.primefaces.model.DefaultScheduleModel;
+import org.primefaces.event.ScheduleEntrySelectEvent;
 import org.primefaces.event.ScheduleEntryMoveEvent;
 import org.primefaces.event.ScheduleEntryResizeEvent;
-import org.primefaces.event.SelectEvent;
 
 /**
  *
@@ -120,19 +123,18 @@ public class ScheduleController {
      event = new DefaultScheduleEvent();  
      } */
 
-    public void onEventSelect(SelectEvent selectEvent) {
+    public void onEventSelect(ScheduleEntrySelectEvent selectEvent) {
         Calendar hoy = Calendar.getInstance();
         hoy.set(Calendar.HOUR_OF_DAY, 12);
         hoy.set(Calendar.MINUTE, 0);
         hoy.set(Calendar.SECOND, 0);
         hoy.set(Calendar.MILLISECOND, 0);
         Calendar evDate = Calendar.getInstance();
-        evDate.setTime(((ScheduleEvent)selectEvent.getObject()).getStartDate());
+        evDate.setTime(selectEvent.getScheduleEvent().getStartDate());
         evDate.set(Calendar.HOUR_OF_DAY, 12);
         evDate.set(Calendar.MINUTE, 0);
         evDate.set(Calendar.SECOND, 0);
         evDate.set(Calendar.MILLISECOND, 0);
-        evDate.add(Calendar.DATE, 1);
         //System.out.println(evDate.getTime());
         //System.out.println("hoy: " + hoy.getTime());
         //System.out.println("evDate.compareTo(hoy)<0:" + (evDate.compareTo(hoy) < 0));
@@ -140,16 +142,16 @@ public class ScheduleController {
             return;
         }
         modificando = true;
-        eventModel.deleteEvent((ScheduleEvent)selectEvent.getObject());
+        eventModel.deleteEvent(selectEvent.getScheduleEvent());
 
         Calendar c = Calendar.getInstance();
-        c.setTime(((ScheduleEvent)selectEvent.getObject()).getStartDate());
+        c.setTime(selectEvent.getScheduleEvent().getStartDate());
         String yearMonthKey = (c.get(Calendar.MONTH) + 1) + "-" + c.get(Calendar.YEAR);
         map.get(yearMonthKey).remove(c.getTime());
         diasEliminar.add(c.getTime());
     }
 
-    public void onDateSelect(SelectEvent selectEvent) {
+    public void onDateSelect(DateSelectEvent selectEvent) {
         Calendar hoy = Calendar.getInstance();
         hoy.set(Calendar.HOUR_OF_DAY, 0);
         hoy.set(Calendar.MINUTE, 0);
@@ -157,7 +159,7 @@ public class ScheduleController {
         hoy.set(Calendar.MILLISECOND, 0);
 
         Calendar evDate = Calendar.getInstance();
-        evDate.setTime((Date)selectEvent.getObject());
+        evDate.setTime(selectEvent.getDate());
         evDate.set(Calendar.HOUR_OF_DAY, 0);
         evDate.set(Calendar.MINUTE, 0);
         evDate.set(Calendar.SECOND, 0);
@@ -172,8 +174,7 @@ public class ScheduleController {
         modificando = true;
         boolean assigned = false;
         for (ScheduleEvent ev : eventModel.getEvents()) {
-            Date fecha = (Date) selectEvent.getObject();
-            if (fecha.equals(ev.getStartDate())) {
+            if (selectEvent.getDate().equals(ev.getStartDate())) {
                 assigned = true;
                 break;
             }
@@ -184,9 +185,9 @@ public class ScheduleController {
              eventModel.addEvent(event);*/
 
             Calendar c = Calendar.getInstance();
-            c.setTime((Date)selectEvent.getObject());
+            c.setTime(selectEvent.getDate());
             String yearMonthKey = (c.get(Calendar.MONTH) + 1) + "-" + c.get(Calendar.YEAR);
-            map.get(yearMonthKey).add((Date)selectEvent.getObject());
+            map.get(yearMonthKey).add(selectEvent.getDate());
         }
 
     }

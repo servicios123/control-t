@@ -29,7 +29,7 @@ public class RestriccionesLazyList extends LazyDataModel<RestriccionDependencia>
     
     @Override
     public List<RestriccionDependencia> load(int first, int pageSize, String sortField, 
-        SortOrder sortOrder, Map<String, Object> filters) {
+        SortOrder sortOrder, Map<String, String> filters) {
         lista = service.getLista(restriccionFiltro, first,first + pageSize,
                 sortField, SortOrderEnum.getSortOrder(sortOrder));
         this.setRowCount(service.getCount().intValue());

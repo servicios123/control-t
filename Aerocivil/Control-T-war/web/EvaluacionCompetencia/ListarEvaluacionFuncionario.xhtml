@@ -26,7 +26,7 @@
                         <ui:param name="filtro3" value="false"/>
                     </ui:include>
                     <p:dataTable value="#{funcionarioBBean.lazyList}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
+                                 paginator="true" paginatorPosition="bottom" rows="15"  
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
@@ -36,7 +36,7 @@
 
                         <p:ajax event="rowEdit" listener="#{funcionarioBBean.onEditEvaluacion}"></p:ajax>
 
-                        <p:column rendered="#{funcionarioBBean.columns[2]}" style="width: 6%">
+                        <p:column rendered="#{funcionarioBBean.columns[2]}">
                             <p:rowEditor/>
                         </p:column>
                         <p:column sortBy="#{item.funNombre}">
@@ -45,21 +45,21 @@
                             </f:facet>
                             <h:outputText value="#{item.funNombre}" class="#{item.colorEvaluacion}"/>
                         </p:column>
-                        <p:column sortBy="#{item.funAlias}" style="width: 10%">
+                        <p:column sortBy="#{item.funAlias}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.funAlias}"/>
                             </f:facet>
                             <h:outputText value="#{item.funAlias}" class="#{item.colorEvaluacion}"/>
                         </p:column>
 
-                        <p:column sortBy="#{item.funEstado}" style="width: 8%">
+                        <p:column sortBy="#{item.funEstado}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.funEstado}"/>
                             </f:facet>
                             <h:outputText value="#{item.funEstado}" class="#{item.colorEvaluacion}"/>
                         </p:column>
 
-                        <p:column style="width: 8%">
+                        <p:column>
                             <f:facet name="header">
                                 <h:outputText value="Evaluacion"/>
                             </f:facet>
@@ -76,7 +76,7 @@
                             </p:cellEditor>
                         </p:column>
 
-                        <p:column style="width: 8%">
+                        <p:column>
                             <f:facet name="header">
                                 <h:outputText value="Resultado"/>
                             </f:facet>
@@ -94,7 +94,7 @@
                             </p:cellEditor>
                         </p:column>
 
-                        <p:column style="width: 11%">
+                        <p:column >
                             <f:facet name="header">
                                 <h:outputText value="Fecha Realizacion"/>
                             </f:facet>
@@ -112,7 +112,7 @@
                             </p:cellEditor>
                         </p:column>
 
-                        <p:column style="width: 11%">
+                        <p:column >
                             <f:facet name="header">
                                 <h:outputText value="Fecha Vence"/>
                             </f:facet>
@@ -131,7 +131,7 @@
 
 
                     <p:dataTable style="display: none;" value="#{funcionarioBBean.lazyList}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
+                                 paginator="true" paginatorPosition="bottom" rows="15"  
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                                  currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                                  rowsPerPageTemplate="10,15,20" id="exportTable" draggableColumns="true"

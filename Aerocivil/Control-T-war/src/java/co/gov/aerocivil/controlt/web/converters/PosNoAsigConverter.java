@@ -39,9 +39,6 @@ public class PosNoAsigConverter implements Converter{
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
-        if(o==null){
-            return null;
-        }
          try{
                      
             long id= ((PosNoAsig) o).getPna_id();          
