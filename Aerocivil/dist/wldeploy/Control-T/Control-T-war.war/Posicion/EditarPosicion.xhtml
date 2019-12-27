@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"      
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.editar} #{msg.posicion}" rendered="#{posicionBBean.posicion.posId !=null}" ></h:outputText>
+                <h:outputText value="#{msg.crear} #{msg.posicion}" rendered="#{posicionBBean.posicion.posId==null}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                <h:form>
+                    <h:panelGrid styleClass="tabla_formulario" columns="2">
+                        
+                       <xf:selectOneMenu entity="#{posicionBBean.posicion.funcion}" fieldName="fuId" required="true">
+                           <f:selectItems value="#{posicionBBean.listFuncion}" var="fu" itemValue="#{fu.fuId}" itemLabel="#{fu.fuNombre}"/>
+                           <p:ajax update="posAlias_ou"  
+                                   listener="#{posicionBBean.cargarAliasPos}" /> 
+                       </xf:selectOneMenu>
+                       <xf:selectOneMenu entity="#{posicionBBean.posicion.sector}" fieldName="secId" required="true">
+                            <f:selectItems value="#{posicionBBean.listSector}" var="sec" itemValue="#{sec.secId}" itemLabel="#{sec.secNombre}"/>
+                            <p:ajax update="posAlias_ou"  
+                                    listener="#{posicionBBean.cargarAliasPos}" /> 
+                        </xf:selectOneMenu>
+                        
+                        <xf:selectOneMenu entity="#{posicionBBean.posicion}" fieldName="posEstado" >  
+                            <f:selectItem itemLabel="Activo" itemValue="Activo" />  
+                            <f:selectItem itemLabel="Inactivo" itemValue="Inactivo" /> 
+                        </xf:selectOneMenu>
+                        
+                        <xf:inputText entity="#{posicionBBean.posicion}" fieldName="posTiempoVence" required="true" label="#{msg.posTiempoVenceDias}" />
+                        <xf:inputText entity="#{posicionBBean.posicion}" fieldName="posAlias" required="true" readonly="true" ></xf:inputText>
+                        <f:facet name="footer">
+                            <h:commandButton  action="#{posicionBBean.guardar}" value="#{msg.guardar}"  />
+                            <h:commandButton  action="#{posicionBBean.filtrar}" value="#{msg.cancelar}" immediate="true" />
+                        </f:facet>
+                    </h:panelGrid>
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

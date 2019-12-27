@@ -284,6 +284,15 @@ public class ProgramacionTurnosBBean {
 
 
         }
+        if (logbbean.isFuncionarioNivel(RolEnum.NIVEL_U1)) {
+            dependencia.setDepcategoria(logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepcategoria());
+            dependencia.setDepId(logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId());
+            programacionFiltro.setDependencia(dependencia);
+
+
+        }
+        
+        
         programacionFiltro.setDependencia(dependencia);
 
 

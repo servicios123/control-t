@@ -115,7 +115,7 @@ public class SolicitudBBean {
         funcionario_reem = new Funcionario();
         funcionario_reem.setDependencia(dependencia);
         funcionario_reem.setFunEstado("Activo");
-        funcionario_reem.setRoles(new Long[]{5L,6L});
+        funcionario_reem.setRoles(new Long[]{5L,6L,4L});
         listFuncionariosDependencia = funcionarioService.getListaPag(funcionario_reem, null, null, "funAlias", SortOrderEnum.ASC.getOrder());
         
         solicitud = new Solicitud();

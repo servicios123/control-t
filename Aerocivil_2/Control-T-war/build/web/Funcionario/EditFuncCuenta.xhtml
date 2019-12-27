@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.editarCuenta}"/>
+            </ui:define>
+
+            <ui:define name="contenido">
+                <h:form>
+                    <h:panelGrid styleClass="tabla_formulario">
+
+                        <p:fieldset legend="Datos Personales" >
+                            <h:panelGrid styleClass="tabla_formulario" columns="4">
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funId" required="true" readonly="true" />                        
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funNombre" required="true" readonly="true"/>
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funDireccion" required="false" readonly="true"/> 
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funTelefono" required="false" readonly="true"/> 
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funCelular" required="false" readonly="true" /> 
+                                <xf:calendar entity="#{funcionarioBBean.funcionario}" fieldName="funFIngreso" required="true" readonly="true" /> 
+                                <xf:calendar entity="#{funcionarioBBean.funcionario}" fieldName="funFvEvaluacion" required="false" readonly="true"/> 
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funSueldo" required="true" readonly="true"/> 
+                            </h:panelGrid>
+                        </p:fieldset>
+                        <p:fieldset legend="Datos Básicos" >
+                            <h:panelGrid styleClass="tabla_formulario" columns="4">
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funCargo" readonly="#{!funcionarioBBean.editando}"/> 
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funGrado" required="true" readonly="#{!funcionarioBBean.editando}"/> 
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funNumLicencia" required="true" readonly="#{!funcionarioBBean.editando}"/> 
+                                <xf:calendar entity="#{funcionarioBBean.funcionario}" fieldName="funFuTraslado" required="false" readonly="#{!funcionarioBBean.editando}"/> 
+                                <xf:calendar entity="#{funcionarioBBean.funcionario}" fieldName="funFvCurso" required="false" readonly="true"/> 
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funAlias" required="true" 
+                                              readonly="#{loginBBean.funNivel>=2}" 
+                                              validatorMessage="#{msg.alfabetico}">
+                                    <f:validateRegex pattern="[a-zA-Z]+"/>
+                                    <f:validateLength minimum="2" maximum="3"/>
+                                </xf:inputText> 
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funCorreoElectronico" rendered="#{funcionarioBBean.editando}"/> 
+                                <h:outputText value="#{msg.rolNombre}"/>
+                                <h:panelGroup>
+                                    <p:selectOneMenu value="#{funcionarioBBean.funcionario.fuNivel}"
+                                                     rendered="#{loginBBean.funNivel==0 or loginBBean.funNivel == 1}">
+                                        <f:selectItems value="#{listadosBBean.listaRoles}" var="rol" itemValue="#{rol.rolId}" itemLabel="#{rol.rolNombre}"/> 
+                                        <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}" />
+                                        <p:ajax update="regId,aeId,depId"  
+                                                listener="#{funcionarioBBean.seleccionRol}" /> 
+                                    </p:selectOneMenu>
+                                    <h:outputText value="#{funcionarioBBean.funcionario.rol.rolNombre}" rendered="#{loginBBean.funNivel>1}"/>
+                                    <!--xf:selectOneMenu entity="{funcionarioBBean.funcionario}" label="rolNombre" fieldLabel="rolNombre" fieldName="fuNivel" readonly="{loginBBean.funNivel>=1}">  
+                                    
+                                </xf:selectOneMenu--> 
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </p:fieldset>
+                        <p:fieldset legend="Datos de Ubicacion" >
+                            <h:panelGrid styleClass="tabla_formulario" columns="4">
+                                <xf:selectOneMenu rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel}" label="regNombre"
+                                                  entity="#{funcionarioBBean.funcionario.dependencia.aeropuerto.regional}"  fieldName="regId" readonly="#{loginBBean.funNivel>=2}"
+                                                  disabled="#{funcionarioBBean.funcionarioDepInformatica}" width="270px">  
+
+                                    <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
+                                    <p:ajax update="aeId,depId"  
+                                            listener="#{funcionarioBBean.cargarAeropuerto}" />  
+                                </xf:selectOneMenu> 
+
+
+                                <xf:selectOneMenu  readonly="#{loginBBean.funNivel>=2}"
+                                                   entity="#{funcionarioBBean.funcionario.dependencia.aeropuerto}" fieldName="aeId" label="aeNombre"
+                                                   disabled="#{funcionarioBBean.funcionarioDepInformatica}" width="270px">  
+
+                                    <f:selectItems value="#{funcionarioBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
+                                    <p:ajax update="depId"  
+                                            listener="#{funcionarioBBean.cargarDependencia}" /> 
+                                </xf:selectOneMenu> 
+
+                                <xf:selectOneMenu readonly="#{loginBBean.funNivel>=2}" label="depNombre"
+                                                  entity="#{funcionarioBBean.funcionario.dependencia}" fieldName="depId" required="true"
+                                                  width="270px">
+                                    <f:selectItems value="#{funcionarioBBean.listDependencia}" var="reg" itemValue="#{reg.depId}" itemLabel="#{reg.depNombre}"/>
+                                </xf:selectOneMenu>
+                            </h:panelGrid>
+                        </p:fieldset>
+                        <p:fieldset legend="Condiciones Especiales" >
+                            <h:panelGrid styleClass="tabla_formulario" columns="4">
+                                <xf:selectOneMenu entity="#{funcionarioBBean.funcionario}" fieldName="funHorasExtras" 
+                                                  readonly="#{loginBBean.funNivel>=2}" rendered="#{funcionarioBBean.editando}"
+                                                  width="200px">
+                                    <f:selectItem itemLabel="Si" itemValue="#{true}" />  
+                                    <f:selectItem itemLabel="No" itemValue="#{false}" />  
+                                    <p:ajax event="valueChange" update="funCantMaxHE,funHEExcedente" 
+                                            listener="#{funcionarioBBean.listenerHExtras}"/>
+                                </xf:selectOneMenu>                                                
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funCantMaxHE" 
+                                              readonly="#{loginBBean.funNivel>=2}" rendered="#{funcionarioBBean.editando}"
+                                              disabled="#{!funcionarioBBean.funcionario.funHorasExtras}"/> 
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funHEExcedente" 
+                                              readonly="#{loginBBean.funNivel>=2}" rendered="#{funcionarioBBean.editando}"
+                                              disabled="#{!funcionarioBBean.funcionario.funHorasExtras}"/> 
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funCatDom" 
+                                              rendered="#{funcionarioBBean.editando}"/> 
+                                <xf:selectOneMenu entity="#{funcionarioBBean.funcionario}" 
+                                                  rendered="#{funcionarioBBean.editando}"
+                                                  fieldName="funDescansoSemana" readonly="#{loginBBean.funNivel>=2}"
+                                                  width="200px">
+                                    <f:selectItem itemLabel="Si" itemValue="#{true}" />  
+                                    <f:selectItem itemLabel="No" itemValue="#{false}" />  
+                                </xf:selectOneMenu>                        
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funPuntaje" required="false"  
+                                              rendered="#{funcionarioBBean.editando}"/> 
+                                <xf:calendar entity="#{funcionarioBBean.funcionario}" fieldName="funFvCertmedico" required="false" 
+                                             rendered="#{funcionarioBBean.editando}"/>
+                                <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funCertMedico" required="false" 
+                                              rendered="#{funcionarioBBean.editando}"/>
+
+                                <xf:selectOneMenu entity="#{funcionarioBBean.funcionario}" fieldName="funEstado" 
+                                                  readonly="#{loginBBean.funNivel!=1}"
+                                                  rendered="#{funcionarioBBean.editando}"
+                                                  width="200px">  
+                                    <f:selectItem itemLabel="Activo" itemValue="Activo" />  
+                                    <f:selectItem itemLabel="Inactivo" itemValue="Inactivo" />
+                                    <f:selectItem itemLabel="Bloqueado" itemValue="Bloqueado" /> 
+                                </xf:selectOneMenu>
+
+                            </h:panelGrid>
+                        </p:fieldset>
+
+                    </h:panelGrid>
+                    <h:panelGrid columns="4">
+
+                        <f:facet name="footer" >
+                            <h:panelGroup>
+                                <h:commandButton  action="#{funcionarioBBean.guardar}" value="#{msg.guardar}"  />
+                                <h:commandButton  action="#{funcionarioBBean.filtrar}" value="#{msg.cancelar}" immediate="true" />
+                            </h:panelGroup>
+                        </f:facet>
+
+
+
+                    </h:panelGrid>
+                </h:form>
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

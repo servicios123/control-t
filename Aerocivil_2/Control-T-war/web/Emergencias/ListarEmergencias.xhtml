@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:p="http://primefaces.org/ui"
+     xmlns:xf="http://www.xfaces.com/jsf">
+<body>
+<ui:composition template="../template_interior.xhtml">
+
+  <ui:define name="titulo">
+      
+      <h:outputText value="#{msg.consultar} #{msg.emergencia}" ></h:outputText>
+       
+  </ui:define>
+
+  <ui:define name="contenido">
+       
+        <h:form>
+           
+            <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
+                <f:facet name="header" ><h:outputText value="#{msg.filtros}" ></h:outputText></f:facet>
+
+                 <xf:selectOneMenu  entity="#{emergenciasBBean.emergenciasFiltro.funcionario.dependencia.aeropuerto.regional}"  
+                                           fieldName="regId" rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel}">  
+                            <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
+                            <p:ajax update="aeId,depId"  
+                                    listener="#{emergenciasBBean.cargarAeropuertoListado}"  />  
+                        </xf:selectOneMenu> 
+                        
+                        <xf:selectOneMenu entity="#{emergenciasBBean.emergenciasFiltro.funcionario.dependencia.aeropuerto}" fieldName="aeId"
+                                         rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}"  >  
+                            <f:selectItems value="#{emergenciasBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
+                            <p:ajax update="depId"  
+                                    listener="#{emergenciasBBean.cargarDependenciaListado}" /> 
+                        </xf:selectOneMenu> 
+                        
+                <xf:selectOneMenu entity="#{emergenciasBBean.emergenciasFiltro.funcionario.dependencia}" 
+                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}" fieldName="depId">
+                    <f:selectItems value="#{emergenciasBBean.listDependencia}" var="reg" itemValue="#{reg.depId}" itemLabel="#{reg.depNombre}"/>
+                        </xf:selectOneMenu>
+                
+                <xf:calendar entity="#{emergenciasBBean.emergenciasFiltro}" fieldName="emFechaini" mindate="#{emergenciasBBean.current}"></xf:calendar>
+                <xf:calendar entity="#{emergenciasBBean.emergenciasFiltro}" fieldName="emFechafin" mindate="#{emergenciasBBean.current}"></xf:calendar>
+                
+                <f:facet name="footer">
+                    <h:commandButton  action="#{emergenciasBBean.filtrar}" value="#{msg.buscar}"  />            
+                </f:facet>
+
+           </h:panelGrid>
+        </h:form>
+        <br></br>
+        <h:form>
+            <p:dataTable value="#{emergenciasBBean.lista}" var="item" styleClass="tabla_lista"
+                         paginator="true" paginatorPosition="bottom" rows="15"  
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                         currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                         rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
+                         sortBy="#{item.emFechaini}"
+                         emptyMessage="#{msg.emptyList}">
+                <p:column rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel==4 || loginBBean.funcionarioTO.funcionario.fuNivel==5}">
+                    <f:facet name="header">
+                       
+                        <h:outputText value="#{msg.editar}" 
+                         />
+                    </f:facet>
+                    
+                   
+                    <h:commandLink value="#{msg.editar}" action="#{emergenciasBBean.editar}" 
+                                   >
+                        <f:setPropertyActionListener value="#{item}" target="#{emergenciasBBean.emergencias}" />
+                    </h:commandLink>
+                </p:column>
+                
+                <p:column sortBy="#{item.emFechaini}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.emFechaini}">
+                        </h:outputText>
+                    </f:facet>
+                    <h:outputText value="#{item.emFechaini}">
+                         <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                    </h:outputText>
+                </p:column>
+                <p:column sortBy="#{item.emHinicio}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.emHinicio}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.emHinicio}:#{item.emMinicio}"/>
+                </p:column>
+                <p:column sortBy="#{item.emFechafin}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.emFechafin}">
+                        </h:outputText>
+                    </f:facet>
+                    <h:outputText value="#{item.emFechafin}">
+                         <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                    </h:outputText>
+                </p:column>
+                 <p:column sortBy="#{item.emHfin}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.emHfin}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.emHfin}:#{item.emMfin}"/>
+                </p:column>
+                <p:column sortBy="#{item.funcionario.funAlias}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.funAlias}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.funcionario.funAlias}"/>
+                </p:column>
+                <p:column sortBy="#{item.funcionario.dependencia.depAbreviatura}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.depId}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.funcionario.dependencia.depAbreviatura}"/>
+                </p:column>
+                <p:column sortBy="#{item.funcionario.dependencia.aeropuerto.aeNombre}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.aeropuerto}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.funcionario.dependencia.aeropuerto.aeNombre}"/>
+                </p:column>
+                <p:column sortBy="#{item.funcionario.dependencia.aeropuerto.regional.regNombre}">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.regional}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.funcionario.dependencia.aeropuerto.regional.regNombre}"/>
+                </p:column>
+               
+            </p:dataTable>
+            <h:commandButton action="#{emergenciasBBean.crear}" value="#{msg.crear}" rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel==4 || loginBBean.funcionarioTO.funcionario.fuNivel==5 || loginBBean.funcionarioTO.funcionario.fuNivel==9}" />
+             
+        </h:form>
+
+  </ui:define>
+  
+</ui:composition>
+</body>
+</html>

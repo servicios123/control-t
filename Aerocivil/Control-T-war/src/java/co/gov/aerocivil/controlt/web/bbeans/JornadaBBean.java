@@ -81,12 +81,12 @@ public class JornadaBBean {
     }
 
     public String crear() {
-        
-        jorRestricciones=null;
-        jornadaOpAnteriorChecked=false;
-        editando=false;        
-        
-        
+
+        jorRestricciones = null;
+        jornadaOpAnteriorChecked = false;
+        editando = false;
+
+
         Dependencia dependencia = new Dependencia();
 
         Regional regional = new Regional();
@@ -102,76 +102,76 @@ public class JornadaBBean {
     }
 
     public String editar() {
-        
-        jorDisponibles = jornadaService.getListaJornadasDisponibles
-        (this.jornada.getDependencia(), jornada.getJoId());
+
+        jorDisponibles = jornadaService.getListaJornadasDisponibles(this.jornada.getDependencia(), jornada.getJoId());
         jorRestricciones = new Long[jorDisponibles.size()];
-        jornadaOpAnteriorChecked=false;
-        if(jornada.getJornadaObligatoria()!=null){
-            this.jornadaOpAnteriorChecked=true;
+        jornadaOpAnteriorChecked = false;
+        if (jornada.getJornadaObligatoria() != null) {
+            this.jornadaOpAnteriorChecked = true;
         }
         //System.out.println("jorDisponibles.size(): " + jorDisponibles.size());
         List<BigDecimal> lista = jornadaService.getListaJornadasRestriccion(this.jornada);
-        int i=0;
-        for (BigDecimal bd:lista){
-            jorRestricciones[i++] = bd.longValue();
-        }        
-        editando=true;
-        jorOpAnterior = jornadaService.getJornadaAnterior(this.jornada);
-        if(jorOpAnterior!=null){
-            msgJornadaAnteriorRequerida = JsfUtil.formatMessage("jornadaAnteriorRequerida", 
-                    jorOpAnterior.getJoAlias()+" ("+jorOpAnterior.getJoHoraInicio()+"-"+jorOpAnterior.getJoHoraFin()+")", 
-                    this.jornada.getJoAlias());
+        int i = 0;
+        for (BigDecimal bd : lista) {
+            try {
+                jorRestricciones[i++] = bd.longValue();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        else{
-            msgJornadaAnteriorRequerida="";
+        editando = true;
+        jorOpAnterior = jornadaService.getJornadaAnterior(this.jornada);
+        if (jorOpAnterior != null) {
+            msgJornadaAnteriorRequerida = JsfUtil.formatMessage("jornadaAnteriorRequerida",
+                    jorOpAnterior.getJoAlias() + " (" + jorOpAnterior.getJoHoraInicio() + "-" + jorOpAnterior.getJoHoraFin() + ")",
+                    this.jornada.getJoAlias());
+        } else {
+            msgJornadaAnteriorRequerida = "";
         }
 
         /*cargarAeropuerto(jornada);
          cargarDependencia(jornada);*/
 
 //        if (cons == false) {
-            return "configurarJornada";
+        return "configurarJornada";
         /*} else {
-            return "configurarJornada";
-        }*/
+         return "configurarJornada";
+         }*/
 
         /*cargarAeropuerto(jornada);
          cargarDependencia(jornada);*/
 
         /*if (cons == false) {
-            return "editarJornada";
-        } else {
-            return "configurarJornada";
-        }*/
+         return "editarJornada";
+         } else {
+         return "configurarJornada";
+         }*/
     }
 
     public String guardar() {
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         jornada.setDependencia(logbbean.getFuncionarioTO().getFuncionario().getDependencia());
         jornada.setJoAlias(jornada.getJoAlias().toUpperCase());
-        try{
+        try {
             this.listaJornadaRestriccion = new ArrayList<Jornada>();
-            if(jorRestricciones!=null){
-                for(Long i:jorRestricciones){
+            if (jorRestricciones != null) {
+                for (Long i : jorRestricciones) {
                     Jornada j = new Jornada(i);
-                    j=(Jornada) JsfUtil.getListadosBBean().obtenerObjById(Jornada.class, j.getJoId());
+                    j = (Jornada) JsfUtil.getListadosBBean().obtenerObjById(Jornada.class, j.getJoId());
                     this.listaJornadaRestriccion.add(j);
                 }
             }
-            if(jornadaOpAnteriorChecked){
+            if (jornadaOpAnteriorChecked) {
                 jornada.setJornadaObligatoria(this.jorOpAnterior);
-            }
-            else{
+            } else {
                 jornada.setJornadaObligatoria(null);
             }
             jornada.setJornadasRestriccion(this.listaJornadaRestriccion);
-            jornada=jornadaService.guardar(jornada, 
-                JsfUtil.getFuncionarioSesion());
+            jornada = jornadaService.guardar(jornada,
+                    JsfUtil.getFuncionarioSesion());
             JsfUtil.addSuccessMessage("genericSingleSaveSuccess");
             return editar();
-        }
-        catch(Exception ex){
+        } catch (Exception ex) {
             JsfUtil.addWarningMessage("jornadaDependenciaAsignada");
             return null;
         }
@@ -193,9 +193,10 @@ public class JornadaBBean {
         dependencia.setAeropuerto(aeropuerto);
         listAeropuerto = null;
         listDependencia = null;
+        jornadaFiltro.setJoEstado("Activo");
 
-       // FuncionarioBBean funcBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);
-        
+        // FuncionarioBBean funcBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);
+
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         if (logbbean.isFuncionarioEnNivel(new RolEnum[]{RolEnum.NIVEL_A2})) {
 

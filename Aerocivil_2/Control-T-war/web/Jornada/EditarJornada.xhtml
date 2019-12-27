@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"      
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.editar} #{msg.jornada}" rendered="#{jornadaBBean.jornada.joId!=null}" ></h:outputText>
+                <h:outputText value="#{msg.crear} #{msg.jornada}" rendered="#{jornadaBBean.jornada.joId==null}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                <h:form>
+                    <h:panelGrid styleClass="tabla_formulario" columns="2">
+
+
+
+
+                        <xf:inputText entity="#{jornadaBBean.jornada}" fieldName="joAlias" required="true" />
+
+                        <xf:timeSelector entity="#{jornadaBBean.jornada}" fieldName="joHoraInicio" minFieldName="joMinutoInicio" required="true" />
+                        <xf:timeSelector entity="#{jornadaBBean.jornada}" fieldName="joHoraFin" minFieldName="joMinutoFin" required="true" />
+                        <xf:selectOneMenu entity="#{jornadaBBean.jornada}" fieldName="joEstado" required="true">  
+                            <f:selectItem itemLabel="Activo" itemValue="Activo" />  
+                            <f:selectItem itemLabel="Inactivo" itemValue="Inactivo" /> 
+                        </xf:selectOneMenu>
+                        <f:facet name="footer">
+                            <h:commandButton  action="#{jornadaBBean.guardar}" value="#{msg.guardar}"  />
+                            <h:commandButton  action="#{jornadaBBean.filtrar}" value="#{msg.cancelar}" immediate="true" />
+                        </f:facet>
+                    </h:panelGrid>
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

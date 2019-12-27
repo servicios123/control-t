@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.asignar} #{msg.posiciones} #{msg.funcionario}"  ></h:outputText>
+
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                <style>
+                    .tabla_info_basica tr td:nth-child(odd)
+                    {
+                        font-weight:bold;
+                        width:20%;
+                    }
+                     .tabla_info_basica tr td:nth-child(even)
+                    {                        
+                        width:30%;
+                    }
+                </style>
+                
+                <h:form>
+                    
+                    <h:panelGrid styleClass="tabla_formulario tabla_info_basica" border="1" cellpadding="3" cellspacing="0" columns="4">
+
+                        <xf:inputText entity="#{posicionHabilitadaBBean.funcionario}" fieldName="funId" readonly="true" />                        
+                        <xf:inputText entity="#{posicionHabilitadaBBean.funcionario}" fieldName="funNombre" readonly="true"  />
+                        <xf:inputText entity="#{posicionHabilitadaBBean.funcionario}" fieldName="rolName" readonly="true"  /> 
+                        
+                        
+                        <xf:inputText entity="#{posicionHabilitadaBBean.funcionario}" fieldName="funAlias" readonly="true"  /> 
+                        
+                        <xf:inputText entity="#{posicionHabilitadaBBean.funcionario}" fieldName="funTelefono" readonly="true"  /> 
+                        <xf:inputText entity="#{posicionHabilitadaBBean.funcionario}" fieldName="funCelular" readonly="true"  /> 
+                        <xf:calendar entity="#{posicionHabilitadaBBean.funcionario}" fieldName="funFIngreso" readonly="true"  /> 
+                        <xf:calendar entity="#{posicionHabilitadaBBean.funcionario}" fieldName="funFuTraslado" readonly="true"  /> 
+                        <xf:calendar entity="#{posicionHabilitadaBBean.funcionario}" fieldName="funFvCurso" readonly="true"  /> 
+                        <xf:calendar entity="#{posicionHabilitadaBBean.funcionario}" fieldName="funFvEvaluacion" readonly="true"  /> 
+                        <xf:inputText entity="#{posicionHabilitadaBBean.funcionario}" fieldName="funSueldo" readonly="true"  /> 
+                        
+                        <xf:inputText entity="#{posicionHabilitadaBBean.funcionario}" fieldName="funGrado" readonly="true"  /> 
+                        
+                        <xf:inputText entity="#{posicionHabilitadaBBean.funcionario}" fieldName="funEstado" readonly="true"  /> 
+                        <xf:inputText entity="#{posicionHabilitadaBBean.funcionario.dependencia.aeropuerto.regional}" fieldName="regNombre" readonly="true"  /> 
+                        <xf:inputText entity="#{posicionHabilitadaBBean.funcionario.dependencia.aeropuerto}" fieldName="aeNombre" readonly="true"  /> 
+                        <xf:inputText entity="#{posicionHabilitadaBBean.funcionario.dependencia}" fieldName="depNombre" readonly="true"  /> 
+
+                        <h:outputLabel value="#{msg.funHorasExtras}"/>
+                        <h:outputText value="#{funcionarioBBean.funcionario.funHorasExtras!=null and funcionarioBBean.funcionario.funHorasExtras?'Si':'No'}"/>
+                        <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funCantMaxHE" readonly="true"/>
+                        <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funHEExcedente" readonly="true"/>
+                        <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funCatDom" readonly="true"/>
+                        <h:outputLabel value="#{msg.funDescansoSemana}"/>
+                        <h:outputText value="#{funcionarioBBean.funcionario.funDescansoSemana!=null and funcionarioBBean.funcionario.funDescansoSemana?'Si':'No'}"/>
+                        <xf:inputText entity="#{funcionarioBBean.funcionario}" fieldName="funPuntaje" required="false"  
+                                      rendered="#{4==loginBBean.funcionarioTO.funcionario.fuNivel}"/> 
+
+                        
+
+                  </h:panelGrid>
+                    <br/>
+                    <h:commandButton value="#{msg.ver} #{msg.cursosRecurrentes}" onclick="cursosPopup.show();return false" rendered="#{false}"/>
+                    <h:commandButton value="#{msg.ver} #{msg.evaluaciones}" onclick="evaluacionPopup.show();return false" rendered="#{false}"/>
+                     
+                     <h:outputLabel  value="Posiciones habilitadas"></h:outputLabel>
+                    <h:panelGrid styleClass="tabla_formulario" columns="2">
+                        
+                        <xf:selectManyCheckbox  value="#{posicionHabilitadaBBean.listadoPosiciones}" >  
+
+                            <f:selectItems value="#{posicionHabilitadaBBean.listPosicion}" var="regi" itemValue="#{regi.posId}" itemLabel="#{regi.posicionNacional.siglaPosicion}" itemLabelEscaped="false"/>  
+                           
+                        </xf:selectManyCheckbox> 
+                        
+                        
+                        <f:facet name="footer">
+                            <h:panelGroup>
+                                <h:commandButton action="#{posicionHabilitadaBBean.guardarAsignacion}" value="#{msg.guardar}" />
+                                <h:commandButton action="#{funcionarioBBean.filtrar}" value="#{msg.cancelar}" immediate="true" />
+                            </h:panelGroup>
+                        </f:facet>
+                    </h:panelGrid>
+                </h:form>
+                  <style>
+                .ui-selectmanycheckbox 
+                {
+                    overflow:hidden;
+                }  
+                .ui-selectmanycheckbox tbody tr
+                {
+                    float:left;
+                    width:70px;
+                }
+                </style>
+                <ui:include src="popupsCursosEvaluaciones.xhtml">
+                    <ui:param name="funcionario" value="#{posicionHabilitadaBBean.funcionario}"/>
+                </ui:include>
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.editar} #{msg.diarioSenal}" rendered="#{diarioSenalBBean.diarioSenal.dsenId!=null}" ></h:outputText>
+                <h:outputText value="#{msg.crear} #{msg.diarioSenal}" rendered="#{diarioSenalBBean.diarioSenal.dsenId==null}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+
+                <h:form>
+                    <h:panelGrid styleClass="tabla_formulario" columns="2">
+                        <h:outputText value="#{msg.lugarSuceso}"/>
+
+                        <h:panelGroup>
+                            <p:selectOneMenu id="depId" value="#{diarioSenalBBean.dependencia}" required="true" >
+                                <f:selectItems value="#{diarioSenalBBean.dependenciaList}" var="ts" itemValue="#{ts.value}" itemLabel="#{ts.label}"/>
+                            </p:selectOneMenu>
+                            <br/>
+                            <h:message id="depIdMessage" 
+                                       styleClass="error" 
+                                       for="depId" />
+                        </h:panelGroup>
+                        <h:outputText value="#{msg.lugarSuceso}"/>
+                        <p:selectOneMenu value="#{diarioSenalBBean.diarioSenal.dsTipo.dstId}" required="true">
+                            <f:selectItems value="#{diarioSenalBBean.listDsTipo}" var="ts" itemValue="#{ts.dstId}" itemLabel="#{ts.dstNombre}"/>
+                        </p:selectOneMenu>
+                        <xf:calendar entity="#{diarioSenalBBean.diarioSenal}" fieldName="dsenFechaSuceso" required="true" mindate="#{currentDate}"
+                                     readonly="true"/>
+                        <xf:timeSelectorDSenal entity="#{diarioSenalBBean.diarioSenal}" fieldName="dsenHoraSuceso" minFieldName="dsenMinSuceso" required="true" label="dsenHoraSucesoLbl"/>
+                        <xf:textArea entity="#{diarioSenalBBean.diarioSenal}" fieldName="dsenDescripcion" required="true" rows="18" cols="100" 
+                                     maxlength="4000"/> 
+                        <xf:selectBooleanCheckbox entity="#{diarioSenalBBean.diarioSenal}" fieldName="resaltar">
+                            <f:selectItem itemValue="#{false}" itemLabel="#{msg.jornadaExtra}"/>
+                        </xf:selectBooleanCheckbox>
+                        <h:commandButton  action="#{diarioSenalBBean.guardar}" value="#{msg.guardar}"  />
+                        <!--xf:inputText entity="{diarioSenalBBean.diarioSenal}" fieldName="dsenLugarSuceso" required="true" /-->
+
+                    </h:panelGrid>
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

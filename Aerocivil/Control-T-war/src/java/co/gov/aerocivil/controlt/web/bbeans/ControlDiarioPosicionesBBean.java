@@ -71,16 +71,12 @@ public class ControlDiarioPosicionesBBean {
     }
     @EJB
     private ControlDiarioPosicionesService service;
-    
     @EJB
     private ListasService listasService;
-    
     @EJB
     private FuncionarioService funcService;
-    
     @EJB
     private TurnoService turnoService;
-    
     private DiarioPosicion diario;
     private DiarioPosicion diarioFiltro;
     private Dependencia dependenciaFiltro;
@@ -113,12 +109,12 @@ public class ControlDiarioPosicionesBBean {
         precargarFiltros();
         return "consultarDiario";
     }
-    
-    public String generarReporteDiarioGeneral(){
-        TurnosProgVsEjecutadosBBean turnosBBean = 
+
+    public String generarReporteDiarioGeneral() {
+        TurnosProgVsEjecutadosBBean turnosBBean =
                 (TurnosProgVsEjecutadosBBean) JsfUtil.getManagedBean(TurnosProgVsEjecutadosBBean.class);
         turnosBBean.precargarFiltros();
-        turnosBBean.getProgramacionFiltro().setDependencia(dependenciaFiltro);        
+        turnosBBean.getProgramacionFiltro().setDependencia(dependenciaFiltro);
         turnosBBean.getProgramacionFiltro().setProFechaInicio(diarioFiltro.getTurno().getTurFecha());
         turnosBBean.generarReporte();
         return null;
@@ -139,9 +135,9 @@ public class ControlDiarioPosicionesBBean {
                     DiarioPosicion dp = new DiarioPosicion();
                     dp.setDposTipoRealizacion(TURNO_NORMAL);
                     dp.setDposHoraIngreso(jornadaFiltro.getJoHoraInicio());
-                    dp.setDposMinutoIngreso(jornadaFiltro.getJoMinutoInicio());                    
+                    dp.setDposMinutoIngreso(jornadaFiltro.getJoMinutoInicio());
                     dp.setDposHoraSalida(jornadaFiltro.getJoHoraFin());
-                    dp.setDposMinutoSalida(jornadaFiltro.getJoMinutoFin());                    
+                    dp.setDposMinutoSalida(jornadaFiltro.getJoMinutoFin());
                     dp.setTurno(vp);
                     vp.setDiarioPosicion(dp);
                 } else {
@@ -170,6 +166,7 @@ public class ControlDiarioPosicionesBBean {
         diarioFiltro = new DiarioPosicion();
         diarioFiltro.setFuncionario(fun);
         diarioFiltro.setTurno(new Vistaprogramacion());
+        dataModel = new ListDataModel<Vistaprogramacion>();
     }
 
     public void actualizar() {
@@ -177,7 +174,7 @@ public class ControlDiarioPosicionesBBean {
         //System.out.println(dataModel.getRowData() + "- " + dataModel.getRowData().getTurId());
         Vistaprogramacion vp = dataModel.getRowData();
         DiarioPosicion diario2 = vp.getDiarioPosicion();
-        if (diario2.getFuncionario().getFunAlias()==null || "".equals(diario2.getFuncionario().getFunAlias().trim())){
+        if (diario2.getFuncionario().getFunAlias() == null || "".equals(diario2.getFuncionario().getFunAlias().trim())) {
             diario2.setFuncionario(new Funcionario());
             JsfUtil.addWarningMessage("funcionarioAliasRequerido");
             return;
@@ -213,14 +210,14 @@ public class ControlDiarioPosicionesBBean {
         if (diario2.getDposFechaRegistroInicio() == null && diario2.getDposHoraIngreso() != null && diario2.getDposMinutoIngreso() != null) {
             diario2.setDposFechaRegistroInicio(new Date());
         }
-        
+
         diario2.setDposRetardo(DateUtil.getTimeDiff(
                 diario2.getDposHoraIngreso(), diario2.getDposMinutoIngreso(),
                 vp.getTurHInicio(), vp.getTurMInicio(),
                 UnitTimeEnum.MINUTES));
 
         diario2.setSupervisor(JsfUtil.getFuncionarioSesion());
-        if ("HE".equals(diario2.getDposTipoRealizacion())){
+        if ("HE".equals(diario2.getDposTipoRealizacion())) {
             Turno turno = new Turno();
             turno.setTurTurnoOriginal(vp.getTurId());
             turno.setTurTipo(10L);
@@ -237,15 +234,15 @@ public class ControlDiarioPosicionesBBean {
         }
         diario2 = service.guardar(diario2,
                 JsfUtil.getFuncionarioSesion());
-        if(diario2.getDposNotificacion()!=null && diario2.getFuncionario().getFunCorreoElectronico()!=null
-                && !"".equals(diario2.getFuncionario().getFunCorreoElectronico().trim())){            
+        if (diario2.getDposNotificacion() != null && diario2.getFuncionario().getFunCorreoElectronico() != null
+                && !"".equals(diario2.getFuncionario().getFunCorreoElectronico().trim())) {
             MailUtil mailUtil = new MailUtil(
                     JsfUtil.getListadosBBean().getParametrosSistema().get(ParametrosEnum.mail_server.name()),
                     JsfUtil.getListadosBBean().getParametrosSistema().get(ParametrosEnum.mail_port.name()),
-                    JsfUtil.getListadosBBean().getParametrosSistema().get(ParametrosEnum.mail_from.name())
-                    );            
+                    JsfUtil.getListadosBBean().getParametrosSistema().get(ParametrosEnum.mail_from.name()));
+            //Cambiar condicion
             mailUtil.sendEmail(diario2.getFuncionario().getFunCorreoElectronico(),
-                    "Notificación","I".equals(diario2.getDposNotificacion())?"Incumplimiento":"Retardo");
+                    "Notificación", "I".equals(diario2.getDposNotificacion()) ? "Incumplimiento" : "Retardo");
         }
 
         //service.flush(diario2);
@@ -269,9 +266,9 @@ public class ControlDiarioPosicionesBBean {
 
     public String cerrarDiario() {
         List<DiarioPosicion> listaDPos = new ArrayList<DiarioPosicion>();
-        
+
         //recorrer diarios y dposCerrado
-        if (listaTurnos!=null){
+        if (listaTurnos != null) {
             for (Vistaprogramacion vp : listaTurnos) {
                 DiarioPosicion dp = vp.getDiarioPosicion();
 
@@ -284,23 +281,23 @@ public class ControlDiarioPosicionesBBean {
 
                 //dp.setDposCerrado(true);            
                 /*service.guardar(dp,
-                        JsfUtil.getFuncionarioSesion());*/
+                 JsfUtil.getFuncionarioSesion());*/
 
-                if (dp.getFuncionario() != null && dp.getFuncionario().getFunId()!=null) {
+                if (dp.getFuncionario() != null && dp.getFuncionario().getFunId() != null) {
                     listaDPos.add(dp);
                 } /*else {
-                    diarioCerrado=false;
-                    JsfUtil.addWarningMessage("noCierreControlDiario");
-                    return null;
-                }*/
+                 diarioCerrado=false;
+                 JsfUtil.addWarningMessage("noCierreControlDiario");
+                 return null;
+                 }*/
             }
         }
         diarioCerrado = true;
         for (DiarioPosicion dp : listaDPos) {
             dp.setDposCerrado(true);
             //if (dp.getDposId() != null) {
-                service.guardar(dp,
-                        JsfUtil.getFuncionarioSesion());
+            service.guardar(dp,
+                    JsfUtil.getFuncionarioSesion());
             //}
         }
         return "";
@@ -376,6 +373,7 @@ public class ControlDiarioPosicionesBBean {
     }
     List<DiarioPosicionesIndividualVista[]> lista;
     List<ControlDiarioFuncionarioTO> listaReporte;
+
     public String filtrarDiarioIndividual() {
         lista = new ArrayList<DiarioPosicionesIndividualVista[]>();
         Funcionario f = ((FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class)).getFuncionarioFiltro();
@@ -390,9 +388,13 @@ public class ControlDiarioPosicionesBBean {
         listaDiarioPosIndiv = service.getListaDiarioPosicionesIndividual(f, DateUtil.getFirstDayMonth(c.getTime()),
                 DateUtil.getLastDayMonth(c.getTime()));
         for (DiarioPosicionesIndividualVista dp : listaDiarioPosIndiv) {
-            DiarioPosicionesIndividualVista[] dposArr = mapa.get(dp.getDia());
-            dposArr[dp.getTurTipo() - 1] = dp;
-            mapa.put(dp.getDia(), dposArr);
+            try {
+                DiarioPosicionesIndividualVista[] dposArr = mapa.get(dp.getDia());
+                dposArr[dp.getTurTipo() - 1] = dp;
+                mapa.put(dp.getDia(), dposArr);
+            } catch (Exception e) {
+                mapa.put(dp.getDia(), new DiarioPosicionesIndividualVista[2]);
+            }
         }
         for (int i = 1; i < 31; i++) {
             DiarioPosicionesIndividualVista[] arr = mapa.get(i);
@@ -439,28 +441,27 @@ public class ControlDiarioPosicionesBBean {
         this.lista = lista;
     }
 
-    public String exportPDF(){
-        
+    public String exportPDF() {
+
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
-        
+
         java.util.HashMap<String, Object> map = new HashMap<String, Object>();
         HashMap<String, String> params = listasService.getParametrosSistema();
-        
-        Funcionario f = ((FuncionarioBBean) 
-                JsfUtil.getManagedBean(FuncionarioBBean.class)).getFuncionarioFiltro();
+
+        Funcionario f = ((FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class)).getFuncionarioFiltro();
         f = funcService.getFuncionarioById(f);
         map.put("funcionario", f.getFunNombre());
-        
-                
+
+
         map.put("clave", logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepcategoria().getDcClaveDp());
         map.put("version", logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepcategoria().getDcVersionDp());
         map.put("fechaFormato", DateUtil.formatDate(logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepcategoria().getDcFechaDp()));
-        
+
         map.put("dependencia", f.getDependencia().getDepNombre());
         map.put("depAbrev", f.getDependencia().getDepAbreviatura());
 
-        map.put("aeropuerto", f.getDependencia().getAeropuerto().getAeNombre());        
-        String periodo = Months.getMonth(this.mes).getLabel().toUpperCase()+" DEL "+anio;
+        map.put("aeropuerto", f.getDependencia().getAeropuerto().getAeNombre());
+        String periodo = Months.getMonth(this.mes).getLabel().toUpperCase() + " DEL " + anio;
         map.put("periodo", periodo);
         map.put("sigla", f.getFunAlias());
         map.put("jefe", funcService.getJefeDependencia(f.getDependencia().getDepId()).getFunNombre());
@@ -472,12 +473,12 @@ public class ControlDiarioPosicionesBBean {
 
     private List<ControlDiarioFuncionarioTO> loadListaReporte() {
         listaReporte = new ArrayList<ControlDiarioFuncionarioTO>();
-        for(DiarioPosicionesIndividualVista[] obj:lista){
+        for (DiarioPosicionesIndividualVista[] obj : lista) {
             ControlDiarioFuncionarioTO item = new ControlDiarioFuncionarioTO();
             /*if(obj[0]==null){
-                obj[0] = new DiarioPosicionesIndividualVista();
-            }*/
-            if(obj[1]==null){
+             obj[0] = new DiarioPosicionesIndividualVista();
+             }*/
+            if (obj[1] == null) {
                 obj[1] = new DiarioPosicionesIndividualVista();
             }
             item.setJorOrdinaria(obj[0]);
@@ -487,8 +488,4 @@ public class ControlDiarioPosicionesBBean {
         return listaReporte;
 
     }
-    
-    
-    
-    
 }

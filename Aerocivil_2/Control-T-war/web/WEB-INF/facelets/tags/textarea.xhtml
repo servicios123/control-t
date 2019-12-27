@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui">
+    <ui:composition>
+        <h:outputLabel id="${fieldName}Label" 
+                       value="#{msg[fieldName]}" for="#{fieldName}"
+                       styleClass="${required and !readonly?'required':''}"/>        
+        <h:outputText id="#{fieldName}_ou" value="#{entity[fieldName]}" rendered="${readonly}"/>
+        <h:panelGroup rendered="${!readonly}">
+            <c:if test="${maxlength!=null}">
+                <p:inputTextarea rows="#{rows}" cols="#{cols}"  value="#{entity[fieldName]}" required="${required}" maxlength="${maxlength}" style="background: #fff; color: #253979;" />  
+            </c:if>
+            <c:if test="${maxlength==null}">
+                <p:inputTextarea rows="#{rows}" cols="#{cols}"  value="#{entity[fieldName]}" required="${required}" style="background: #fff; color: #253979;" />  
+            </c:if>
+            <br/>
+            <h:message id="${id}Message" 
+                       styleClass="error"
+                       for="#{fieldName}" />
+        </h:panelGroup>
+    </ui:composition>
+</html>

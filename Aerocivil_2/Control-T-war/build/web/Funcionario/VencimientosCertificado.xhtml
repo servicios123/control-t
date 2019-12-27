@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.consultar} #{msg.VencimientoCertMedico}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+
+                <br></br>
+                <h:form>
+                    <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
+            <f:facet name="header" >
+                <h:outputText value="#{msg.filtros}" />
+            </f:facet>
+
+            <xf:inputText entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="funNombre" />
+            <xf:inputText entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="funId" />
+            <xf:inputText entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="funAlias" />
+            <xf:selectOneMenu rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel}"
+                              entity="#{funcionarioBBean.funcionarioFiltro.dependencia.aeropuerto.regional}" fieldName="regId">  
+
+                <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
+                <p:ajax update="aeId,depId"  
+                        listener="#{funcionarioBBean.cargarAeropuertoListado}" />  
+            </xf:selectOneMenu> 
+            
+
+            <xf:selectOneMenu rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}"
+                              entity="#{funcionarioBBean.funcionarioFiltro.dependencia.aeropuerto}" fieldName="aeId">  
+
+                <f:selectItems value="#{funcionarioBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
+                <p:ajax update="depId"  
+                        listener="#{funcionarioBBean.cargarDependenciaListado}" /> 
+            </xf:selectOneMenu> 
+            
+            <xf:selectOneMenu rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}" 
+                              
+                              entity="#{funcionarioBBean.funcionarioFiltro.dependencia}"  fieldName="depId" >                            
+                <f:selectItems value="#{funcionarioBBean.listDependencia}" var="res" itemValue="#{res.depId}" itemLabel="#{res.depNombre}"/>
+            </xf:selectOneMenu>
+
+            <xf:calendar entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="fechaini"></xf:calendar>
+            <xf:calendar entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="fechafin"></xf:calendar>
+
+            <f:facet name="footer" >
+                
+                <h:commandButton  actionListener="#{funcionarioBBean.filtrar_vencimiento_certificado}" value="#{msg.buscar}" />
+            </f:facet>
+
+
+
+        </h:panelGrid>   
+                    
+                    <p:dataTable value="#{funcionarioBBean.lazyList}" var="item" styleClass="tabla_lista"
+                                 paginator="true" paginatorPosition="bottom" rows="15"  
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                 rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true">
+                        
+                         <p:column sortBy="#{item.funId}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.funId}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funId}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.funNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.nombre}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.funAlias}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.funAlias}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funAlias}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dependencia.aeropuerto.regional.regNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.regNombre}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dependencia.aeropuerto.regional.regNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dependencia.aeropuerto.aeNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.aeNombre}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dependencia.aeropuerto.aeNombre}"/>
+                        </p:column>
+                        
+                        <p:column sortBy="#{item.dependencia.depNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dependencia}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dependencia.depNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.funFvCertmedico}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.funFvCertmedico}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funFvCertmedico}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                            </h:outputText>
+                        </p:column>
+                        
+
+                    </p:dataTable>
+
+
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

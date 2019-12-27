@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.configuracionJornadas}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+
+                <h:form>
+
+                    <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
+                        <f:facet name="header" ><h:outputText value="#{msg.filtros}" ></h:outputText></f:facet>
+                        <xf:inputText entity="#{jornadaBBean.jornadaFiltro}" fieldName="joAlias" required="false" />                        
+
+                        <xf:selectOneMenu  entity="#{jornadaBBean.jornadaFiltro.dependencia.aeropuerto.regional}"  
+                                           fieldName="regId" rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel}">  
+                            <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
+                            <p:ajax update="aeId,depId"  
+                                    listener="#{jornadaBBean.cargarAeropuertoListado}"  />  
+                        </xf:selectOneMenu> 
+
+                        <xf:selectOneMenu entity="#{jornadaBBean.jornadaFiltro.dependencia.aeropuerto}" 
+                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}" fieldName="aeId">  
+                            <f:selectItems value="#{jornadaBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
+                            <p:ajax update="depId"  
+                                    listener="#{jornadaBBean.cargarDependenciaListado}" /> 
+                        </xf:selectOneMenu> 
+                        
+                        <xf:selectOneMenu entity="#{jornadaBBean.jornadaFiltro.dependencia}" 
+                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}" fieldName="depId">
+                            <f:selectItems value="#{jornadaBBean.listDependencia}" var="reg" itemValue="#{reg.depId}" itemLabel="#{reg.depNombre}"/>
+                        </xf:selectOneMenu>
+                        
+                        <xf:selectOneMenu entity="#{jornadaBBean.jornadaFiltro}" fieldName="joEstado" >  
+                            <f:selectItem itemLabel="Activo" itemValue="Activo"/>  
+                            <f:selectItem itemLabel="Inactivo" itemValue="Inactivo" /> 
+                        </xf:selectOneMenu>
+                        <h:commandButton  action="#{jornadaBBean.filtrar}" value="#{msg.buscar}"  />            
+
+                    </h:panelGrid>
+                </h:form>
+                <br></br>
+                <h:form>
+                    <p:dataTable value="#{jornadaBBean.lista}" var="item" styleClass="tabla_lista"
+                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                 rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
+                                 sortBy="#{item.joHoraInicio}" paginatorAlwaysVisible="false"
+                                 emptyMessage="#{msg.emptyList}">
+                        <p:column rendered="#{loginBBean.funNivel == 4}" style="width: 5%">
+                            <f:facet name="header" >
+                                <h:outputText value="#{msg.editar}"/>
+                            </f:facet>
+                            <h:commandLink value="#{msg.editar}" action="#{jornadaBBean.editar}" >
+                                <f:setPropertyActionListener value="#{item}" target="#{jornadaBBean.jornada}"/>
+                            </h:commandLink>
+                        </p:column>
+                        <p:column sortBy="#{item.joAlias}" style="width: 9%; text-align: center;">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.jornada}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.joAlias}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.joHoraInicio}" style="width: 12%; text-align: center;" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.joHoraInicio}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.joHoraInicio}:#{item.joMinutoInicio}" />
+                        </p:column>
+                        <p:column sortBy="#{item.joHoraFin}" style="width: 12%; text-align: center;">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.joHoraFin}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.joHoraFin}:#{item.joMinutoFin}" />
+                        </p:column>
+                        
+                        <p:column sortBy="#{item.joEstado}" style="width: 12%">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.joEstado}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.joEstado}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dependencia.aeropuerto.regional.regNombre}" style="width: 15%">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.regional}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dependencia.aeropuerto.regional.regNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dependencia.aeropuerto.aeNombre}" style="width: 18%">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.aeropuerto}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dependencia.aeropuerto.aeNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dependencia.depNombre}" style="width: 18%">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dependencia}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dependencia.depNombre}"/>
+                        </p:column>
+
+                    </p:dataTable>
+                    <br/>
+                    <h:commandButton action="#{jornadaBBean.crear}" value="#{msg.crear} #{msg.jornada}" rendered="#{loginBBean.funNivel == 4}"  />
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

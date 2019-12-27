@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui">
+    <ui:composition>
+        <c:if test="${empty rendered}">
+            <c:set var="rendered" value="true"/>
+        </c:if>
+        
+        <c:if test="${empty id}">
+            <c:set var="id" value="${fieldName}"/>
+        </c:if>
+        <c:if test="${empty label}">
+            <c:set var="label" value="#{msg[fieldName]}"/>
+        </c:if>
+        <c:if test="${empty disabled}">
+            <c:set var="disabled" value="#{false}"/>
+        </c:if>
+        <c:if test="${empty tabindex}">
+            <c:set var="tabindex" value="0"/>
+        </c:if>
+        
+         <c:if test="${rendered}">
+        <h:outputLabel id="${id}Label"
+                       value="${label}" for="#{fieldName}"
+                       styleClass="${required and !readonly?'required':''}"/>        
+        <h:outputText id="${id}_ou" value="#{entity[fieldName]}" rendered="${readonly}"/>
+        <h:panelGroup rendered="${!readonly}">
+            <p:inputText id="#{id}" value="#{entity[fieldName]}" tabindex="${tabindex}"
+                         required="${required}" disabled="${disabled}" styleClass="${styleClass}"
+                         validatorMessage="${validatorMessage}" style="${style}}">
+                <ui:insert />
+            </p:inputText>        
+            <br/>
+            <h:message id="${id}Message" 
+                       styleClass="error"
+                       for="#{fieldName}" />
+        </h:panelGroup>
+         </c:if>
+    </ui:composition>
+</html>

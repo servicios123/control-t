@@ -101,7 +101,7 @@ public class ReportesBBean {
         try {
             map.put("sueldo", new Double(repHExtFiltro.getFuncionario().getFunSueldo().doubleValue()));
         } catch (Exception e) {
-            map.put("jefe", new Double("0"));
+            map.put("jefe", funService.getJefeDependencia(null));
         }
         for (RepHorasExtras repHX : lista) {
             repHX.setCol14(DateUtil.formatJornada(repHX.getCol14()));

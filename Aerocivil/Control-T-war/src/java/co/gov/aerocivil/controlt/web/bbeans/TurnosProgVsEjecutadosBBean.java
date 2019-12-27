@@ -40,17 +40,21 @@ public class TurnosProgVsEjecutadosBBean {
     private ListasService listasService;
 
     private Dependencia dependenciaFiltro;
-    private LazyDataModel<Vistaprogramacion> lazyList;
+//    private LazyDataModel<Vistaprogramacion> lazyList;
+    private List<Vistaprogramacion> lazyList;
     private List<Vistaprogramacion> lista;
     
+    
+    
     public String filtrarProgVsEjecutado(){        
-        lazyList = new TurnosProgEjecutadosLazyList(service, programacionFiltro, funcionario);
+        lazyList = service.getListaProgramadoVsEjecutado(programacionFiltro, funcionario, null,null,
+                null, SortOrderEnum.ASC.getOrder());
         return "listarProgVsEjecutados";
     }
     
     public String filtrarProgVsEjecutadoSinPaginar(){
-        lazyList = new TurnosProgEjecutadosLazyList(service, programacionFiltro, funcionario);
-        lazyList.load(0, 0, "turFecha", SortOrder.ASCENDING, null);
+        lazyList = service.getListaProgramadoVsEjecutado(programacionFiltro, funcionario, null,null,
+                null, SortOrderEnum.ASC.getOrder());
         return "listarProgVsEjecutadosNoPag";
     }
 
@@ -89,11 +93,11 @@ public class TurnosProgVsEjecutadosBBean {
         this.programacionFiltro = programacionFiltro;
     }
 
-    public LazyDataModel<Vistaprogramacion> getLazyList() {
+    public List<Vistaprogramacion> getLazyList() {
         return lazyList;
     }
 
-    public void setLazyList(LazyDataModel<Vistaprogramacion> lazyList) {
+    public void setLazyList(List<Vistaprogramacion> lazyList) {
         this.lazyList = lazyList;
     }
 

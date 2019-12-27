@@ -64,6 +64,7 @@ import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.JRPdfExporterParameter;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
+import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import org.primefaces.context.RequestContext;
 
 public class JsfUtil {
@@ -378,13 +379,13 @@ public class JsfUtil {
 
     public static void salidaReporteXls(ArrayList<JasperPrint> listado, String reportFileName) {
         HttpServletResponse response = (HttpServletResponse) getFacesContext().getExternalContext().getResponse();
-        response.setContentType("application/xls");
-        response.setHeader("Content-Disposition", "attachment;filename=\"" + reportFileName + "(" + DateUtil.formatDate(new Date()) + ").xls\"");
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment;filename=\"" + reportFileName + "(" + DateUtil.formatDate(new Date()) + ").xlsx\"");
         OutputStream os = null;
         try {
             os = response.getOutputStream();
 
-            JRExporter exporter = new JRXlsExporter();
+            JRExporter exporter = new JRXlsxExporter();
 
             exporter.setParameter(JRXlsExporterParameter.JASPER_PRINT_LIST, listado);
             exporter.setParameter(JRExporterParameter.CHARACTER_ENCODING, "UTF-8");

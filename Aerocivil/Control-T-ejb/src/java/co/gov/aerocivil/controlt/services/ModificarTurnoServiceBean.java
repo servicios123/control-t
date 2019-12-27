@@ -58,9 +58,9 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
     public List<Funcionario> getFuncionarioTurnoPorFecha(Date date, long dep) {
 
         try {
-            
+
             Calendar actual = Calendar.getInstance();
-                       
+
             Query query = em.createQuery("SELECT f FROM Funcionario f WHERE f.dependencia.depId =:depId AND f.funId IN (SELECT t.funcionario.funId FROM Turno t WHERE t.turFecha= :fecha AND t.programacion.dependencia.depId = :depId) and f.funFvCertmedico > :actual and f.funFvCurso > :actual and f.funFvEvaluacion > :actual ORDER BY f.funAlias ASC ");
             query.setParameter("fecha", date, TemporalType.DATE);
             query.setParameter("depId", dep);
@@ -76,7 +76,7 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
     public List<Funcionario> getFuncionarioTurnoEspecialPorFecha(Date date, long dep) {
 
         try {
-            Query query = em.createQuery("SELECT f FROM Funcionario f WHERE f.dependencia.depId =:depId AND f.funId IN (SELECT t.funcionario.funId FROM Turno t WHERE t.turFecha= :fecha AND t.programacion.dependencia.depId = :depId and t.turTipo in (3,4,5)) ORDER BY f.funAlias ASC ");
+            Query query = em.createQuery("SELECT f FROM Funcionario f WHERE f.dependencia.depId =:depId AND f.funId IN (SELECT t.funcionario.funId FROM Turno t WHERE t.turFecha= :fecha AND t.programacion.dependencia.depId = :depId and t.turTipo in (3,4,5,8)) ORDER BY f.funAlias ASC ");
             query.setParameter("fecha", date, TemporalType.DATE);
             query.setParameter("depId", dep);
             return (List<Funcionario>) query.getResultList();
@@ -214,6 +214,7 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
     public boolean anularTurno(Vistaprogramacion vp, Funcionario f) {
         try {
             Turno t = em.find(Turno.class, vp.getTurId());
+            Date fecha = t.getTurFecha();
             long id = t.getTurPosicionJornada();
 
             em.remove(t);
@@ -222,6 +223,14 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
                 TurnoEspFuncionario tef = em.find(TurnoEspFuncionario.class, id);
                 auditoriaService.auditarDelete("TURNO_ESPECIAL_FUNCIONARIO", f, 0L, id);
                 em.remove(tef);
+            }
+
+            List<Turno> turnos = getTurnoPorUsuarioFecha(t.getFuncionario(), fecha);
+            for (Turno t1 : turnos) {
+                if (t1 != null && t1.getTurTipo() == 2 && t1.getTurId() != t.getTurId()) {
+                    t1.setTurTipo(1L);
+                    auditoriaService.auditar(t1, f);
+                }
             }
 
             return true;
@@ -561,6 +570,17 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
             return (Vistaprogramacion) query.getSingleResult();
 
         } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
+    public List<Turno> getTurnoPorUsuarioFecha(Funcionario f, Date date) {
+        try {
+            Query q = em.createQuery("select t from Turno t where t.funcionario.funId = :funId and t.turFecha = :fecha");
+            q.setParameter("funId", f.getFunId());
+            q.setParameter("fecha", date);
+            return q.getResultList();
+        } catch (Exception e) {
             return null;
         }
     }

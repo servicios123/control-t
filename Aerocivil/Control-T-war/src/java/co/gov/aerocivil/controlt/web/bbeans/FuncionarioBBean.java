@@ -601,7 +601,7 @@ public class FuncionarioBBean {
         ec.setEvDescripcion(this.funcionarioSeleccionado.getEvaluacionCompetenciaEdicion().getEvDescripcion());
         ec.setEvFechaRealiza(this.funcionarioSeleccionado.getEvaluacionCompetenciaEdicion().getEvFechaRealiza());
         ec.setEvFechaVence(this.fechaVenceEvaluacion);
-        ec.setEvResultado(this.funcionarioSeleccionado.getEvaluacionCompetenciaEdicion().getEvResultado());
+        ec.setEvResultado("Aprobó");
         ec.setFuncionario(funcionarioSeleccionado);
         evalBbean.setEvaluacion(ec);
         evalBbean.guardarEvaluacion();

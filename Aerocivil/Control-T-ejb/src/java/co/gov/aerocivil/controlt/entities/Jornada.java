@@ -190,6 +190,41 @@ public class Jornada implements Serializable {
     public void setListaJornadasNoLaborables(List<JornadaNoLaborable> listaJornadasNoLaborables) {
         this.listaJornadasNoLaborables = listaJornadasNoLaborables;
     }
+    
+    
+    public String getHoraInicioFull(){
+        String hora = "";
+        if(joHoraInicio.toString().length()==1){
+            hora+="0"+joHoraInicio.toString();
+        }else{
+            hora+=joHoraInicio.toString();
+        }
+        hora+=":";
+        if(joMinutoInicio.toString().length()==1){
+            hora+="0"+joMinutoInicio.toString();
+        }else{
+            hora+=joMinutoInicio.toString();
+        }
+        return hora;
+        
+    }
+    
+    public String getHoraFinFull(){
+        String hora = "";
+        if(joHoraFin.toString().length()==1){
+            hora+="0"+joHoraFin.toString();
+        }else{
+            hora+=joHoraFin.toString();
+        }
+        hora+=":";
+        if(joMinutoFin.toString().length()==1){
+            hora+="0"+joMinutoFin.toString();
+        }else{
+            hora+=joMinutoFin.toString();
+        }
+        return hora;
+        
+    }
 
     @Override
     public int hashCode() {

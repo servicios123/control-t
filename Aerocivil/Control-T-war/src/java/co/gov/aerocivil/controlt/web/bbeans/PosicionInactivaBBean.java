@@ -223,7 +223,6 @@ public class PosicionInactivaBBean {
         Calendar seleccionada = Calendar.getInstance();
         seleccionada.setTime((Date) selectEvent.getObject());
         seleccionada = DateUtil.setCeroHoras(seleccionada);
-        seleccionada.add(Calendar.DATE, 1);
 
         Calendar evDate = Calendar.getInstance();
         evDate.setTime((Date) selectEvent.getObject());
