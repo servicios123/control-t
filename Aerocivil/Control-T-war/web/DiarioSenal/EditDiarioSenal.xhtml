@@ -32,6 +32,7 @@
                         </h:panelGroup>
                         <h:outputText value="#{msg.dsenTipo}"/>
                         <p:selectOneMenu value="#{diarioSenalBBean.diarioSenal.dsTipo.dstId}" required="true">
+                            <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}"/>
                             <f:selectItems value="#{diarioSenalBBean.listDsTipo}" var="ts" itemValue="#{ts.dstId}" itemLabel="#{ts.dstNombre}"/>
                         </p:selectOneMenu>
                         <xf:calendar entity="#{diarioSenalBBean.diarioSenal}" fieldName="dsenFechaSuceso" required="true" mindate="#{currentDate}"
