@@ -28,7 +28,7 @@ public class VistaProgramacionConverter implements Converter {
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
         
-        if(value==null || value.isEmpty() || value.equalsIgnoreCase("--Seleccione--"))
+        if(value==null || value.isEmpty() || value.equalsIgnoreCase("--Seleccione--")|| value.equalsIgnoreCase("  "))
         {
             //System.out.println("getAsObject null");
             return null;

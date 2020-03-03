@@ -77,6 +77,7 @@
                         <h:commandButton  action="#{tempVerProgramacionBBean.enviarAprobar}" value="#{msg.enviarAprobar}" rendered="#{tempVerProgramacionBBean.programacion.proEstado==0 and tempVerProgramacionBBean.funcionario.fuNivel == 4 and tempVerProgramacionBBean.isEmptyListPosNoAsig==true}" />            
                         <h:commandButton  action="#{tempVerProgramacionBBean.volverEditar}" value="#{msg.volverEditar}" rendered="#{tempVerProgramacionBBean.programacion.proEstado==2  and tempVerProgramacionBBean.funcionario.fuNivel &lt; 5}" />                       
                         <h:commandButton action="#{tempVerProgramacionBBean.exportPDF}" value="#{msg.generarReporte}" />
+                        <h:commandButton actionListener="#{tempVerProgramacionBBean.obtenerProcesoResumen}" value="Tiempo del proceso"/>
                         <h:commandButton  action="#{tempVerProgramacionBBean.exportXLS}" value="#{msg.generarReporteXls}" />
                         
 

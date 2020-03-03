@@ -27,13 +27,11 @@ public class FuncionarioConverter implements Converter {
     ListasService listasService;
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
-        
-        Long id= Long.valueOf(value);
-        if(value==null || value.isEmpty())
+        if(value==null || value.isEmpty()|| value.equalsIgnoreCase("--Seleccione--"))
         {
             return null;
         }
-           
+        Long id= Long.valueOf(value);   
         return listasService.obtenerObjById(Funcionario.class, Long.parseLong(value));
     }
 

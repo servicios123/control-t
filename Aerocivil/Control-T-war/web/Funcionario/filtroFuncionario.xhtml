@@ -63,7 +63,7 @@
             <f:selectItems value="#{listadosBBean.listaDepCategoria}" var="dc" itemValue="#{dc.dcId}" itemLabel="#{dc.dcNombre}"/> 
         </xf:selectOneMenu> 
 
-        <xf:selectOneMenu rendered="#{!filtro2}" entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="funEstado">  
+        <xf:selectOneMenu rendered="#{!filtro2 and loginBBean.funNivel != 7}" entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="funEstado">  
             <f:selectItem itemLabel="Activo" itemValue="Activo" />  
             <f:selectItem itemLabel="Inactivo" itemValue="Inactivo" /> 
         </xf:selectOneMenu>

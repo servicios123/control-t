@@ -28,12 +28,12 @@ public class TurnoEspecialConverter implements Converter{
        
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
-        Long id= Long.valueOf(value);
-        if(value==null || value.isEmpty())
+        
+        if(value==null || value.isEmpty()|| value.equalsIgnoreCase("--Seleccione--"))
         {
             return null;
         }
-           
+        Long id= Long.valueOf(value);   
         return listasService.obtenerObjById(TurnoEspecial.class, Long.parseLong(value));
     }
 

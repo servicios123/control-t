@@ -361,8 +361,6 @@ public class FuncionarioServiceBean implements FuncionarioService {
             params.put("fvEvaluacion", funcionario.getFunFvEvaluacion());
         }
 
-        condiciones.add("f.funEstado = :estado");
-        params.put("estado", "Activo");
         StringBuilder strQry = new StringBuilder();
 
         if (condiciones.size() > 0) {

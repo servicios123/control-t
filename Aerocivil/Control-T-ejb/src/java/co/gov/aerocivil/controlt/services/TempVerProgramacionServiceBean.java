@@ -5,13 +5,16 @@
 package co.gov.aerocivil.controlt.services;
 
 import co.gov.aerocivil.controlt.entities.Funcionario;
+import co.gov.aerocivil.controlt.entities.ProcesoProgramacion;
 import co.gov.aerocivil.controlt.entities.Programacion;
 import co.gov.aerocivil.controlt.entities.Resumen;
 import co.gov.aerocivil.controlt.entities.TempVerProgramacion;
 import co.gov.aerocivil.controlt.entities.Vistaprogramacion;
+import co.gov.aerocivil.controlt.util.StringDateUtil;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -124,5 +127,30 @@ public class TempVerProgramacionServiceBean implements TempVerProgramacionServic
         Query query = em.createQuery("Select r from Resumen r where r.programacion = :proId");
         query.setParameter("proId", programacion);
         return query.getResultList();
+    }
+
+    @Override
+    public String obtenerResumenProceso(Long programacion, Funcionario funcionario) {
+        String resumen = "Programacion generada por: "+funcionario.getFunNombre()+"\n"
+                + "Dependencia: "+funcionario.getDependencia().getDepAbreviatura()+"\n\n"
+                + "Flujo del proceso:\n\n";
+        try {
+            Query query = em.createNamedQuery("ProcesoProgramacion.findById");
+            query.setParameter("proId", programacion);
+            List<ProcesoProgramacion> list = query.getResultList();
+            int i = 1;
+            for(ProcesoProgramacion p: list){
+                String inicio = new SimpleDateFormat("HH:mm:ss aa").format(p.getInicio());
+                String fin = new SimpleDateFormat("HH:mm:ss aa").format(p.getFin());
+                long secs = Math.abs(p.getFin().getTime()-p.getInicio().getTime())/1000;
+                resumen+=i+". Proceso "+p.getProceso()+" ejecutado entre "+inicio +" y "+fin+" en ("+secs+" segundos)\n";
+                i++;
+            }
+            resumen += "\n"
+                    + "Proceso completado!";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resumen;
     }
 }

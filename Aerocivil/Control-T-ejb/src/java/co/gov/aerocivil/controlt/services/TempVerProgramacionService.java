@@ -32,4 +32,6 @@ public interface TempVerProgramacionService {
     public java.util.List<co.gov.aerocivil.controlt.entities.Vistaprogramacion> fechasProgramacion(long programacion);
     
     public List<Resumen> obtenerResumen(Long programacion);
+
+    public java.lang.String obtenerResumenProceso(java.lang.Long programacion, co.gov.aerocivil.controlt.entities.Funcionario funcionario);
 }

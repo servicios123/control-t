@@ -12,6 +12,7 @@ import co.gov.aerocivil.controlt.entities.PosNoAsig;
 import co.gov.aerocivil.controlt.entities.PosicionHabilitada;
 import co.gov.aerocivil.controlt.entities.PosicionInactiva;
 import co.gov.aerocivil.controlt.entities.PosicionJornada;
+import co.gov.aerocivil.controlt.entities.ProcesoProgramacion;
 import co.gov.aerocivil.controlt.entities.Programacion;
 import co.gov.aerocivil.controlt.entities.RestriccionDependencia;
 import co.gov.aerocivil.controlt.entities.Turno;
@@ -72,11 +73,15 @@ public class ProgramacionTotalServiceBean
     private List<Jornada> jornadas;
     private ArrayList<Week> weeks;
     private List<DiaFestivo> holydays;
+    private List<ProcesoProgramacion> procesoProgramacionList;
     private Funcionario funcionario;
     @EJB
     private ListasService listasService;
     @EJB
     private JornadaNoLaboralService jornadaNoLaboralService;
+    @EJB
+    private AuditoriaService auditoriaService;
+    
     
     public class TargetDay {
         
@@ -238,6 +243,7 @@ public class ProgramacionTotalServiceBean
     
     public void run(Programacion programacion, Funcionario fun, Boolean debug) {
         this.funcionario = fun;
+        this.procesoProgramacionList = new ArrayList<ProcesoProgramacion>();
         init(programacion, fun, debug);
         programme();
         save();
@@ -394,6 +400,16 @@ public class ProgramacionTotalServiceBean
         orderFunctionaries();
     }
     
+    private ProcesoProgramacion getProcesoProgramacion(String proceso, Date inicio, Date fin){
+        ProcesoProgramacion procesoProgramacion = new ProcesoProgramacion();
+        procesoProgramacion.setProgramacion(this.programming);
+        procesoProgramacion.setProceso(proceso);
+        procesoProgramacion.setInicio(inicio);
+        procesoProgramacion.setFin(fin);
+        return procesoProgramacion;
+        
+    }
+    
     private void programme() {
         ParametroSistema sec = getSystemParameter(new BigDecimal(100));
         if (sec == null) {
@@ -422,48 +438,67 @@ public class ProgramacionTotalServiceBean
             for (String num : order) {
                 if (num.equals("1")) {
                     print_sec = print_sec + "1.Especiales\n";
+                    Date inicio = new Date();
                     solveSpecialTurns();
+                    this.auditoriaService.auditar(getProcesoProgramacion("Especiales",inicio,new Date()), funcionario);
+//                    System.out.println("Especiales Fin: "+new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
                 }
                 if (num.equals("2")) {
                     print_sec = print_sec + "2.Empalme mes anterior\n";
+                    Date inicio = new Date();
                     solveFirstDayAgainstLastMonth();
+                    this.auditoriaService.auditar(getProcesoProgramacion("Empalme mes anterior",inicio,new Date()), funcionario);
                 }
                 if (num.equals("3")) {
+                    Date inicio = new Date();
                     print_sec = print_sec + "3.Top 5 posiciones con menor funcionarios habilitados\n";
 //                    solveTop(5);
+                    this.auditoriaService.auditar(getProcesoProgramacion("Top 5 posiciones con menor funcionarios habilitados",inicio,new Date()),funcionario);
                 }
                 if (num.equals("4")) {
+                    Date inicio = new Date();
                     print_sec = print_sec + "4.Jornadas con jornada anterior obligatoria\n";
                     solvePeriodsRecessAndRequired();
+                    this.auditoriaService.auditar(getProcesoProgramacion("Jornadas con jornada anterior obligatoria",inicio,new Date()),funcionario);
                 }
                 if (num.equals("5")) {
+                    Date inicio = new Date();
                     print_sec = print_sec + "5.Descansos\n";
                     if (funcionario.getDependencia() != null && funcionario.getDependencia().getDepcategoria() != null && funcionario.getDependencia().getDepcategoria().getDcId() != null && funcionario.getDependencia().getDepcategoria().getDcId() == 1L) {
                         solveTropByWeekPeriodRecess();
                     }
                     solveRestByWeekPeriodRecess();
                     solveDescByWeekPeriodRecessFull();
+                    this.auditoriaService.auditar(getProcesoProgramacion("Descansos",inicio,new Date()),funcionario);
                 }
                 if (num.equals("6")) {
                     print_sec = print_sec + "6.Turnos ordinarios ordenados por jornada ASC\n";
+                    Date inicio = new Date();
                     for (Jornada jornada : this.jornadas) {
                         solveOrdinaryTurnsByPeriod(jornada.getJoId().longValue());
                     }
+                    this.auditoriaService.auditar(getProcesoProgramacion("Turnos ordinarios ordenados por jornada ASC",inicio,new Date()),funcionario);
                 }
                 if (num.equals("7")) {
                     print_sec = print_sec + "7.Turnos ordinarios full\n";
+                    Date inicio = new Date();
                     solveOrdinaryTurnsComplete();
                     //solveOrdinaryTurnsAvaible();
+                    this.auditoriaService.auditar(getProcesoProgramacion("Turnos ordinarios full",inicio,new Date()),funcionario);
                 }
                 if (num.equals("8")) {
                     print_sec = print_sec + "8.Turnos extraordinarios\n";
+                    Date inicio = new Date();
                     solveExtraordinaryTurnsDistribuied(Boolean.valueOf(false));
+                    this.auditoriaService.auditar(getProcesoProgramacion("Turnos extraordinarios",inicio,new Date()),funcionario);
                 }
             }
             write_data(print_sec + "\n");
         }
+        Date inicio = new Date();
         refiningByDay();
         refiningSequence();
+        this.auditoriaService.auditar(getProcesoProgramacion("Refinamiento",inicio,new Date()),funcionario);
 //        solveExtraordinaryTurnsDistribuied(Boolean.valueOf(false));
         debug_missed();
     }
@@ -1304,7 +1339,6 @@ public class ProgramacionTotalServiceBean
                 }
             }
         }
-        Day day;
     }
     
     private void saveNoAssignedPosition(Turn turn, Day day) {

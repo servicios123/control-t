@@ -257,6 +257,7 @@ public class FuncionarioBBean {
         funcionarioFiltro = new Funcionario();
         funcionarioFiltro.setDependencia(getDependenciaXNivelUsuario());
         funcionarioFiltro.getDependencia().setDepcategoria(new DepCategoria());
+        funcionarioFiltro.setFunEstado("Activo");
         //columns = new boolean[3];
         columns = new boolean[]{true, false, false};
         if (JsfUtil.getFuncionarioSesion().getFuNivel().equals(RolEnum.NIVEL_A4.getRolId())) {
@@ -270,6 +271,7 @@ public class FuncionarioBBean {
         funcionarioFiltro.setSortField(sortField);
         funcionarioFiltro.setDependencia(getDependenciaXNivelUsuario());
         funcionarioFiltro.getDependencia().setDepcategoria(new DepCategoria());
+        funcionarioFiltro.setFunEstado("Activo");
         //columns = new boolean[3];
         columns = new boolean[]{true, false, false};
         if (JsfUtil.getFuncionarioSesion().getFuNivel().equals(RolEnum.NIVEL_A4.getRolId())) {
@@ -297,6 +299,7 @@ public class FuncionarioBBean {
         funcionarioFiltro = new Funcionario();
         funcionarioFiltro.setDependencia(getDependenciaXNivelUsuario());
         funcionarioFiltro.getDependencia().setDepcategoria(new DepCategoria());
+        funcionarioFiltro.setFunEstado("Activo");
         Calendar c = Calendar.getInstance();
         funcionarioFiltro.setFechafin(c.getTime());
         return filtrar_Cert_Medico();
@@ -446,6 +449,15 @@ public class FuncionarioBBean {
     }
 
     public String filtrar() {
+        LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
+        Funcionario funcionarioSesion = logbbean.getFuncionarioTO().getFuncionario();
+        if(funcionarioSesion!=null && funcionarioSesion.getFuNivel()==RolEnum.LINEA_3000.getRolId()){
+            funcionarioFiltro.setFunEstado("Bloqueado");
+        }
+        
+        if(funcionarioSesion!=null && funcionarioSesion.getFuNivel()==RolEnum.NIVEL_A1.getRolId()){
+            funcionarioFiltro.setFunEstado(null);
+        }
         lazyList = new FuncionarioLazyList(funcionarioService, funcionarioFiltro);
         return "listarFuncionario";
     }
@@ -458,6 +470,7 @@ public class FuncionarioBBean {
      */
     public String filtrarSinPaginar() {
         this.seleccionarTodas = false;
+        this.funcionarioFiltro.setFunEstado("Activo");
         this.funcionariosDisponibles = funcionarioService.getListaPag(funcionarioFiltro, null, null,
                 "funFvCurso", SortOrderEnum.ASC.getOrder());
         heightList = this.funcionariosDisponibles.size() >= 20 ? "404px"

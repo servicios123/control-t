@@ -3,9 +3,12 @@
  * and open the template in the editor.
  */
 package co.gov.aerocivil.controlt.entities;
+
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,6 +19,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -38,50 +42,42 @@ import javax.persistence.Transient;
     @NamedQuery(name = "Programacion.findByProFechaAprobacion", query = "SELECT p FROM Programacion p WHERE p.proFechaAprobacion = :proFechaAprobacion"),
     @NamedQuery(name = "Programacion.findMaximos", query = "SELECT max(p.proId),p.dependencia.depId FROM Programacion p group by p.dependencia.depId"),
     @NamedQuery(name = "Programacion.findByProEstado", query = "SELECT p FROM Programacion p WHERE p.proEstado = :proEstado")})
-    
 public class Programacion implements Serializable {
+
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    
-    
     @Id
     @Basic(optional = false)
     @Column(name = "PRO_ID")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_PROGRAMACION")
     @SequenceGenerator(name = "SEQ_PROGRAMACION", sequenceName = "SEQ_PROGRAMACION", allocationSize = 1)
     private Long proId;
-    
     @Basic(optional = false)
     @Column(name = "PRO_FECHA_INICIO")
     @Temporal(TemporalType.TIMESTAMP)
     private Date proFechaInicio;
-    
     @Basic(optional = false)
     @Column(name = "PRO_FECHA_FIN")
     @Temporal(TemporalType.TIMESTAMP)
     private Date proFechaFin;
-    
     @JoinColumn(name = "PRO_FUNCIONARIO_APRUEBA", referencedColumnName = "FUN_ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Funcionario funcionarioAprueba;
-
     @Column(name = "PRO_FECHA_APROBACION")
     @Temporal(TemporalType.TIMESTAMP)
     private Date proFechaAprobacion;
-    
     @JoinColumn(name = "PRO_DEPENDENCIA", referencedColumnName = "DEP_ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Dependencia dependencia;
-
     @Column(name = "PRO_ESTADO")
     private Integer proEstado;
-
     @JoinColumn(name = "PRO_FUNCIONARIO_GENERA", referencedColumnName = "FUN_ID")
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     private Funcionario funcionarioGenera;
-    
     @Transient
     private boolean reporte;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "programacion", fetch = FetchType.EAGER)
+    private List<ProcesoProgramacion> procesoProgramacionList;
 
     public boolean isReporte() {
         return reporte;
@@ -90,8 +86,7 @@ public class Programacion implements Serializable {
     public void setReporte(boolean reporte) {
         this.reporte = reporte;
     }
-    
-            
+
     public Long getProId() {
         return proId;
     }
@@ -139,6 +134,7 @@ public class Programacion implements Serializable {
     public void setDependencia(Dependencia dependencia) {
         this.dependencia = dependencia;
     }
+
     public Integer getProEstado() {
         return proEstado;
     }
@@ -146,7 +142,15 @@ public class Programacion implements Serializable {
     public void setProEstado(Integer proEstado) {
         this.proEstado = proEstado;
     }
-    
+
+    public List<ProcesoProgramacion> getProcesoProgramacionList() {
+        return procesoProgramacionList;
+    }
+
+    public void setProcesoProgramacionList(List<ProcesoProgramacion> procesoProgramacionList) {
+        this.procesoProgramacionList = procesoProgramacionList;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -183,7 +187,6 @@ public class Programacion implements Serializable {
      * @param funcionarioGenera the funcionarioGenera to set
      */
     public void setFuncionarioGenera(Funcionario funcionarioGenera) {
-        this.funcionarioGenera = funcionarioGenera; 
+        this.funcionarioGenera = funcionarioGenera;
     }
-    
 }

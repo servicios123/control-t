@@ -190,13 +190,13 @@
                             <p:ajax event="change" listener="#{vistaProgramacionBBean.onFunAnularOrd}" update="form_anular_ord"/>
                         </p:selectOneMenu>
                         <h:outputText value="#{msg.turno}"/>
-                        <p:selectOneMenu  required="true" id="turn_anular" value="#{vistaProgramacionBBean.turn_anular}">  
+                        <p:selectOneMenu  required="true" id="turn_anular" value="#{vistaProgramacionBBean.turn_anular}" onchange="PF('buttonDelete').enable()">  
                              <f:selectItem itemValue="#{null}" itemLabel="#{msg.selectItemNull}"/>
                              <f:selectItems value="#{vistaProgramacionBBean.list_turn_anular_ord}" var="turno" itemValue="#{turno}" itemLabel="#{turno.pjAlias}"/>   
                             <f:converter converterId="VistaProgramacionConverter" binding="#{VistaProgramacionConverter}"/>
                         </p:selectOneMenu>   
-                        <h:panelGroup>
-                            <p:commandButton onclick="PF('dlg2').show()" value="#{msg.anularOperativo}" style="background: #253979 !important;border: 1px #253979 solid !important;"/>
+                        <h:panelGroup id="buttonPnl">
+                            <p:commandButton widgetVar="buttonDelete" disabled="#{vistaProgramacionBBean.turn_anular == null}" onclick="PF('dlg2').show()" value="#{msg.anularOperativo}" style="background: #253979 !important;border: 1px #253979 solid !important;"/>
                         </h:panelGroup>
                     </h:panelGrid>   
                       <br/><br/><hr/><br/><br/>

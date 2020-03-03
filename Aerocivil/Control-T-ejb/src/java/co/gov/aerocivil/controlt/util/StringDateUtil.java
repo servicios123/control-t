@@ -21,10 +21,9 @@ public class StringDateUtil {
     private StringDateUtil() {
         // Utility class, hide the constructor.
     }
-    
-    
-    public static String getFormatoHora(Byte hora, Byte minutos){
-        if(hora==null || minutos==null){
+
+    public static String getFormatoHora(Byte hora, Byte minutos) {
+        if (hora == null || minutos == null) {
             return null;
         }
         Calendar c = Calendar.getInstance();
@@ -34,75 +33,86 @@ public class StringDateUtil {
         return df.format(c.getTime());
     }
 
-    public static String formatDate(Date d){
+    public static String formatDate(Date d) {
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         return df.format(d);
     }
-    
-    public static <T>T getValue(Object obj, Class <T> klass){
-	if(obj!=null){
-            if (obj instanceof String || obj instanceof Character[]){
-                    return (T) obj.toString();
+
+    public static <T> T getValue(Object obj, Class<T> klass) {
+        if (obj != null) {
+            if (obj instanceof String || obj instanceof Character[]) {
+                return (T) obj.toString();
             }
-            if (obj instanceof Long){
-                    return (T) Long.valueOf(obj.toString());
+            if (obj instanceof Long) {
+                return (T) Long.valueOf(obj.toString());
             }
-            if (obj instanceof BigDecimal){
-                    return (T) Long.valueOf(obj.toString());
+            if (obj instanceof BigDecimal) {
+                return (T) Long.valueOf(obj.toString());
             }
-            if (obj instanceof Date){
-                    return (T)(Date)obj;
+            if (obj instanceof Date) {
+                return (T) (Date) obj;
             }
-            
-	}
+
+        }
         return null;
     }
-    
-    public static Long getLongFromBigDecimal(BigDecimal bd){
-        if(bd == null){
+
+    public static Long getLongFromBigDecimal(BigDecimal bd) {
+        if (bd == null) {
             return null;
         }
         return bd.longValue();
     }
-    public static Boolean getBoolFromString(String bool){
-        if(bool == null){
+
+    public static Boolean getBoolFromString(String bool) {
+        if (bool == null) {
             return null;
         }
         return Boolean.valueOf(bool);
     }
-    
-    public static <T>T getFirst(List<T> list, Class T){
+
+    public static <T> T getFirst(List<T> list, Class T) {
         return list.get(0);
     }
-    
-    public static String join(List list){
+
+    public static String join(List list) {
         StringBuilder sb = new StringBuilder();
         Iterator it = list.iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             sb.append(it.next().toString());
-            if(it.hasNext()){
+            if (it.hasNext()) {
                 sb.append(", ");
             }
         }
         return sb.toString();
     }
-    
-    public static Calendar setCeroHoras(Calendar c){
+
+    public static Calendar setCeroHoras(Calendar c) {
         c.set(Calendar.HOUR_OF_DAY, 0);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
-        return c;        
+        return c;
     }
 
-    public static Date setCeroHoras(Date d){
+    public static Date setCeroHoras(Date d) {
         Calendar c = Calendar.getInstance();
-        c.setTime(d);        
+        c.setTime(d);
         c = setCeroHoras(c);
         d = new Date();
         d.setTime(c.getTimeInMillis());
-        return d;        
+        return d;
     }
 
-
+    public static Date getDifferenceBetwenDates(Date dateInicio, Date dateFinal) {
+        long milliseconds = dateFinal.getTime() - dateInicio.getTime();
+        int seconds = (int) (milliseconds / 1000) % 60;
+        int minutes = (int) ((milliseconds / (1000 * 60)) % 60);
+        int hours = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.SECOND, seconds);
+        c.set(Calendar.MINUTE, minutes);
+        c.set(Calendar.HOUR_OF_DAY, hours);
+        return c.getTime();
+    }
 }
