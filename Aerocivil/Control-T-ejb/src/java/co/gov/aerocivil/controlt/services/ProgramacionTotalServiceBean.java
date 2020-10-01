@@ -56,7 +56,7 @@ import javax.persistence.TemporalType;
 @Stateless
 public class ProgramacionTotalServiceBean
         implements ProgramacionTotalService {
-    
+
     @PersistenceContext(unitName = "ControlT-ejbPU")
     private EntityManager em;
     private ArrayList<Day> days;
@@ -75,24 +75,24 @@ public class ProgramacionTotalServiceBean
     private List<DiaFestivo> holydays;
     private List<ProcesoProgramacion> procesoProgramacionList;
     private Funcionario funcionario;
+    private List<Jornada> jornadasDependencia;
     @EJB
     private ListasService listasService;
     @EJB
     private JornadaNoLaboralService jornadaNoLaboralService;
     @EJB
     private AuditoriaService auditoriaService;
-    
-    
+
     public class TargetDay {
-        
+
         public static final int PREVIOUS = -1;
         public static final int CURRENT = 0;
         public static final int NEXT = 1;
         public static final int PREVIOUS_2_DAYS = -2;
     }
-    
+
     public class Type {
-        
+
         public static final int ANY = -1;
         public static final int ORDINARY = 1;
         public static final int EXTRAORDINARY = 2;
@@ -101,17 +101,17 @@ public class ProgramacionTotalServiceBean
         public static final int LD = 4;
         public static final int TROP = 8;
     }
-    
+
     @Override
     public String validateTurn(Turno turno, Long cambio) {
         //System.out.println("Llegar a validateTurn ");
         String result = null;
         this.programming = turno.getProgramacion();
         List<Turno> turnos = getTurnosFunPro(turno.getFuncionario().getFunId().longValue(), turno.getProgramacion().getProId().longValue());
-        
+
         this.log = new ArrayList();
         this.days = new ArrayList();
-        
+
         Calendar current = Calendar.getInstance();
         current.setTime(this.programming.getProFechaInicio());
         while (current.getTime().compareTo(this.programming.getProFechaFin()) <= 0) {
@@ -143,9 +143,9 @@ public class ProgramacionTotalServiceBean
         this.restrictivePeriod = getRestrictivePeriod();
         this.sequences = getSequences();
         this.holydays = getDiaFestivo();
-        
+
         prepareSetting();
-        
+
         this.weeks = new ArrayList();
         Week week = new Week();
         for (Day day : this.days) {
@@ -166,7 +166,7 @@ public class ProgramacionTotalServiceBean
                     if (turn.getFunctionary() == null) {
                         Calendar c = Calendar.getInstance();
                         c.setTime(day.getDate());
-                        
+
                         Turn ordinary = getTurnOfFunctionary(fun, c.getTime(), 0, -1);
                         if (ordinary == null) {
                             validateOrdinaryTurn(fun, turn, day.getDate());
@@ -192,12 +192,12 @@ public class ProgramacionTotalServiceBean
         }
         return result;
     }
-    
+
     private Turn convertTurno2Turn(Turno turno1, Functionary fun) {
         try {
             if ((turno1.getTurTipo().longValue() == 1L) || (turno1.getTurTipo().longValue() == 2L)) {
                 PosicionJornada pj = getPositionPeriod(turno1.getTurPosicionJornada());
-                
+
                 Position pos = new Position(pj.getPosicion().getPosId().longValue(), pj.getPosicion().getPosicionNacional().getPnAlias());
                 Period per = new Period(pj.getJornada().getJoId().longValue(), pj.getJornada().getJoAlias(), pj.getJornada().getJoHoraInicio().byteValue(), pj.getJornada().getJoHoraFin().byteValue() + 1);
                 if (pj.getJornada().getJornadaObligatoria() != null) {
@@ -207,7 +207,7 @@ public class ProgramacionTotalServiceBean
                 if (turno1.getTurTipo().longValue() == 1L) {
                     turn.setType(1);
                 } else {
-                    turn.setType(Type.EXTRAORDINARY);
+                    turn.setType(ProgramacionTotalServiceBean.Type.EXTRAORDINARY);
                 }
                 return turn;
             }
@@ -221,26 +221,26 @@ public class ProgramacionTotalServiceBean
                     Period per = new Period(0L, "", te.getTurnoEspecial().getTeHinicio().byteValue(), te.getTurnoEspecial().getTeHfin().byteValue() + 1);
                     Turn turn = new Turn(per, pos, fun, turno1.getTurPosicionJornada().longValue());
                     turn.setPermiteHorasExtra(false);
-                    turn.setType(Type.SPECIAL);
+                    turn.setType(ProgramacionTotalServiceBean.Type.SPECIAL);
                     return turn;
                 }
             }
             Period period = new Period(0L, "", 0, 24);
             Position position = new Position(0L, "DES");
             Turn turn = new Turn(period, position, fun, 0L);
-            turn.setType(Type.REST);
+            turn.setType(ProgramacionTotalServiceBean.Type.REST);
             turn.setPermiteHorasExtra(false);
             return turn;
         } catch (Exception e) {
             Period period = new Period(0L, "", 0, 24);
             Position position = new Position(0L, "DES");
             Turn turn = new Turn(period, position, fun, 0L);
-            turn.setType(Type.REST);
+            turn.setType(ProgramacionTotalServiceBean.Type.REST);
             turn.setPermiteHorasExtra(false);
             return turn;
         }
     }
-    
+
     public void run(Programacion programacion, Funcionario fun, Boolean debug) {
         this.funcionario = fun;
         this.procesoProgramacionList = new ArrayList<ProcesoProgramacion>();
@@ -249,45 +249,47 @@ public class ProgramacionTotalServiceBean
         save();
         finish();
     }
-    
+
     private void init(Programacion programacion, Funcionario fun, Boolean debug) {
         this.log = new ArrayList();
         this.data = new ArrayList();
-        
+
         this.debug = debug;
-        
+
         this.programming = programacion;
         this.days = new ArrayList();
         this.functionaries = new ArrayList();
         this.enabledPositions = getEnabledPositions();
-        
+
         this.lastDay = getLastDay();
         this.holydays = getDiaFestivo();
         this.restrictivePeriod = getRestrictivePeriod();
         this.sequences = getSequences();
         
+        this.jornadasDependencia = listasService.obtenerJornadaXDependencia(this.programming.getDependencia().getDepId());
+
         Calendar c = Calendar.getInstance();
         c.setTime(this.programming.getProFechaFin());
-        
+
         Calendar a = Calendar.getInstance();
-        
+
         write_data("Dependencia;Mes;A?o;Func;Fecha;");
         write_data(this.programming.getDependencia().getDepAbreviatura() + ";" + (c.get(2) + 1) + ";" + c.get(1) + ";" + fun.getFunNombre() + ";" + a.get(5) + "/" + (a.get(2) + 1) + "/" + a.get(1) + " " + a.get(10) + ":" + a.get(12));
         write_data("");
-        
+
         prepareSetting();
         prepareDays();
         prepareFunctionaries();
-        
+
         write("Tipo;Fecha;Funcionario;Ordinario;ExtraOrdinario;Resultado;Detalles;");
     }
-    
+
     private void prepareDays() {
         List<PosicionJornada> positionPeriods = getPositionPeriods();
-        
+
         Calendar current = Calendar.getInstance();
         current.setTime(this.programming.getProFechaInicio());
-        
+
         Boolean print = Boolean.valueOf(true);
         while (current.getTime().compareTo(this.programming.getProFechaFin()) <= 0) {
             ArrayList<Turn> turns = new ArrayList();
@@ -299,7 +301,7 @@ public class ProgramacionTotalServiceBean
                 Position position = new Position(pj.getPosicion().getPosId().longValue(), pj.getPosicion().getPosicionNacional().getPnAlias());
                 Turn turn = new Turn(period, position, null, pj.getPjId().longValue());
                 turn.setNumEnables(numEnables(pj.getPosicion().getPosId().longValue()));
-                
+
                 turns.add(turn);
             }
             orderTurns(turns);
@@ -315,7 +317,7 @@ public class ProgramacionTotalServiceBean
                 }
                 write_data("");
                 write_data("");
-                
+
                 print = Boolean.valueOf(false);
             }
             this.days.add(new Day(current.getTime(), turns));
@@ -335,7 +337,7 @@ public class ProgramacionTotalServiceBean
             this.weeks.add(week);
         }
     }
-    
+
     private void prepareSetting() {
         this.setting = new Setting();
         List<RestriccionDependencia> restricciones = getRestrictions();
@@ -370,7 +372,7 @@ public class ProgramacionTotalServiceBean
         }
         this.jornadas = getJornadas();
     }
-    
+
     private void prepareFunctionaries() {
         List<Funcionario> funcionarios = getFunctionaries();
         for (Funcionario fun : funcionarios) {
@@ -399,23 +401,23 @@ public class ProgramacionTotalServiceBean
         }
         orderFunctionaries();
     }
-    
-    private ProcesoProgramacion getProcesoProgramacion(String proceso, Date inicio, Date fin){
+
+    private ProcesoProgramacion getProcesoProgramacion(String proceso, Date inicio, Date fin) {
         ProcesoProgramacion procesoProgramacion = new ProcesoProgramacion();
         procesoProgramacion.setProgramacion(this.programming);
         procesoProgramacion.setProceso(proceso);
         procesoProgramacion.setInicio(inicio);
         procesoProgramacion.setFin(fin);
         return procesoProgramacion;
-        
+
     }
-    
+
     private void programme() {
         ParametroSistema sec = getSystemParameter(new BigDecimal(100));
         if (sec == null) {
             write_data("\nSecuencia Por Defecto\n1.Especiales\n2.Empalme mes anterior\n3.Top 5 posiciones con menor funcionarios habilitados\n4.Jornadas con jornada anterior obligatoria\n5.Descansos\n6.Turnos ordinarios ordenados por jornada ASC\n7.Turnos ordinarios full\n8.Turnos extraordinarios\n\n");
             solveSpecialTurns();
-            
+
             solveFirstDayAgainstLastMonth();
             if (funcionario.getDependencia() != null && funcionario.getDependencia().getDepcategoria() != null && funcionario.getDependencia().getDepcategoria().getDcId() != null && funcionario.getDependencia().getDepcategoria().getDcId() == 1L) {
                 solveTropByWeekPeriodRecess();
@@ -431,7 +433,7 @@ public class ProgramacionTotalServiceBean
             solveOrdinaryTurnsComplete();
             //solveOrdinaryTurnsAvaible();
             solveExtraordinaryTurnsDistribuied(Boolean.valueOf(false));
-            
+
         } else {
             String[] order = sec.getParValor().split(",");
             String print_sec = "\nSecuencia Definida " + sec.getParValor() + "\n";
@@ -439,27 +441,32 @@ public class ProgramacionTotalServiceBean
                 if (num.equals("1")) {
                     print_sec = print_sec + "1.Especiales\n";
                     Date inicio = new Date();
+                    System.out.println("[PROCESO] Especiales Inicio: " + new SimpleDateFormat("HH:mm:ss aa").format(inicio));
                     solveSpecialTurns();
-                    this.auditoriaService.auditar(getProcesoProgramacion("Especiales",inicio,new Date()), funcionario);
-//                    System.out.println("Especiales Fin: "+new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
+                    this.auditoriaService.auditar(getProcesoProgramacion("Especiales", inicio, new Date()), funcionario);
+                    System.out.println("[PROCESO] Especiales Fin: " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
                 }
                 if (num.equals("2")) {
                     print_sec = print_sec + "2.Empalme mes anterior\n";
                     Date inicio = new Date();
+                    System.out.println("[PROCESO] Empalme mes anterior Inicio: " + new SimpleDateFormat("HH:mm:ss aa").format(inicio));
                     solveFirstDayAgainstLastMonth();
-                    this.auditoriaService.auditar(getProcesoProgramacion("Empalme mes anterior",inicio,new Date()), funcionario);
+                    this.auditoriaService.auditar(getProcesoProgramacion("Empalme mes anterior", inicio, new Date()), funcionario);
+                    System.out.println("[PROCESO] Empalme mes anterior Fin: " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
                 }
                 if (num.equals("3")) {
                     Date inicio = new Date();
                     print_sec = print_sec + "3.Top 5 posiciones con menor funcionarios habilitados\n";
 //                    solveTop(5);
-                    this.auditoriaService.auditar(getProcesoProgramacion("Top 5 posiciones con menor funcionarios habilitados",inicio,new Date()),funcionario);
+                    this.auditoriaService.auditar(getProcesoProgramacion("Top 5 posiciones con menor funcionarios habilitados", inicio, new Date()), funcionario);
+                    System.out.println("[PROCESO] Top 5 Fin: " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
                 }
                 if (num.equals("4")) {
                     Date inicio = new Date();
                     print_sec = print_sec + "4.Jornadas con jornada anterior obligatoria\n";
                     solvePeriodsRecessAndRequired();
-                    this.auditoriaService.auditar(getProcesoProgramacion("Jornadas con jornada anterior obligatoria",inicio,new Date()),funcionario);
+                    this.auditoriaService.auditar(getProcesoProgramacion("Jornadas con jornada anterior obligatoria", inicio, new Date()), funcionario);
+                    System.out.println("[PROCESO] Jornada anerior obl Fin: " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
                 }
                 if (num.equals("5")) {
                     Date inicio = new Date();
@@ -469,28 +476,40 @@ public class ProgramacionTotalServiceBean
                     }
                     solveRestByWeekPeriodRecess();
                     solveDescByWeekPeriodRecessFull();
-                    this.auditoriaService.auditar(getProcesoProgramacion("Descansos",inicio,new Date()),funcionario);
+                    this.auditoriaService.auditar(getProcesoProgramacion("Descansos", inicio, new Date()), funcionario);
+                    System.out.println("[PROCESO] Descansos Fin: " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
                 }
                 if (num.equals("6")) {
                     print_sec = print_sec + "6.Turnos ordinarios ordenados por jornada ASC\n";
                     Date inicio = new Date();
-                    for (Jornada jornada : this.jornadas) {
-                        solveOrdinaryTurnsByPeriod(jornada.getJoId().longValue());
+                    boolean excludeMorning = false;
+                    Jornada morning = getJornadaM();
+                    if(morning!=null){
+                        solveOrdinaryTurnsOnlyMorning(morning.getJoId().longValue());
+                        excludeMorning = !excludeMorning;
                     }
-                    this.auditoriaService.auditar(getProcesoProgramacion("Turnos ordinarios ordenados por jornada ASC",inicio,new Date()),funcionario);
+                    for (Jornada jornada : this.jornadas) {
+                        if(excludeMorning && !jornada.getJoAlias().equalsIgnoreCase("M")){
+                            solveOrdinaryTurnsByPeriod(jornada.getJoId().longValue());
+                        }
+                    }
+                    this.auditoriaService.auditar(getProcesoProgramacion("Turnos ordinarios ordenados por jornada ASC", inicio, new Date()), funcionario);
+                    System.out.println("[PROCESO] oridnarios Fin: " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
                 }
                 if (num.equals("7")) {
                     print_sec = print_sec + "7.Turnos ordinarios full\n";
                     Date inicio = new Date();
                     solveOrdinaryTurnsComplete();
                     //solveOrdinaryTurnsAvaible();
-                    this.auditoriaService.auditar(getProcesoProgramacion("Turnos ordinarios full",inicio,new Date()),funcionario);
+                    this.auditoriaService.auditar(getProcesoProgramacion("Turnos ordinarios full", inicio, new Date()), funcionario);
+                    System.out.println("[PROCESO] Ordinarios Full Fin: " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
                 }
                 if (num.equals("8")) {
                     print_sec = print_sec + "8.Turnos extraordinarios\n";
                     Date inicio = new Date();
                     solveExtraordinaryTurnsDistribuied(Boolean.valueOf(false));
-                    this.auditoriaService.auditar(getProcesoProgramacion("Turnos extraordinarios",inicio,new Date()),funcionario);
+                    this.auditoriaService.auditar(getProcesoProgramacion("Turnos extraordinarios", inicio, new Date()), funcionario);
+                    System.out.println("[PROCESO] Extras Fin: " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
                 }
             }
             write_data(print_sec + "\n");
@@ -498,28 +517,28 @@ public class ProgramacionTotalServiceBean
         Date inicio = new Date();
         refiningByDay();
         refiningSequence();
-        this.auditoriaService.auditar(getProcesoProgramacion("Refinamiento",inicio,new Date()),funcionario);
+        this.auditoriaService.auditar(getProcesoProgramacion("Refinamiento", inicio, new Date()), funcionario);
 //        solveExtraordinaryTurnsDistribuied(Boolean.valueOf(false));
         debug_missed();
     }
-    
+
     private void refiningSequence() {
-        
+
         Calendar c = Calendar.getInstance();
         for (Day day : days) {
             c.setTime(day.getDate());
             ArrayList<Turn> todays = new ArrayList<Turn>();
             ArrayList<Turn> others = new ArrayList<Turn>();
-            
+
             for (Turn turn : day.getTurns()) {
-                if (turn.getFunctionary() != null && turn.getType() == Type.ORDINARY) {
-                    Turn previous = getTurnOfFunctionary(turn.getFunctionary(), day.getDate(), TargetDay.PREVIOUS, Type.ORDINARY);
-                    
+                if (turn.getFunctionary() != null && turn.getType() == ProgramacionTotalServiceBean.Type.ORDINARY) {
+                    Turn previous = getTurnOfFunctionary(turn.getFunctionary(), day.getDate(), ProgramacionTotalServiceBean.TargetDay.PREVIOUS, ProgramacionTotalServiceBean.Type.ORDINARY);
+
                     if (previous != null && previous.getPeriod().getId() == turn.getPeriod().getId()) {
                         todays.add(turn);
-                        
+
                     } else {
-                        if (turn.getType() == Type.ORDINARY) {
+                        if (turn.getType() == ProgramacionTotalServiceBean.Type.ORDINARY) {
                             others.add(turn);
                         }
                     }
@@ -536,68 +555,68 @@ public class ProgramacionTotalServiceBean
             for (Turn other : others) {
                 //System.out.println("\t\t" + other.getFunctionary().getAlias() + "\t" + other.getPeriod().getAlias() + other.getPosition().getAlias());
             }
-            
+
             setFunctionariesAvailable();
-            
+
             for (Turn today : todays) {
                 if (today.getFunctionary().isAvailable()) {
                     for (Turn other : others) {
                         if (other.getFunctionary().isAvailable()) {
                             if (other.getPeriod().getId() != today.getPeriod().getId()) {
-                                if (validateAllTurn(today, other.getFunctionary(), day.getDate(), Type.ORDINARY)) {
+                                if (validateAllTurn(today, other.getFunctionary(), day.getDate(), ProgramacionTotalServiceBean.Type.ORDINARY)) {
                                     if (today.getFunctionary().getAlias().equalsIgnoreCase("ICG") && other.getPeriod().getId() == 426) {
                                         System.out.println("poscision");
                                     }
                                     Functionary aux = other.getFunctionary();
                                     other.setFunctionary(today.getFunctionary());
                                     today.setFunctionary(aux);
-                                    
+
                                     today.getFunctionary().setAvailable(false);
                                     other.getFunctionary().setAvailable(false);
-                                    
+
                                 }
                             }
                         }
-                        
+
                     }
                 }
             }
-            
+
         }
-        
+
     }
-    
+
     private boolean validateAllTurn(Turn turn, Functionary fun, Date date, int type) {
-        
+
         Functionary actual = turn.getFunctionary();
         if (actual.getAlias().equalsIgnoreCase("ICG") && turn.getPeriod().getId() == 427) {
             System.out.println("validate all turn");
         }
         turn.setFunctionary(fun);
-        
+
         Calendar tomorrow = Calendar.getInstance();
         tomorrow.setTime(date);
         tomorrow.add(Calendar.DATE, 1);
-        
+
         boolean result = false;
-        
+
         if (turn.getPeriod().getId() == -1) {
             if (fun != null) {
-                
-                Turn next = getTurnOfFunctionary(fun, date, TargetDay.NEXT, Type.ORDINARY);
+
+                Turn next = getTurnOfFunctionary(fun, date, ProgramacionTotalServiceBean.TargetDay.NEXT, ProgramacionTotalServiceBean.Type.ORDINARY);
                 Turn other = null;
-                
-                if (type == Type.ORDINARY) {
-                    other = getTurnOfFunctionary(fun, date, TargetDay.CURRENT, Type.EXTRAORDINARY);
+
+                if (type == ProgramacionTotalServiceBean.Type.ORDINARY) {
+                    other = getTurnOfFunctionary(fun, date, ProgramacionTotalServiceBean.TargetDay.CURRENT, ProgramacionTotalServiceBean.Type.EXTRAORDINARY);
                 }
-                if (type == Type.EXTRAORDINARY) {
-                    other = getTurnOfFunctionary(fun, date, TargetDay.CURRENT, Type.ORDINARY);
+                if (type == ProgramacionTotalServiceBean.Type.EXTRAORDINARY) {
+                    other = getTurnOfFunctionary(fun, date, ProgramacionTotalServiceBean.TargetDay.CURRENT, ProgramacionTotalServiceBean.Type.ORDINARY);
                 }
-                
+
                 if (next == null || (next != null && next.getPeriod().getRequiredPeriod() == -1)) {
-                    if (type == Type.ORDINARY) {
+                    if (type == ProgramacionTotalServiceBean.Type.ORDINARY) {
                         if (validateOrdinaryTurn(fun, turn, date)) {
-                            
+
                             if (other == null || (other != null && validateExtraordinaryTurn(turn, other, date, fun.getMaxHoursExtra(), false))) {
                                 result = true;
                             }
@@ -608,25 +627,25 @@ public class ProgramacionTotalServiceBean
                         }
                     }
                 }
-                
+
             }
         }
         turn.setFunctionary(actual);
-        
+
         return result;
     }
-    
+
     private void solveTop(int top) {
         List<Functionary> funs = functionaries;
         if (top * 2 < functionaries.size()) {
             funs = functionaries.subList(0, top * 2);
         }
         Calendar c = Calendar.getInstance();
-        
+
         for (Functionary f : funs) {
             //System.out.println("Funcionario entre funs\t" + f.getAlias() + "\t" + f.getCountRestSunday());
         }
-        
+
         setFunctionariesAvailable();
         for (Day day : days) {
             setFunctionariesBusy(day.getTurns());
@@ -637,9 +656,9 @@ public class ProgramacionTotalServiceBean
                 if (turn.getFunctionary() == null && i <= top) {
                     Collections.shuffle(funs);
                     for (Functionary fun : funs) {
-                        Turn ayer = getTurnOfFunctionary(fun, day.getDate(), TargetDay.PREVIOUS, Type.ORDINARY);
-                        Turn antier = getTurnOfFunctionary(fun, day.getDate(), TargetDay.PREVIOUS_2_DAYS, Type.ORDINARY);
-                        
+                        Turn ayer = getTurnOfFunctionary(fun, day.getDate(), ProgramacionTotalServiceBean.TargetDay.PREVIOUS, ProgramacionTotalServiceBean.Type.ORDINARY);
+                        Turn antier = getTurnOfFunctionary(fun, day.getDate(), ProgramacionTotalServiceBean.TargetDay.PREVIOUS_2_DAYS, ProgramacionTotalServiceBean.Type.ORDINARY);
+
                         if (!(ayer != null && antier != null && ayer.getPosition().getId() == antier.getPosition().getId() && ayer.getPeriod().getId() == antier.getPeriod().getId())) {
                             if (this.solvingOrdinaryTurn(fun, turn, day.getDate())) {
                                 i++;
@@ -647,17 +666,17 @@ public class ProgramacionTotalServiceBean
                                 break;
                             }
                         }
-                        
+
                     }
-                    
+
                 }
             }
             setFunctionariesAvailable();
         }
-        
+
         orderFunctionaries();
     }
-    
+
     private void solvePeriodsRecessAndRequired() {
         for (Jornada jornada : this.jornadas) {
             if (jornada.getJornadaObligatoria() != null) {
@@ -668,7 +687,7 @@ public class ProgramacionTotalServiceBean
         }
         orderFunctionaries();
     }
-    
+
     private void solveSpecialTurns() {
         List<TurnoEspFuncionario> tes = getSpecialTurns();
         for (TurnoEspFuncionario te : tes) {
@@ -687,9 +706,9 @@ public class ProgramacionTotalServiceBean
                         Position position = new Position(0L, te.getTurnoEspecial().getTeSigla());
                         Functionary func = new Functionary(te.getFuncionario());
                         Turn turn = new Turn(period, position, func, te.getTefId().longValue());
-                        turn.setType(Type.SPECIAL);
+                        turn.setType(ProgramacionTotalServiceBean.Type.SPECIAL);
                         turn.setPermiteHorasExtra(te.getTurnoEspecial().getTePermiteExtras());
-                        
+
                         if (te.getTurnoEspecial().getTeComision() != null && te.getTurnoEspecial().getTeComision() == 2) {
                             turn.setPermiteDescanso(false);
                             //System.out.println("no permite descanso = " + turn.getFunctionary().getAlias());
@@ -698,7 +717,7 @@ public class ProgramacionTotalServiceBean
                         }
                         day.addTurn(turn);
                         write("Especial;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + func.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;OK;");
-                        
+
                         break;
                     }
                 }
@@ -708,9 +727,9 @@ public class ProgramacionTotalServiceBean
         // DOMINGOS
 
         Calendar c = Calendar.getInstance();
-        
+
         ArrayList<Day> sundays = new ArrayList<Day>();
-        
+
         for (Day day : days) {
             c.setTime(day.getDate());
             if (c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY || isHolyDay(day.getDate())) {
@@ -722,59 +741,59 @@ public class ProgramacionTotalServiceBean
         write_data("");
         write_data("Total Domingos en el mes;" + count_sunday);
         write_data("Funcionario;No Domingos Trabaja;No Domingos Libre;Domingos Libre");
-        
+
         Random rg = new Random();
-        
+
         for (Functionary fun : functionaries) {
 //            if (fun.getCountRestSunday() != 0) {
             if (fun.getCountRestSunday() != null) {
                 int num_ld = count_sunday - fun.getCountRestSunday();
-                
+
                 if (num_ld > 0) {
                     ArrayList<Integer> lds = new ArrayList<Integer>();
                     String fechas = "";
-                    
+
                     final Random random = new Random();
                     final Set<Integer> intSet = new HashSet<Integer>();
                     while (intSet.size() < num_ld) {
                         intSet.add(random.nextInt(sundays.size()));
                     }
-                    
+
                     for (Integer index : intSet) {
                         Day day = sundays.get(index);
                         c.setTime(day.getDate());
-                        
-                        Turn turn = getTurnOfFunctionary(fun, day.getDate(), TargetDay.CURRENT, Type.ANY);
+
+                        Turn turn = getTurnOfFunctionary(fun, day.getDate(), ProgramacionTotalServiceBean.TargetDay.CURRENT, ProgramacionTotalServiceBean.Type.ANY);
                         if (turn == null) {
-                            
+
                             fechas += c.get(Calendar.DATE) + "/" + (c.get(Calendar.MONTH) + 1) + ", ";
                             Period period = new Period((long) 0, "", 0, 24);
                             Position position = new Position((long) 0, "LXR");
                             Turn ld = new Turn(period, position, fun, 0);
-                            ld.setType(Type.LD);
+                            ld.setType(ProgramacionTotalServiceBean.Type.LD);
                             ld.setPermiteHorasExtra(false);
                             day.addTurn(ld);
                             lds.add(index);
                             write("LD;" + c.get(Calendar.DATE) + "/" + (c.get(Calendar.MONTH) + 1) + ";" + fun.getAlias() + ";" + ld.getPeriod().getAlias() + ld.getPosition().getAlias() + ";;OK;");
-                            
+
                         }
-                        
+
                     }
-                    
+
                     write_data(fun.getAlias() + ";" + fun.getCountRestSunday() + ";" + num_ld + ";" + fechas);
-                    
+
                 }
             }
-            
+
         }
         write_data("");
         write_data("");
-        
+
     }
-    
+
     private void solveFirstDayAgainstLastMonth() {
         Day day = (Day) this.days.get(0);
-        
+
         Calendar c = Calendar.getInstance();
         c.setTime(day.getDate());
         setFunctionariesAvailable();
@@ -788,7 +807,7 @@ public class ProgramacionTotalServiceBean
                             Period period = new Period(0L, "", 0, 24);
                             Position position = new Position(0L, "DES");
                             Turn rest = new Turn(period, position, fun, 0L);
-                            rest.setType(Type.REST);
+                            rest.setType(ProgramacionTotalServiceBean.Type.REST);
                             rest.setPermiteHorasExtra(false);
                             day.addTurn(rest);
                             write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + rest.getPeriod().getAlias() + rest.getPosition().getAlias() + ";;OK;Empalmando mes anterior");
@@ -827,7 +846,7 @@ public class ProgramacionTotalServiceBean
             }
         }
     }
-    
+
     private void solveRestByWeekPeriodRecess() {
         write_data("Descansos");
         String head = "Funcionario;";
@@ -847,7 +866,7 @@ public class ProgramacionTotalServiceBean
                             if (des == null) {
                                 if ((isRestSunday(day.getDate(), fun)) && (!isHolyDay(day.getDate()).booleanValue())) {
                                     Turn previous = null;
-                                    
+
                                     previous = getTurnOfFunctionary(fun, day.getDate(), -1, 1);
                                     if ((previous != null) && (previous.getPeriod().getId() == this.setting.getPeriodId())) {
                                         Calendar c = Calendar.getInstance();
@@ -855,7 +874,7 @@ public class ProgramacionTotalServiceBean
                                         Period period = new Period(0L, "", 0, 24);
                                         Position position = new Position(0L, "DES");
                                         Turn rest = new Turn(period, position, fun, 0L);
-                                        rest.setType(Type.REST);
+                                        rest.setType(ProgramacionTotalServiceBean.Type.REST);
                                         rest.setPermiteHorasExtra(false);
                                         day.addTurn(rest);
                                         write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + rest.getPeriod().getAlias() + rest.getPosition().getAlias() + ";;OK;");
@@ -885,11 +904,11 @@ public class ProgramacionTotalServiceBean
                                     if (des == null) {
                                         Calendar c = Calendar.getInstance();
                                         c.setTime(d.getDate());
-                                        
+
                                         Period period = new Period(0L, "", 0, 24);
                                         Position position = new Position(0L, "DES");
                                         Turn turn = new Turn(period, position, fun, 0L);
-                                        turn.setType(Type.REST);
+                                        turn.setType(ProgramacionTotalServiceBean.Type.REST);
                                         turn.setPermiteHorasExtra(false);
                                         d.addTurn(turn);
                                         write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;OK;");
@@ -917,7 +936,7 @@ public class ProgramacionTotalServiceBean
                         if ((special != null) && ((special.getPeriod().getAlias() + special.getPosition().getAlias()).equals("DESC"))) {
                             Calendar ca = Calendar.getInstance();
                             ca.setTime(day.getDate());
-                            
+
                             row = row + ca.get(5) + ";";
                             existe = Boolean.valueOf(true);
                             break;
@@ -925,7 +944,7 @@ public class ProgramacionTotalServiceBean
                     } else {
                         Calendar ca = Calendar.getInstance();
                         ca.setTime(day.getDate());
-                        
+
                         row = row + ca.get(5) + ";";
                         existe = Boolean.valueOf(true);
                         break;
@@ -940,7 +959,7 @@ public class ProgramacionTotalServiceBean
         write_data("");
         write_data("");
     }
-    
+
     private void solveRestByWeekPeriodRecessFull() {
         write_data("Descansos");
         String head = "Funcionario;";
@@ -960,7 +979,7 @@ public class ProgramacionTotalServiceBean
                             if (des == null) {
                                 if ((isRestSunday(day.getDate(), fun)) && (!isHolyDay(day.getDate()).booleanValue())) {
                                     Turn previous = null;
-                                    
+
                                     previous = getTurnOfFunctionary(fun, day.getDate(), -1, 1);
                                     if ((previous != null) && (previous.getPeriod().getId() == this.setting.getPeriodId())) {
                                         Calendar c = Calendar.getInstance();
@@ -968,7 +987,7 @@ public class ProgramacionTotalServiceBean
                                         Period period = new Period(0L, "", 0, 24);
                                         Position position = new Position(0L, "DES");
                                         Turn rest = new Turn(period, position, fun, 0L);
-                                        rest.setType(Type.REST);
+                                        rest.setType(ProgramacionTotalServiceBean.Type.REST);
                                         rest.setPermiteHorasExtra(false);
                                         day.addTurn(rest);
                                         write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + rest.getPeriod().getAlias() + rest.getPosition().getAlias() + ";;OK;");
@@ -998,11 +1017,11 @@ public class ProgramacionTotalServiceBean
                                     if (des == null) {
                                         Calendar c = Calendar.getInstance();
                                         c.setTime(d.getDate());
-                                        
+
                                         Period period = new Period(0L, "", 0, 24);
                                         Position position = new Position(0L, "DES");
                                         Turn turn = new Turn(period, position, fun, 0L);
-                                        turn.setType(Type.REST);
+                                        turn.setType(ProgramacionTotalServiceBean.Type.REST);
                                         turn.setPermiteHorasExtra(false);
                                         d.addTurn(turn);
                                         write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;OK;");
@@ -1030,7 +1049,7 @@ public class ProgramacionTotalServiceBean
                         if ((special != null) && ((special.getPeriod().getAlias() + special.getPosition().getAlias()).equals("DESC"))) {
                             Calendar ca = Calendar.getInstance();
                             ca.setTime(day.getDate());
-                            
+
                             row = row + ca.get(5) + ";";
                             existe = Boolean.valueOf(true);
                             break;
@@ -1038,7 +1057,7 @@ public class ProgramacionTotalServiceBean
                     } else {
                         Calendar ca = Calendar.getInstance();
                         ca.setTime(day.getDate());
-                        
+
                         row = row + ca.get(5) + ";";
                         existe = Boolean.valueOf(true);
                         break;
@@ -1053,7 +1072,7 @@ public class ProgramacionTotalServiceBean
         write_data("");
         write_data("");
     }
-    
+
     private void solveTropByWeekPeriodRecess() {
         write_data("Trop");
         String head = "Funcionario;";
@@ -1073,7 +1092,7 @@ public class ProgramacionTotalServiceBean
                         if (des == null) {
                             if ((isRestSunday(day.getDate(), fun)) && (!isHolyDay(day.getDate()).booleanValue())) {
                                 Turn previous = null;
-                                
+
                                 previous = getTurnOfFunctionary(fun, day.getDate(), -1, 1);
                                 if ((previous != null) && (previous.getPeriod().getId() != this.setting.getPeriodId())) {
                                     Calendar c = Calendar.getInstance();
@@ -1081,7 +1100,7 @@ public class ProgramacionTotalServiceBean
                                     Period period = new Period(0L, "", 0, 24);
                                     Position position = new Position(0L, "TROP");
                                     Turn rest = new Turn(period, position, fun, 0L);
-                                    rest.setType(Type.TROP);
+                                    rest.setType(ProgramacionTotalServiceBean.Type.TROP);
                                     rest.setPermiteHorasExtra(false);
                                     day.addTurn(rest);
                                     write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + rest.getPeriod().getAlias() + rest.getPosition().getAlias() + ";;OK;");
@@ -1111,11 +1130,11 @@ public class ProgramacionTotalServiceBean
                                 if (des == null) {
                                     Calendar c = Calendar.getInstance();
                                     c.setTime(d.getDate());
-                                    
+
                                     Period period = new Period(0L, "", 0, 24);
                                     Position position = new Position(0L, "TROP");
                                     Turn turn = new Turn(period, position, fun, 0L);
-                                    turn.setType(Type.TROP);
+                                    turn.setType(ProgramacionTotalServiceBean.Type.TROP);
                                     turn.setPermiteHorasExtra(false);
                                     d.addTurn(turn);
                                     write("Trop;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;OK;");
@@ -1143,7 +1162,7 @@ public class ProgramacionTotalServiceBean
                         if ((special != null) && ((special.getPeriod().getAlias() + special.getPosition().getAlias()).equals("TROP"))) {
                             Calendar ca = Calendar.getInstance();
                             ca.setTime(day.getDate());
-                            
+
                             row = row + ca.get(5) + ";";
                             existe = Boolean.valueOf(true);
                             break;
@@ -1151,7 +1170,7 @@ public class ProgramacionTotalServiceBean
                     } else {
                         Calendar ca = Calendar.getInstance();
                         ca.setTime(day.getDate());
-                        
+
                         row = row + ca.get(5) + ";";
                         existe = Boolean.valueOf(true);
                         break;
@@ -1166,7 +1185,7 @@ public class ProgramacionTotalServiceBean
         write_data("");
         write_data("");
     }
-    
+
     private void solveDescByWeekPeriodRecessFull() {
         write_data("DESC SATURDAY");
         String head = "Funcionario;";
@@ -1182,7 +1201,7 @@ public class ProgramacionTotalServiceBean
                 if (fun.isRestWeek().booleanValue()) {
                     if (!isDescAsigned(fun, week)) {
                         for (Day day : week.getDays()) {
-                            
+
                             Turn des = getTurnOfFunctionary(fun, day.getDate(), 0, -1);
                             if (des == null) {
                                 Calendar c = Calendar.getInstance();
@@ -1195,29 +1214,29 @@ public class ProgramacionTotalServiceBean
                                     Period period = new Period(0L, "", 0, 24);
                                     Position position = new Position(0L, "DESC");
                                     Turn rest = new Turn(period, position, fun, 0L);
-                                    rest.setType(Type.REST);
+                                    rest.setType(ProgramacionTotalServiceBean.Type.REST);
                                     rest.setPermiteHorasExtra(false);
                                     day.addTurn(rest);
                                     write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + rest.getPeriod().getAlias() + rest.getPosition().getAlias() + ";;OK;");
                                     break;
                                 }
                             }
-                            
+
                         }
                     }
                 }
             }
         }
-        
+
     }
-    
+
     private boolean isRestSunday(Date date, Functionary fun) {
         Calendar c = Calendar.getInstance();
         c.setTime(date);
         int count;
-        
+
         if ((fun.getCountRestSunday() != null) && (fun.getCountRestSunday() == 0) && (c.get(7) == 1)) {
-            
+
             count = 0;
             for (Day day : this.days) {
                 c.setTime(day.getDate());
@@ -1235,7 +1254,7 @@ public class ProgramacionTotalServiceBean
         }
         return true;
     }
-    
+
     private void solveOrdinaryTurnsEmpty() {
         setFunctionariesAvailable();
         for (Day day : this.days) {
@@ -1251,7 +1270,7 @@ public class ProgramacionTotalServiceBean
             setFunctionariesBusy(day.getTurns());
         }
     }
-    
+
     private void solveOrdinaryTurnsComplete() {
         setFunctionariesAvailable();
         for (Day day : this.days) {
@@ -1266,11 +1285,11 @@ public class ProgramacionTotalServiceBean
             }
             Functionary fun;
             Collections.shuffle(this.functionaries);
-            
+
             setFunctionariesAvailable();
         }
     }
-    
+
     private void solveOrdinaryTurnsByPeriod(long period) {
         setFunctionariesAvailable();
         for (Day day : this.days) {
@@ -1288,7 +1307,24 @@ public class ProgramacionTotalServiceBean
             setFunctionariesAvailable();
         }
     }
-    
+    private void solveOrdinaryTurnsOnlyMorning(long period) {
+        setFunctionariesAvailable();
+        for (Day day : this.days) {
+            setFunctionariesBusy(day.getTurns());
+            for (Turn turn : day.getTurns()) {
+                if ((turn.getFunctionary() == null) && (turn.getPeriod().getId() == period)) {
+                    for (Functionary fun : this.functionaries) {
+                        if (solvingOrdinaryTurnMorning(fun, turn, day.getDate())) {
+                            break;
+                        }
+                    }
+                }
+                Collections.shuffle(this.functionaries);
+            }
+            setFunctionariesAvailable();
+        }
+    }
+
     private void solveOrdinaryTurnsAvaible() {
         setFunctionariesAvailable();
         for (Day day : this.days) {
@@ -1307,7 +1343,7 @@ public class ProgramacionTotalServiceBean
             setFunctionariesAvailable();
         }
     }
-    
+
     private void solveExtraordinaryTurnsDistribuied(Boolean exceeded) {
         setFunctionariesAvailable();
         for (Day day : this.days) {
@@ -1328,7 +1364,7 @@ public class ProgramacionTotalServiceBean
             setFunctionariesAvailable();
         }
     }
-    
+
     private void save() {
         for (Day day : this.days) {
             for (Turn turn : day.getTurns()) {
@@ -1340,7 +1376,7 @@ public class ProgramacionTotalServiceBean
             }
         }
     }
-    
+
     private void saveNoAssignedPosition(Turn turn, Day day) {
         PosNoAsig pos = new PosNoAsig();
         pos.setFecha(day.getDate());
@@ -1349,10 +1385,10 @@ public class ProgramacionTotalServiceBean
         pos.setPosicion(Long.valueOf(turn.getPosition().getId()));
         pos.setProgramacion(this.programming.getProId());
         pos.setPosicionJornada(new PosicionJornada(Long.valueOf(turn.getPositionPeriod())));
-        
+
         persist(pos);
     }
-    
+
     private void saveAssignedPosition(Turn turn, Day day) {
         Turno turn_raw = new Turno();
         turn_raw.setFuncionario(new Funcionario(Long.valueOf(turn.getFunctionary().getId()), null, null, null, null));
@@ -1365,10 +1401,10 @@ public class ProgramacionTotalServiceBean
         turn_raw.setTurHFin(Long.valueOf(turn.getPeriod().getEnd() - 1L));
         turn_raw.setTurMInicio(Long.valueOf(0L));
         turn_raw.setTurMFin(Long.valueOf(59L));
-        
+
         persist(turn_raw);
     }
-    
+
     private boolean solvingOrdinaryTurn(Functionary fun, Turn turn, Date date) {
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -1383,6 +1419,20 @@ public class ProgramacionTotalServiceBean
         return false;
     }
     
+    private boolean solvingOrdinaryTurnMorning(Functionary fun, Turn turn, Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        if (validateOrdinaryTurnMorningNigth(fun, turn, date).booleanValue()) {
+            if (c.get(Calendar.DAY_OF_MONTH) == 1 && (turn.getPeriod().getAlias() + turn.getPosition().getAlias()).equalsIgnoreCase("AF")) {
+                System.out.println("c = " + c);
+            }
+            turn.setFunctionary(fun);
+            fun.setAvailable(Boolean.valueOf(false));
+            return true;
+        }
+        return false;
+    }
+
     private boolean solvingExtraOrdinaryTurn(Functionary fun, Turn extra, Boolean exceeded, Date date) {
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -1391,7 +1441,7 @@ public class ProgramacionTotalServiceBean
         }
         if (!fun.isAvailable().booleanValue()) {
             Turn turn = getTurnOfFunctionary(fun, date, 0, -1);
-            
+
             if ((turn != null) && (!turn.getHaveExtra().booleanValue())) {
                 int hourEval = fun.getMaxHoursExtra();
                 if (exceeded.booleanValue()) {
@@ -1400,7 +1450,7 @@ public class ProgramacionTotalServiceBean
                 if (hourEval < extra.getPeriod().getTotal()) {
                     return false;
                 }
-                if (turn.getType() == Type.SPECIAL) {
+                if (turn.getType() == ProgramacionTotalServiceBean.Type.SPECIAL) {
                     return false;
                 }
                 int extraType = extra.getType();
@@ -1410,11 +1460,11 @@ public class ProgramacionTotalServiceBean
                         System.out.println("poscision");
                     }
                     extra.setFunctionary(fun);
-                    extra.setType(Type.ORDINARY);
-                    turn.setType(Type.EXTRAORDINARY);
+                    extra.setType(ProgramacionTotalServiceBean.Type.ORDINARY);
+                    turn.setType(ProgramacionTotalServiceBean.Type.EXTRAORDINARY);
                     if (validateExtraordinaryTurn(extra, turn, date, hourEval, exceeded.booleanValue()).booleanValue()) {
-                        extra.setType(Type.ORDINARY);
-                        turn.setType(Type.EXTRAORDINARY);
+                        extra.setType(ProgramacionTotalServiceBean.Type.ORDINARY);
+                        turn.setType(ProgramacionTotalServiceBean.Type.EXTRAORDINARY);
                         turn.setHaveExtra(Boolean.valueOf(true));
                         extra.setHaveExtra(Boolean.valueOf(true));
                         //System.out.print("Fun: " + fun.getAlias() + "\tAntes: " + fun.getMaxHoursExtra());
@@ -1437,7 +1487,7 @@ public class ProgramacionTotalServiceBean
                     extra.setFunctionary(null);
                 } else if (validateExtraordinaryTurn(turn, extra, date, hourEval, exceeded.booleanValue()).booleanValue()) {
                     extra.setFunctionary(fun);
-                    extra.setType(Type.EXTRAORDINARY);
+                    extra.setType(ProgramacionTotalServiceBean.Type.EXTRAORDINARY);
                     fun.addCountExtras();
 //                    if(turn.getPosition().getAlias().startsWith("N")){
 //                        fun.addCoeuntExtrasNocturnas();
@@ -1463,7 +1513,7 @@ public class ProgramacionTotalServiceBean
         }
         return false;
     }
-    
+
     private void orderFunctionaries() {
         Collections.sort(functionaries, new Comparator<Functionary>() {
             @Override
@@ -1474,7 +1524,7 @@ public class ProgramacionTotalServiceBean
             }
         });
     }
-    
+
     private void orderTurns(ArrayList<Turn> turns) {
         Collections.sort(turns, new Comparator<Turn>() {
             @Override
@@ -1485,7 +1535,7 @@ public class ProgramacionTotalServiceBean
             }
         });
     }
-    
+
     private void solvePeriodRequired(long period, long required) {
         setFunctionariesAvailable();
         for (Day day : this.days) {
@@ -1500,7 +1550,7 @@ public class ProgramacionTotalServiceBean
                             Turn previous = null;
                             if (day.getDate().compareTo(this.programming.getProFechaInicio()) == 0) {
                                 previous = getTurnLastDayFromLastProg(fun);
-                                
+
                                 if ((previous != null) && (previous.getPeriod().getId() == required) && (previous.getPosition().getId() == turn.getPosition().getId())) {
                                     if (fun.getAlias().equalsIgnoreCase("ICG") && turn.getPeriod().getId() == 427) {
                                         System.out.println("poscision");
@@ -1508,11 +1558,11 @@ public class ProgramacionTotalServiceBean
                                     turn.setFunctionary(fun);
                                     write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;OK;");
                                     fun.setAvailable(Boolean.valueOf(false));
-                                    
+
                                     Functionary aux = fun;
                                     this.functionaries.remove(fun);
                                     this.functionaries.add(aux);
-                                    
+
                                     break;
                                 }
                             } else {
@@ -1538,9 +1588,9 @@ public class ProgramacionTotalServiceBean
                                                         c.add(5, -1);
                                                         write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + previous.getPeriod().getAlias() + previous.getPosition().getAlias() + ";;OK;");
                                                         c.setTime(day.getDate());
-                                                        
+
                                                         fun.setAvailable(Boolean.valueOf(false));
-                                                        
+
                                                         Functionary aux = fun;
                                                         this.functionaries.remove(fun);
                                                         this.functionaries.add(aux);
@@ -1580,7 +1630,7 @@ public class ProgramacionTotalServiceBean
             setFunctionariesAvailable();
         }
     }
-    
+
     private boolean isRestWeek(Functionary fun, Week week) {
         for (Day day : week.getDays()) {
             Calendar c = Calendar.getInstance();
@@ -1595,7 +1645,7 @@ public class ProgramacionTotalServiceBean
                     return true;
                 }
             }
-            
+
             for (Turn turn : day.getTurns()) {
                 if ((turn.getFunctionary() != null) && (turn.getFunctionary().getId() == fun.getId()) && !turn.getPermiteDescanso()) {
                     return true;
@@ -1604,30 +1654,30 @@ public class ProgramacionTotalServiceBean
         }
         return false;
     }
-    
+
     private boolean isTropWeek(Functionary fun, Week week) {
         for (Day day : week.getDays()) {
             Calendar c = Calendar.getInstance();
             c.setTime(day.getDate());
             for (Turn turn : day.getTurns()) {
-                if ((turn.getFunctionary() != null) && (turn.getFunctionary().getId() == fun.getId()) && (((turn.getType() == Type.TROP) && ((turn.getPeriod().getAlias() + turn.getPosition().getAlias()).equals("TROP"))))) {
+                if ((turn.getFunctionary() != null) && (turn.getFunctionary().getId() == fun.getId()) && (((turn.getType() == ProgramacionTotalServiceBean.Type.TROP) && ((turn.getPeriod().getAlias() + turn.getPosition().getAlias()).equals("TROP"))))) {
                     return true;
                 }
             }
         }
         return false;
     }
-    
+
     private boolean isDescAsigned(Functionary fun, Week week) {
         int spacialDays = 0;
         for (Day day : week.getDays()) {
             Calendar c = Calendar.getInstance();
             c.setTime(day.getDate());
             for (Turn turn : day.getTurns()) {
-                if ((turn.getFunctionary() != null) && (turn.getFunctionary().getId() == fun.getId()) && (((turn.getType() == Type.REST)))) {
+                if ((turn.getFunctionary() != null) && (turn.getFunctionary().getId() == fun.getId()) && (((turn.getType() == ProgramacionTotalServiceBean.Type.REST)))) {
                     return true;
                 }
-                if ((turn.getFunctionary() != null) && (turn.getFunctionary().getId() == fun.getId()) && (((turn.getType() == Type.SPECIAL)))) {
+                if ((turn.getFunctionary() != null) && (turn.getFunctionary().getId() == fun.getId()) && (((turn.getType() == ProgramacionTotalServiceBean.Type.SPECIAL)))) {
                     int time = (turn.getPeriod().getEnd() - turn.getPeriod().getStart());
                     if (time <= 12) {
                         spacialDays++;
@@ -1637,7 +1687,7 @@ public class ProgramacionTotalServiceBean
         }
         return !(spacialDays == 5);
     }
-    
+
     private boolean areWeBusy() {
         for (Functionary fun : this.functionaries) {
             if (fun.isAvailable().booleanValue()) {
@@ -1646,7 +1696,7 @@ public class ProgramacionTotalServiceBean
         }
         return true;
     }
-    
+
     private Turn getTurnDateByPeriodPosition(Date current, int amountDay, long period, long pos) {
         Calendar eval = Calendar.getInstance();
         eval.setTime(current);
@@ -1662,15 +1712,15 @@ public class ProgramacionTotalServiceBean
         }
         return null;
     }
-    
+
     private Boolean validateExtraordinaryTurn(Turn turn, Turn extra, Date current, int hourEval, boolean exceeded) {
         Calendar c = Calendar.getInstance();
         c.setTime(current);
-        
+
         if (c.get(Calendar.DAY_OF_MONTH) == 1 && (turn.getPeriod().getAlias() + turn.getPosition().getAlias()).equalsIgnoreCase("AF")) {
             System.out.println("c = " + c);
         }
-        
+
         String s = "ExtraOrdinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + turn.getFunctionary().getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";" + extra.getPeriod().getAlias() + extra.getPosition().getAlias() + ";";
         if (satisfiesInitialConditionalExtra(s, turn, extra, current, hourEval, exceeded).booleanValue()) {
             if (((satisfiesEnabledPosition(turn.getFunctionary().getId(), turn.getPosition().getId()).booleanValue())
@@ -1679,7 +1729,7 @@ public class ProgramacionTotalServiceBean
                     && (satisfiesEnabledPosition(turn.getFunctionary().getId(), extra.getPosition().getId()).booleanValue()))
                     || ((satisfiesEnabledSpecialPosition(turn.getFunctionary().getId(), extra.getPositionPeriod()).booleanValue())
                     && (satisfiesEnabledPosition(turn.getFunctionary().getId(), turn.getPosition().getId()).booleanValue()))) {
-                
+
                 Turn next = getTurnOfFunctionary(turn.getFunctionary(), current, 1, 1);
                 if (next != null && turn != null) {
                     if (!satisfiesRestrictionPreviousPeriod(turn, next).booleanValue()) {
@@ -1708,7 +1758,7 @@ public class ProgramacionTotalServiceBean
                                         } else if (!satisfiesPetitions(extra, current, turn.getFunctionary())) {
                                             write(s + "El funcionario tiene un peticion para la jornada: " + extra.getPeriod().getAlias() + " el dia: " + new SimpleDateFormat("dd/MM/yy").format(current));
                                         } else {
-                                            
+
                                             if (isJornadaNoLaboral(turn, turn.getFunctionary())) {
                                                 write("Ordinario;" + "El funcionario " + turn.getFunctionary().getAlias() + " esta configurado con la jornada " + turn.getPeriod().getAlias() + " como no laboral;;;;");
                                             } else if (isJornadaNoLaboral(extra, turn.getFunctionary())) {
@@ -1749,11 +1799,11 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(false);
     }
-    
+
     private Boolean validateOrdinaryTurn(Functionary fun, Turn turn, Date current) {
         Calendar c = Calendar.getInstance();
         c.setTime(current);
-        
+
         String s = "Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;";
         if (!isJornadaNoLaboral(turn, fun)) {
             if (satisfiesRestByWeek(fun, current)) {
@@ -1763,7 +1813,7 @@ public class ProgramacionTotalServiceBean
                         if (current.compareTo(this.programming.getProFechaInicio()) == 0) {
                             previous = getTurnLastDayFromLastProg(fun);
                         }
-                        Turn next = getTurnOfFunctionary(fun, current, TargetDay.NEXT, Type.ORDINARY);
+                        Turn next = getTurnOfFunctionary(fun, current, ProgramacionTotalServiceBean.TargetDay.NEXT, ProgramacionTotalServiceBean.Type.ORDINARY);
                         if (next != null && turn != null) {
                             if (!satisfiesRestrictionPreviousPeriod(turn, next).booleanValue()) {
                                 write(s + "No cumple con la restricion de jornada restrictiva con respecto a la jornada anterior;" + next.getPeriod().getAlias() + next.getPosition().getAlias() + ";");
@@ -1793,22 +1843,6 @@ public class ProgramacionTotalServiceBean
                                     write(s + "No cumple con la restricion de jornada de receso;" + previous.getPeriod().getAlias() + previous.getPosition().getAlias() + ";");
                                 }
                             } else {
-//                            if (satisfiesRecessPeriod(previous, turn, false, current)) {
-//                                if (satisfiesSequence(previous, turn).booleanValue()) {
-//                                    if (satisfiesInactivePosition(turn, current)) {
-//                                        if (satisfiesPetitions(turn, current, fun)) {
-//                                            write(s + "OK;");
-//                                            return Boolean.valueOf(true);
-//
-//                                        } else {
-//                                            write(s + "El funcionario tiene un peticion para la jornada: " + turn.getPeriod().getAlias() + " el dia: " + new SimpleDateFormat("dd/MM/yy").format(current));
-//                                        }
-//                                    } else {
-//                                        write(s + "La posicion: " + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + "esta inactiva el dia: " + new SimpleDateFormat("dd/MM/yy").format(current));
-//                                    }
-//                                }
-//                                write(s + "No cumple con secuencia;");
-//                            }
                                 write(s + "No cumple con la restricion de jornada restrictiva con respecto a la jornada anterior;" + previous.getPeriod().getAlias() + previous.getPosition().getAlias() + ";");
                             }
                         } else if (previous == null) {
@@ -1831,11 +1865,82 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(false);
     }
-    
+
+    private Boolean validateOrdinaryTurnMorningNigth(Functionary fun, Turn turn, Date current) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(current);
+
+        String s = "Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;";
+        if (!isJornadaNoLaboral(turn, fun)) {
+            if (satisfiesRestByWeek(fun, current)) {
+                if (fun.isAvailable().booleanValue()) {
+                    if (satisfiesEnabledPosition(fun.getId(), turn.getPosition().getId()).booleanValue()) {
+                        Turn previous = getTurnOfFunctionary(fun, current, -1, -1);
+                        if (current.compareTo(this.programming.getProFechaInicio()) == 0) {
+                            previous = getTurnLastDayFromLastProg(fun);
+                        }
+                        Turn next = getTurnOfFunctionary(fun, current, ProgramacionTotalServiceBean.TargetDay.NEXT, ProgramacionTotalServiceBean.Type.ORDINARY);
+                        if (next != null && turn != null) {
+                            if (!satisfiesRestrictionPreviousPeriod(turn, next).booleanValue()) {
+                                write(s + "No cumple con la restricion de jornada restrictiva con respecto a la jornada anterior;" + next.getPeriod().getAlias() + next.getPosition().getAlias() + ";");
+                                return false;
+                            }
+                        }
+                        if (satisfiesRequiredPeriod(previous, turn).booleanValue()) {
+                            if (satisfiesRestrictionPreviousPeriod(previous, turn).booleanValue()) {
+                                if (satisfiesRecessPeriod(previous, turn, Boolean.valueOf(false), current).booleanValue()) {
+                                    if (satisfiesSequence(previous, turn).booleanValue()) {
+                                        if (satisfiesInactivePosition(turn, current)) {
+                                            if (satisfiesPetitions(turn, current, fun)) {
+                                                if (turn !=null && turn.getPeriod().getAlias().equalsIgnoreCase("M")) {
+                                                    if (next!=null && next.getPeriod().getAlias().equalsIgnoreCase("N")) {
+                                                        write(s + "OK;");
+                                                        return Boolean.valueOf(true);
+                                                    } else {
+                                                        write(s + "La jornada siguiente no es Nocturna");
+                                                    }
+                                                } else {
+                                                    write(s + "La jornada no es mañana");
+                                                }
+                                            } else {
+                                                write(s + "El funcionario tiene un peticion para la jornada: " + turn.getPeriod().getAlias() + " el dia: " + new SimpleDateFormat("dd/MM/yy").format(current));
+                                            }
+                                        } else {
+                                            write(s + "La posicion: " + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + "esta inactiva el dia: " + new SimpleDateFormat("dd/MM/yy").format(current));
+                                        }
+                                    }
+                                    write(s + "No cumple con secuencia;");
+                                } else {
+                                    write(s + "No cumple con la restricion de jornada de receso;" + previous.getPeriod().getAlias() + previous.getPosition().getAlias() + ";");
+                                }
+                            } else {
+                                write(s + "No cumple con la restricion de jornada restrictiva con respecto a la jornada anterior;" + previous.getPeriod().getAlias() + previous.getPosition().getAlias() + ";");
+                            }
+                        } else if (previous == null) {
+                            write(s + "No cumple con la restricion de jornada obligatoria anterior por que no existe;");
+                        } else {
+                            write(s + "No cumple con la restricion de jornada obligatoria anterior;" + previous.getPeriod().getAlias() + previous.getPosition().getAlias() + ";");
+                        }
+                    } else {
+                        write(s + "Funcionario No Tiene Posicion Habilitada;" + turn.getPosition().getAlias() + ";");
+                    }
+                } else {
+                    write(s + "Funcionario ya tiene turno programado para ese dia;");
+                }
+            } else {
+                write(s + "No cumple con las restricci?n de los descansos;");
+            }
+        } else {
+            System.out.println(s + "El funcionario " + fun.getAlias() + " esta configurado con la jornada " + turn.getPeriod().getAlias() + " como no laboral;");
+            write(s + "El funcionario " + fun.getAlias() + " esta configurado con la jornada " + turn.getPeriod().getAlias() + " como no laboral;;;;");
+        }
+        return Boolean.valueOf(false);
+    }
+
     private boolean satisfiesRestByWeek(Functionary fun, Date current_day) {
         return true;
     }
-    
+
     private Boolean isHolyDay(Date date) {
         for (DiaFestivo day : this.holydays) {
             if (date.compareTo(day.getDfFecha()) == 0) {
@@ -1844,9 +1949,9 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(false);
     }
-    
+
     private Boolean satisfiesInitialConditionalExtra(String s, Turn turn, Turn extra, Date current, int hourEval, boolean exceeded) {
-        extra.setType(Type.EXTRAORDINARY);
+        extra.setType(ProgramacionTotalServiceBean.Type.EXTRAORDINARY);
         if (turn.getFunctionary().getCanExtra().booleanValue()) {
             if ((!this.setting.isMaxHoursExtra()) || ((hourEval > 0) && (turn.getFunctionary().getMaxHoursExtra() - extra.getPeriod().getTotal() > 0))) {
                 if (extra.getPeriod().getStart() >= turn.getPeriod().getEnd()) {
@@ -1875,9 +1980,9 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(false);
     }
-    
+
     private Boolean satisfiesMaxContinuosPeriod(Turn turn, Turn extra, Turn next, Date date) {
-        
+
         if ((this.setting.getMaxContinuosPeriod() > 0) && (turn != null) && (extra != null) && (turn.getType() == 1)) {
             if (turn.getPeriod().getEnd() == extra.getPeriod().getStart()) {
                 if (this.setting.getMaxContinuosPeriod() >= 1) {
@@ -1891,7 +1996,7 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(true);
     }
-    
+
     private Boolean satisfiesMaxContinuosDaysExtra(Turn turn, Date date) {
         if ((this.setting.getMaxContinuosDaysExtra() > 0) && (turn != null)) {
             Calendar calendar = Calendar.getInstance();
@@ -1928,7 +2033,7 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(true);
     }
-    
+
     private Boolean satisfiesMaxContinuosDaysExtra(Turn turn, Date date, boolean exceed) {
         if ((this.setting.getMaxContinuosDaysExtra() > 0) && (turn != null)) {
             Calendar calendar = Calendar.getInstance();
@@ -1969,7 +2074,7 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(true);
     }
-    
+
     private Boolean satisfiesRequiredPeriod(Turn previous, Turn current) {
         if (current != null) {
             if (current.getPeriod().getRequiredPeriod() != -1L) {
@@ -1983,7 +2088,7 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(true);
     }
-    
+
     private Boolean satisfiesRestrictionPreviousPeriod(Turn previous, Turn current) {
         if ((previous != null) && (current != null)) {
             if (previous.getPeriod().getId() == 168 && current.getPeriod().getId() == 166) {
@@ -2001,7 +2106,7 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(true);
     }
-    
+
     private Boolean satisfiesRecessPeriod(Turn previous, Turn current, Boolean same_day) {
         if ((previous != null) && (current != null)) {
             if ((this.setting.getPeriodId() != -1L) && (this.setting.getTimeRecess() != -1)) {
@@ -2018,11 +2123,11 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(true);
     }
-    
+
     private Boolean satisfiesRecessPeriod(Turn previous, Turn current, Boolean same_day, Date currentDate) {
         Calendar r = Calendar.getInstance();
         r.setTime(currentDate);
-        
+
         if ((previous != null) && (current != null)) {
             if ((this.setting.getPeriodId() != -1L) && (this.setting.getTimeRecess() != -1)) {
                 if (previous.getPeriod().getId() == this.setting.getPeriodId()) {
@@ -2035,13 +2140,13 @@ public class ProgramacionTotalServiceBean
                     int month = r.get(Calendar.MONTH);
                     int day = r.get(Calendar.DATE);
                     today.set(year, month, day, current.getPeriod().getStart(), 0);
-                    
+
                     Calendar yesterday = Calendar.getInstance();
                     yesterday.setTime(currentDate);
                     yesterday.add(Calendar.DATE, -1);
                     yesterday.set(Calendar.HOUR_OF_DAY, previous.getPeriod().getEnd());
                     yesterday.set(Calendar.MINUTE, 0);
-                    
+
                     long resultado = diferenciaHorasDias(yesterday, today);
                     if (resultado < start) {
                         return Boolean.valueOf(false);
@@ -2051,7 +2156,7 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(true);
     }
-    
+
     private long diferenciaHorasDias(Calendar fechaInicial, Calendar fechaFinal) {
         long diferenciaHoras = 0;
         long milisegundos_dia = 24 * 60 * 60 * 1000;
@@ -2061,7 +2166,7 @@ public class ProgramacionTotalServiceBean
         }
         return diferenciaHoras;
     }
-    
+
     private Boolean satisfiesSequence(Turn previous, Turn current) {
         if ((previous != null) && (current != null)) {
             long sec = -1L;
@@ -2080,7 +2185,7 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(true);
     }
-    
+
     private Boolean satisfiesInactivePosition(Turn current, Date fecha) {
         if ((current != null)) {
             Calendar c = Calendar.getInstance();
@@ -2101,15 +2206,14 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(true);
     }
-    
+
     private boolean isJornadaNoLaboral(Turn turn, Functionary fun) {
         List<JornadaNoLaborable> jornadasNoLaborales = this.jornadaNoLaboralService.getListaJornadasFuncionario(fun.getId());
-        List<Jornada> jorDepNoLaboral = listasService.obtenerJornadaXDependencia(this.programming.getDependencia().getDepId());
-        
-        if (jornadasNoLaborales.size() == jorDepNoLaboral.size()) {
+
+        if (jornadasNoLaborales.size() == this.jornadasDependencia.size()) {
             return true;
         }
-        if (jornadasNoLaborales.size() < jorDepNoLaboral.size()) {
+        if (jornadasNoLaborales.size() < this.jornadasDependencia.size()) {
             for (JornadaNoLaborable j : jornadasNoLaborales) {
                 long currentJoId = turn.getPeriod().getId();
                 long noLabJoId = j.getJornada().getJoId();
@@ -2120,7 +2224,7 @@ public class ProgramacionTotalServiceBean
         }
         return false;
     }
-    
+
     private Boolean satisfiesPetitions(Turn current, Date fecha, Functionary fun) {
 
         /*if (fun.getAlias().equalsIgnoreCase("ICG") && current != null && current.getPeriod().getId() == 427) {
@@ -2133,11 +2237,10 @@ public class ProgramacionTotalServiceBean
                 List<PermisoEspecial> petitions = getPetitions(fun.getId(), fecha);
                 for (PermisoEspecial especial : petitions) {
                     List<Jornada> listaJornadas = especial.getListaJornadas();
-                    List<Jornada> jorDep = listasService.obtenerJornadaXDependencia(this.programming.getDependencia().getDepId());
-                    if (listaJornadas.size() == jorDep.size()) {
+                    if (listaJornadas.size() == this.jornadasDependencia.size()) {
                         return false;
                     }
-                    if (listaJornadas.size() < jorDep.size()) {
+                    if (listaJornadas.size() < this.jornadasDependencia.size()) {
                         for (Jornada j : listaJornadas) {
                             if (current.getPeriod().getId() == j.getJoId()) {
                                 return false;
@@ -2150,10 +2253,10 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(true);
     }
-    
+
     private Boolean satisfiesEnabledPosition(long funId, long posId) {
         Calendar actual = Calendar.getInstance();
-        List<PosicionHabilitada> enabledPositionsFunctionary = getEnabledPositionsFunctionary(funId);
+        List<PosicionHabilitada> enabledPositionsFunctionary = getEnabledPositionsFunctionary(funId, posId);
         for (PosicionHabilitada ph : enabledPositionsFunctionary) {
             if ((ph.getPosicion().getPosId().longValue() == posId) && (actual.getTime().compareTo(ph.getPhFvencimiento()) <= 0)) {
                 return Boolean.valueOf(true);
@@ -2161,7 +2264,7 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(false);
     }
-    
+
     private Boolean satisfiesEnabledSpecialPosition(long funId, long posId) {
         List<TurnoEspFuncionario> tes = getSpecialTurns();
         for (TurnoEspFuncionario te : tes) {
@@ -2171,7 +2274,7 @@ public class ProgramacionTotalServiceBean
         }
         return Boolean.valueOf(false);
     }
-    
+
     private Turn getTurnLastDayFromLastProg(Functionary fun) {
         this.lastDay = getLastDay();
         if (this.lastDay != null) {
@@ -2183,7 +2286,7 @@ public class ProgramacionTotalServiceBean
         }
         return null;
     }
-    
+
     private Turn getTurnLastDayFromLastProgPrevMonth(Functionary fun) {
         this.lastDay = getLastDayPrevMonth();
         if (this.lastDay != null) {
@@ -2195,7 +2298,7 @@ public class ProgramacionTotalServiceBean
         }
         return null;
     }
-    
+
     private Turn getTurnOfFunctionary(Functionary fun, Date current, int amountDay, int type) {
         Calendar eval = Calendar.getInstance();
         eval.setTime(current);
@@ -2204,30 +2307,30 @@ public class ProgramacionTotalServiceBean
             if (day.getDate().compareTo(eval.getTime()) == 0) {
                 for (Turn turn : turnSortByType(day.getTurns())) {
                     if (type == -1) {
-                        if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && ((turn.getType() == Type.EXTRAORDINARY) || (turn.getType() == type))) {
+                        if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && ((turn.getType() == ProgramacionTotalServiceBean.Type.EXTRAORDINARY) || (turn.getType() == type))) {
                             return turn;
                         }
-                        if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && ((turn.getType() == Type.ORDINARY) || (turn.getType() == type))) {
+                        if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && ((turn.getType() == ProgramacionTotalServiceBean.Type.ORDINARY) || (turn.getType() == type))) {
                             return turn;
                         }
-                        if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && ((type == Type.ANY) || (turn.getType() == type))) {
+                        if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && ((type == ProgramacionTotalServiceBean.Type.ANY) || (turn.getType() == type))) {
                             return turn;
                         }
                     } else {
-                        if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && ((type == Type.ORDINARY) || (turn.getType() == type))) {
+                        if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && ((type == ProgramacionTotalServiceBean.Type.ORDINARY) || (turn.getType() == type))) {
                             return turn;
                         }
-                        if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && ((type == Type.TROP) || (turn.getType() == type))) {
+                        if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && ((type == ProgramacionTotalServiceBean.Type.TROP) || (turn.getType() == type))) {
                             return turn;
                         }
-                        
+
                     }
                 }
             }
         }
         return null;
     }
-    
+
     private void replaceTurnOfFunctionary(Functionary fun, Date current, int amountDay, int type, Turn newTurn) {
         Calendar eval = Calendar.getInstance();
         eval.setTime(current);
@@ -2242,7 +2345,7 @@ public class ProgramacionTotalServiceBean
             }
         }
     }
-    
+
     private Turn getTurnTropOfFunctionary(Functionary fun, Date current, int amountDay, int type) {
         Calendar eval = Calendar.getInstance();
         eval.setTime(current);
@@ -2250,17 +2353,17 @@ public class ProgramacionTotalServiceBean
         for (Day day : this.days) {
             if (day.getDate().compareTo(eval.getTime()) == 0) {
                 for (Turn turn : turnSortByType(day.getTurns())) {
-                    
-                    if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && (type == Type.TROP) && (turn.getPosition().getAlias().equals("TROP"))) {
+
+                    if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && (type == ProgramacionTotalServiceBean.Type.TROP) && (turn.getPosition().getAlias().equals("TROP"))) {
                         return turn;
                     }
-                    
+
                 }
             }
         }
         return null;
     }
-    
+
     private void setFunctionariesBusy(ArrayList<Turn> turns) {
         for (Turn turn : turns) {
             if (turn.getFunctionary() != null) {
@@ -2274,19 +2377,19 @@ public class ProgramacionTotalServiceBean
         }
         Turn turn;
     }
-    
+
     private void setFunctionariesAvailable() {
         for (Functionary fun : this.functionaries) {
             fun.setAvailable(Boolean.valueOf(true));
         }
     }
-    
+
     private void setFunctionariesAvailable(List<Functionary> funcionaries) {
         for (Functionary fun : funcionaries) {
             fun.setAvailable(Boolean.valueOf(true));
         }
     }
-    
+
     private int numEnables(long pos) {
         int cont = 0;
         for (PosicionHabilitada ph : this.enabledPositions) {
@@ -2296,7 +2399,7 @@ public class ProgramacionTotalServiceBean
         }
         return cont;
     }
-    
+
     private List<Jornada> getJornadas() {
         try {
             Query query = this.em.createQuery("SELECT j FROM Jornada j WHERE j.dependencia.depId = :depId and j.joEstado = :estado ORDER BY j.joHoraInicio ASC");
@@ -2309,30 +2412,44 @@ public class ProgramacionTotalServiceBean
         return null;
     }
     
+    private Jornada getJornadaM() {
+        try {
+            Query query = this.em.createQuery("SELECT j FROM Jornada j WHERE j.joAlias = :alias and j.dependencia.depId = :depId and j.joEstado = :estado ORDER BY j.joHoraInicio ASC");
+            query.setParameter("alias", "M");
+            query.setParameter("depId", this.programming.getDependencia().getDepId());
+            query.setParameter("estado", "Activo");
+            //System.out.println("queryJornadas = " + query.toString());
+            return (Jornada) query.getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
+        
+    }
+
     private List<PosicionJornada> getPositionPeriods() {
         try {
             Query query = this.em.createQuery("SELECT p FROM PosicionJornada p WHERE p.dependencia.depId = :depId and p.jornada.dependencia.depId = :depId and p.posicion.dependencia.depId = :depId and p.pjEstado= :estado and p.posicion.posEstado= :estado");
             query.setParameter("depId", this.programming.getDependencia().getDepId());
             query.setParameter("estado", "Activo");
-            
+
             return query.getResultList();
         } catch (NoResultException nre) {
         }
         return null;
     }
-    
+
     private PosicionJornada getPositionPeriod(Long id) {
         return (PosicionJornada) this.em.find(PosicionJornada.class, id);
     }
-    
+
     private ParametroSistema getSystemParameter(BigDecimal id) {
         return (ParametroSistema) this.em.find(ParametroSistema.class, id);
     }
-    
+
     private TurnoEspFuncionario getSpecialTurn(Long id) {
         return (TurnoEspFuncionario) this.em.find(TurnoEspFuncionario.class, id);
     }
-    
+
     private List<PosicionHabilitada> getEnabledPositions() {
         try {
             Query query = this.em.createQuery("SELECT p FROM PosicionHabilitada p WHERE p.funcionario.dependencia.depId = :depId and p.posicion.posEstado= :estado and p.posicion.dependencia.depId = :depId");
@@ -2344,19 +2461,20 @@ public class ProgramacionTotalServiceBean
         }
         return null;
     }
-    
-    private List<PosicionHabilitada> getEnabledPositionsFunctionary(Long funId) {
+
+    private List<PosicionHabilitada> getEnabledPositionsFunctionary(Long funId, Long posId) {
         try {
-            Query query = em.createQuery("SELECT p FROM PosicionHabilitada p WHERE p.funcionario.funId = :funId and p.posicion.posEstado= :estado ");
+            Query query = em.createQuery("SELECT p FROM PosicionHabilitada p WHERE p.funcionario.funId = :funId and p.posicion.posEstado= :estado and p.posicion.posId = :posId ");
             query.setParameter("funId", funId);
             query.setParameter("estado", "Activo");
+            query.setParameter("posId", posId);
             return (List<PosicionHabilitada>) query.getResultList();
         } catch (NoResultException nre) {
             return new ArrayList<PosicionHabilitada>();
         }
-        
+
     }
-    
+
     private List<Funcionario> getFunctionaries() {
         try {
             Calendar actual = Calendar.getInstance();
@@ -2369,7 +2487,7 @@ public class ProgramacionTotalServiceBean
         }
         return null;
     }
-    
+
     private List<PermisoEspecial> getPetitions(Long funId, Date current) {
         try {
             Calendar actual = Calendar.getInstance();
@@ -2382,7 +2500,7 @@ public class ProgramacionTotalServiceBean
         }
         return null;
     }
-    
+
     private List<PosicionInactiva> getInactivePositions(Long pjId, Date fecha) {
         try {
             Calendar actual = Calendar.getInstance();
@@ -2395,30 +2513,30 @@ public class ProgramacionTotalServiceBean
         }
         return null;
     }
-    
+
     private List<JornadaRestriccion> getRestrictivePeriod() {
         try {
             Query query = this.em.createQuery("SELECT j FROM JornadaRestriccion j WHERE j.jornada.dependencia.depId = :depId AND j.jornadaEv.dependencia.depId = :depId");
             query.setParameter("depId", this.programming.getDependencia().getDepId());
-            
+
             return query.getResultList();
         } catch (NoResultException nre) {
         }
         return null;
     }
-    
+
     private JornadaRestriccion getRestrictivePeriod(Long prev, Long current) {
         try {
             Query query = this.em.createNamedQuery("JornadaRestriccion.getRestrictions");
             query.setParameter("prev", prev);
             query.setParameter("current", current);
-            
+
             return (JornadaRestriccion) query.getSingleResult();
         } catch (NoResultException nre) {
         }
         return null;
     }
-    
+
     private List<TurnoEspFuncionario> getSpecialTurns() {
         try {
             Calendar actual = Calendar.getInstance();
@@ -2435,7 +2553,7 @@ public class ProgramacionTotalServiceBean
         }
         return null;
     }
-    
+
     private List<RestriccionDependencia> getRestrictions() {
         try {
             Query query = this.em.createQuery("SELECT r FROM RestriccionDependencia r WHERE r.dependencia.depId = :depId");
@@ -2445,7 +2563,7 @@ public class ProgramacionTotalServiceBean
         }
         return null;
     }
-    
+
     private List<Turno> getRestLastWeek() {
         Calendar c = Calendar.getInstance();
         c.setTime(this.programming.getProFechaInicio());
@@ -2455,34 +2573,34 @@ public class ProgramacionTotalServiceBean
         //System.out.println("Entre " + c.get(5) + "/" + (c.get(2) + 1));
         try {
             Query query = this.em.createQuery("SELECT t FROM Turno t WHERE t.programacion.proEstado=1 and t.programacion.dependencia.depId = :depId AND t.turTipo= :turTipo AND (t.turFecha between :start and :finish) ");
-            
+
             query.setParameter("depId", this.programming.getDependencia().getDepId());
             query.setParameter("turTipo", Integer.valueOf(5));
             query.setParameter("start", c.getTime(), TemporalType.DATE);
             query.setParameter("finish", this.programming.getProFechaInicio(), TemporalType.DATE);
-            
+
             return query.getResultList();
         } catch (NoResultException nre) {
         }
         return null;
     }
-    
+
     private List<Turno> getTurnosFunPro(long funId, long proId) {
         try {
             this.em.clear();
             this.em.flush();
-            
+
             Query q1 = this.em.createQuery("SELECT t FROM Turno t WHERE t.funcionario.funId = :funId AND t.programacion.proId = :proId");
-            
+
             q1.setParameter("proId", Long.valueOf(proId));
             q1.setParameter("funId", Long.valueOf(funId));
-            
+
             return q1.getResultList();
         } catch (NoResultException nre) {
         }
         return null;
     }
-    
+
     private List<DiaFestivo> getDiaFestivo() {
         try {
             Query query = this.em.createQuery("SELECT d FROM DiaFestivo d WHERE d.dfFecha between :start and :finish");
@@ -2493,7 +2611,7 @@ public class ProgramacionTotalServiceBean
         }
         return null;
     }
-    
+
     private List<DetSecuencia> getSequences() {
         try {
             Query query = this.em.createQuery("SELECT s FROM DetSecuencia s WHERE s.secuencia.dependencia.depId=:depId AND s.secuencia.secuEstado = :estado ORDER BY s.secuencia.secuId, s.dsOrden");
@@ -2504,24 +2622,24 @@ public class ProgramacionTotalServiceBean
         }
         return null;
     }
-    
+
     private Day getLastDay() {
         Calendar c = Calendar.getInstance();
         c.setTime(this.programming.getProFechaInicio());
         c.add(5, -1);
         try {
             Query query = this.em.createQuery("SELECT t FROM Turno t WHERE t.funcionario.funId is not null and t.programacion.dependencia.depId = :depId AND t.turFecha= :fecha AND t.programacion.proEstado = 1 AND (t.turTipo =2 OR ( t.turTipo =1 AND 0=(SELECT count(tt) FROM Turno tt WHERE tt.funcionario.funId is not null and t.funcionario.funId = tt.funcionario.funId AND t.turFecha=tt.turFecha AND t.turId <> tt.turId ) ) )");
-            
+
             query.setParameter("fecha", c.getTime(), TemporalType.DATE);
             query.setParameter("depId", this.programming.getDependencia().getDepId());
             List<Turno> turnos = query.getResultList();
-            
+
             ArrayList<Turn> turns = new ArrayList();
             for (Turno turno : turnos) {
                 if (turno.getFuncionario() != null) {
                     Calendar f = Calendar.getInstance();
                     f.setTime(turno.getTurFecha());
-                    
+
                     PosicionJornada pj = (PosicionJornada) this.em.find(PosicionJornada.class, turno.getTurPosicionJornada());
                     Period period = new Period(pj.getJornada().getJoId().longValue(), pj.getJornada().getJoAlias(), pj.getJornada().getJoHoraInicio().byteValue(), pj.getJornada().getJoHoraFin().byteValue() + 1);
                     Position position = new Position(pj.getPosicion().getPosId().longValue(), pj.getPosicion().getPosicionNacional().getPnAlias());
@@ -2535,24 +2653,24 @@ public class ProgramacionTotalServiceBean
         }
         return null;
     }
-    
+
     private Day getLastDayPrevMonth() {
         Calendar c = Calendar.getInstance();
         c.setTime(this.programming.getProFechaInicio());
         c.add(5, -1);
         try {
             Query query = this.em.createQuery("SELECT t FROM Turno t WHERE t.funcionario.funId is not null and t.programacion.dependencia.depId = :depId AND t.turFecha= :fecha AND t.programacion.proEstado = 1 AND (t.turTipo =2 OR t.turTipo =1)");
-            
+
             query.setParameter("fecha", c.getTime(), TemporalType.DATE);
             query.setParameter("depId", this.programming.getDependencia().getDepId());
             List<Turno> turnos = query.getResultList();
-            
+
             ArrayList<Turn> turns = new ArrayList();
             for (Turno turno : turnos) {
                 if (turno.getFuncionario() != null) {
                     Calendar f = Calendar.getInstance();
                     f.setTime(turno.getTurFecha());
-                    
+
                     PosicionJornada pj = (PosicionJornada) this.em.find(PosicionJornada.class, turno.getTurPosicionJornada());
                     Period period = new Period(pj.getJornada().getJoId().longValue(), pj.getJornada().getJoAlias(), pj.getJornada().getJoHoraInicio().byteValue(), pj.getJornada().getJoHoraFin().byteValue() + 1);
                     Position position = new Position(pj.getPosicion().getPosId().longValue(), pj.getPosicion().getPosicionNacional().getPnAlias());
@@ -2566,11 +2684,11 @@ public class ProgramacionTotalServiceBean
         }
         return null;
     }
-    
+
     public void persist(Object object) {
         this.em.persist(object);
     }
-    
+
     private void debug_completed() {
         //System.out.print("\n\tHorario Ordinario\n\n\tFun");
         for (Day day : this.days) {
@@ -2635,7 +2753,7 @@ public class ProgramacionTotalServiceBean
         }
         //System.out.println("\n");
     }
-    
+
     private void debug_missed() {
         write_data("No Asignados");
         write_data("Fecha;Posiciones;");
@@ -2682,19 +2800,19 @@ public class ProgramacionTotalServiceBean
         write_data("");
         write_data("");
     }
-    
+
     private void write(String s) {
         if (this.debug.booleanValue()) {
             this.log.add(s);
         }
     }
-    
+
     private void write_data(String s) {
         if (this.debug.booleanValue()) {
             this.data.add(s);
         }
     }
-    
+
     private void finish() {
         if (this.debug.booleanValue()) {
             try {
@@ -2717,17 +2835,17 @@ public class ProgramacionTotalServiceBean
             }
         }
     }
-    
+
     private void refiningByDay() {
         /**
          * .|.
          */
         Calendar c = Calendar.getInstance();
         for (Day day : this.days) {
-            
+
             ArrayList<Turn> no_asigns = new ArrayList();
             ArrayList<Functionary> no_ordins = new ArrayList();
-            
+
             c.setTime(day.getDate());
             for (Turn turn : day.getTurns()) {
                 if (turn.getFunctionary() == null) {
@@ -2737,7 +2855,7 @@ public class ProgramacionTotalServiceBean
             for (Functionary fun : this.functionaries) {
                 boolean es_nulo = true;
                 for (Turn turn : day.getTurns()) {
-                    
+
                     if ((turn.getFunctionary() != null) && (turn.getFunctionary().getId() == fun.getId())) {
                         es_nulo = false;
                         break;
@@ -2748,19 +2866,19 @@ public class ProgramacionTotalServiceBean
                     no_ordins.add(fun);
                 }
             }
-            
+
             for (Turn no_asign : no_asigns) {
                 if (no_asign.getFunctionary() == null) {
                     for (Functionary fun : no_ordins) {
                         if (fun.isAvailable()) {
-                            Turn next = getTurnOfFunctionary(fun, day.getDate(), TargetDay.NEXT, Type.ORDINARY);
-                            if (next == null || (next != null && next.getPeriod().getRequiredPeriod() == Type.ANY)) {
+                            Turn next = getTurnOfFunctionary(fun, day.getDate(), ProgramacionTotalServiceBean.TargetDay.NEXT, ProgramacionTotalServiceBean.Type.ORDINARY);
+                            if (next == null || (next != null && next.getPeriod().getRequiredPeriod() == ProgramacionTotalServiceBean.Type.ANY)) {
                                 if (validateOrdinaryTurn(fun, no_asign, day.getDate()).booleanValue()) {
                                     if (fun.getAlias().equalsIgnoreCase("ICG") && no_asign.getPeriod().getId() == 426) {
                                         System.out.println("poscision");
                                     }
                                     no_asign.setFunctionary(fun);
-                                    no_asign.setType(Type.ORDINARY);
+                                    no_asign.setType(ProgramacionTotalServiceBean.Type.ORDINARY);
                                     fun.setAvailable(false);
                                     break;
                                 }
@@ -2771,27 +2889,27 @@ public class ProgramacionTotalServiceBean
             }
         }
     }
-    
+
     public List<Turn> turnSortByType(List<Turn> turns) {
         Turn[] auxArr = new Turn[turns.size()];
         auxArr = turns.toArray(auxArr);
-        
+
         int n = auxArr.length;
         Turn temp = null;
-        
+
         for (int i = 0; i < n; i++) {
             for (int j = 1; j < (n - i); j++) {
-                
+
                 if (auxArr[j - 1].getType() < auxArr[j].getType()) {
                     //swap the elements!
                     temp = auxArr[j - 1];
                     auxArr[j - 1] = auxArr[j];
                     auxArr[j] = temp;
                 }
-                
+
             }
         }
-        
+
         List<Turn> respuesta = Arrays.asList(auxArr);
         return respuesta;
     }
