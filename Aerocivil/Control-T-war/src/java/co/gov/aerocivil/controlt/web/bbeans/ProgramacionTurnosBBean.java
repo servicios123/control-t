@@ -30,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -112,7 +113,7 @@ public class ProgramacionTurnosBBean {
     }
 
     public String generandoProgramacion() {
-
+        System.out.println("Inicio de la programacion " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
         debug = true;
         Calendar start = Calendar.getInstance();
         Calendar finish = Calendar.getInstance();

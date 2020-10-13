@@ -5,15 +5,15 @@
 package co.gov.aerocivil.models;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
 
 /**
  *
  * @author Administrador
  */
 public class Week {
+
     private ArrayList<Day> days;
+    private int totalDays;
 
     public Week() {
         this.days = new ArrayList<Day>();
@@ -22,26 +22,22 @@ public class Week {
     public Week(ArrayList<Day> days) {
         this.days = days;
     }
-    
-    public void addDay(Day day)
-    {
+
+    public void addDay(Day day) {
         this.days.add(day);
     }
-    
-    public void setRandomDays()
-    {       
+
+    public void setRandomDays() {
         ArrayList<Day> aux = new ArrayList<Day>();
-        if(days.size()>0)
-        {
-            for (int i = 1; i < days.size(); i++) 
-            {
+        if (days.size() > 0) {
+            for (int i = 1; i < days.size(); i++) {
                 aux.add(days.get(i));
-            }        
+            }
             aux.add(days.get(0));
         }
         this.setDays(aux);
     }
-    
+
     /**
      * @return the days
      */
@@ -54,5 +50,13 @@ public class Week {
      */
     public void setDays(ArrayList<Day> days) {
         this.days = days;
+    }
+
+    public int getTotalDays() {
+        return totalDays;
+    }
+
+    public void setTotalDays(int totalDays) {
+        this.totalDays = totalDays;
     }
 }

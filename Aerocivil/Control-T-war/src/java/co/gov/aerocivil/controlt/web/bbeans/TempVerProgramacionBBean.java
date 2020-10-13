@@ -30,6 +30,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -176,6 +177,7 @@ public class TempVerProgramacionBBean {
 
 
         comprobar();
+        System.out.println("Fin de la programacion " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
         //resumenList = tempVerProgramacionService.obtenerResumen(programacion.getProId());
     }
 
