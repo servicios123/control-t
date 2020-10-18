@@ -14,6 +14,8 @@ import java.util.List;
  */
 public class Day {
     private Date date;
+    private int totalTrop;
+    private int TotalDesc;
     private ArrayList<Turn> turns;
 
     public Day(Date date) 
@@ -59,6 +61,24 @@ public class Day {
     {
         this.turns.add(turn);
     }
+
+    public int getTotalTrop() {
+        return totalTrop;
+    }
+
+    public void setTotalTrop(int totalTrop) {
+        this.totalTrop = totalTrop;
+    }
+
+    public int getTotalDesc() {
+        return TotalDesc;
+    }
+
+    public void setTotalDesc(int TotalDesc) {
+        this.TotalDesc = TotalDesc;
+    }
+    
+    
 
   
 }

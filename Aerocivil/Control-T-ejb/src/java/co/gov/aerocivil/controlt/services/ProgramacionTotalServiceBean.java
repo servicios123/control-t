@@ -498,11 +498,14 @@ public class ProgramacionTotalServiceBean
                     Date inicio = new Date();
                     print_sec = print_sec + "5.Descansos\n";
 
-                    solveRestByWeekPeriodRecess();
-                    if (funcionario.getDependencia() != null && funcionario.getDependencia().getDepcategoria() != null && funcionario.getDependencia().getDepcategoria().getDcId() != null && funcionario.getDependencia().getDepcategoria().getDcId() == 1L) {
-                        solveTropByWeekPeriodRecess();
+                    for (int i = 0; i < 2; i++) {
+                        solveRestByWeekPeriodRecess();
+                        if (funcionario.getDependencia() != null && funcionario.getDependencia().getDepcategoria() != null && funcionario.getDependencia().getDepcategoria().getDcId() != null && funcionario.getDependencia().getDepcategoria().getDcId() == 1L) {
+                            solveTropByWeekPeriodRecess();
+                        }
                     }
-                    solveDescByWeekPeriodRecessFull();
+
+                    //solveDescByWeekPeriodRecessFull();
                     this.auditoriaService.auditar(getProcesoProgramacion("Descansos", inicio, new Date()), funcionario);
                     System.out.println("[PROCESO] Descansos Fin: " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
                 }
@@ -511,9 +514,9 @@ public class ProgramacionTotalServiceBean
                     Date inicio = new Date();
 
                     for (Jornada jornada : this.jornadas) {
-//                        if (excludeMorning && !jornada.getJoAlias().equalsIgnoreCase("M")) {
-                        solveOrdinaryTurnsByPeriod(jornada.getJoId().longValue());
-//                        }
+                        if (excludeMorning && !jornada.getJoAlias().equalsIgnoreCase("M")) {
+                            solveOrdinaryTurnsByPeriod(jornada.getJoId().longValue());
+                        }
                     }
                     this.auditoriaService.auditar(getProcesoProgramacion("Turnos ordinarios ordenados por jornada ASC", inicio, new Date()), funcionario);
                     System.out.println("[PROCESO] oridnarios Fin: " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
@@ -880,28 +883,33 @@ public class ProgramacionTotalServiceBean
             head = head + cal.get(5) + ";";
         }
         for (Week week : this.weeks) {
+            double limit = (double) this.functionaries.size() / week.getTotalDays();
+            int maxTurns = (int) Math.round(limit);
             for (Functionary fun : this.functionaries) {
                 if (fun.isRestWeek().booleanValue()) {
                     if (!isRestWeek(fun, week)) {
                         for (Day day : week.getDays()) {
-                            Turn des = getTurnOfFunctionary(fun, day.getDate(), 0, -1);
-                            if (des == null) {
-                                if ((isRestSunday(day.getDate(), fun)) && (!isHolyDay(day.getDate()).booleanValue())) {
-                                    Turn previous = null;
+                            if (day.getTotalDesc() < maxTurns) {
+                                Turn des = getTurnOfFunctionary(fun, day.getDate(), 0, -1);
+                                if (des == null) {
+                                    if ((isRestSunday(day.getDate(), fun)) && (!isHolyDay(day.getDate()).booleanValue())) {
+                                        Turn previous = null;
 
-                                    previous = getTurnOfFunctionary(fun, day.getDate(), -1, 1);
-                                    if ((previous != null) && (previous.getPeriod().getId() == this.setting.getPeriodId())) {
-                                        if (isTurnDayMax(day, week.getTotalDays(), Type.REST)) {
-                                            Calendar c = Calendar.getInstance();
-                                            c.setTime(day.getDate());
-                                            Period period = new Period(0L, "", 0, 24);
-                                            Position position = new Position(0L, "DES");
-                                            Turn rest = new Turn(period, position, fun, 0L);
-                                            rest.setType(ProgramacionTotalServiceBean.Type.REST);
-                                            rest.setPermiteHorasExtra(false);
-                                            day.addTurn(rest);
-                                            write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + rest.getPeriod().getAlias() + rest.getPosition().getAlias() + ";;OK;");
-                                            break;
+                                        previous = getTurnOfFunctionary(fun, day.getDate(), -1, 1);
+                                        if ((previous != null) && (previous.getPeriod().getId() == this.setting.getPeriodId())) {
+                                            if (isTurnDayMax(day, maxTurns, Type.REST)) {
+                                                Calendar c = Calendar.getInstance();
+                                                c.setTime(day.getDate());
+                                                Period period = new Period(0L, "", 0, 24);
+                                                Position position = new Position(0L, "DES");
+                                                Turn rest = new Turn(period, position, fun, 0L);
+                                                rest.setType(ProgramacionTotalServiceBean.Type.REST);
+                                                rest.setPermiteHorasExtra(false);
+                                                day.addTurn(rest);
+                                                day.setTotalDesc(day.getTotalDesc() + 1);
+                                                write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + rest.getPeriod().getAlias() + rest.getPosition().getAlias() + ";;OK;");
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -913,31 +921,37 @@ public class ProgramacionTotalServiceBean
         }
         float max_count;
         int count;
-        for (int i = 0; i < this.weeks.size(); i++) {
-            float percent = ((Week) this.weeks.get(i)).getDays().size() / 7.0F;
+        int i = 0;
+        for (Week week : this.weeks) {
+            double limit = (double) this.functionaries.size() / week.getTotalDays();
+            int maxTurns = (int) Math.round(limit);
+            float percent = week.getDays().size() / 7.0F;
             max_count = percent * this.functionaries.size();
             count = 0;
             for (Functionary fun : this.functionaries) {
                 if (fun.isRestWeek().booleanValue()) {
                     if ((i == 0) || (count <= max_count)) {
-                        if (!isRestWeek(fun, (Week) this.weeks.get(i))) {
-                            ((Week) this.weeks.get(i)).setRandomDays();
-                            for (Day d : ((Week) this.weeks.get(i)).getDays()) {
-                                if ((isRestSunday(d.getDate(), fun)) && (!isHolyDay(d.getDate()).booleanValue())) {
-                                    Turn des = getTurnOfFunctionary(fun, d.getDate(), 0, -1);
-                                    if (des == null && isTurnDayMax(d, this.weeks.get(i).getTotalDays(), Type.REST)) {
-                                        Calendar c = Calendar.getInstance();
-                                        c.setTime(d.getDate());
+                        if (!isRestWeek(fun, week)) {
+                            week.setRandomDays();
+                            for (Day d : week.getDays()) {
+                                if (d.getTotalDesc() < maxTurns) {
+                                    if ((isRestSunday(d.getDate(), fun)) && (!isHolyDay(d.getDate()).booleanValue())) {
+                                        Turn des = getTurnOfFunctionary(fun, d.getDate(), 0, -1);
+                                        if (des == null && isTurnDayMax(d, maxTurns, Type.REST)) {
+                                            Calendar c = Calendar.getInstance();
+                                            c.setTime(d.getDate());
 
-                                        Period period = new Period(0L, "", 0, 24);
-                                        Position position = new Position(0L, "DES");
-                                        Turn turn = new Turn(period, position, fun, 0L);
-                                        turn.setType(ProgramacionTotalServiceBean.Type.REST);
-                                        turn.setPermiteHorasExtra(false);
-                                        d.addTurn(turn);
-                                        write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;OK;");
-                                        count++;
-                                        break;
+                                            Period period = new Period(0L, "", 0, 24);
+                                            Position position = new Position(0L, "DES");
+                                            Turn turn = new Turn(period, position, fun, 0L);
+                                            turn.setType(ProgramacionTotalServiceBean.Type.REST);
+                                            turn.setPermiteHorasExtra(false);
+                                            d.addTurn(turn);
+                                            d.setTotalDesc(d.getTotalDesc() + 1);
+                                            write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;OK;");
+                                            count++;
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -947,6 +961,7 @@ public class ProgramacionTotalServiceBean
                     }
                 }
             }
+            i++;
         }
         write_data(head);
         for (Functionary fun : this.functionaries) {
@@ -1108,26 +1123,31 @@ public class ProgramacionTotalServiceBean
             head = head + cal.get(5) + ";";
         }
         for (Week week : this.weeks) {
+            double limit = (double) this.functionaries.size() / week.getTotalDays();
+            int maxTurns = (int) Math.round(limit);
             for (Functionary fun : this.functionaries) {
                 //if (fun.isRestWeek().booleanValue()) {
                 if (!isTropWeek(fun, week)) {
                     for (Day day : week.getDays()) {
-                        Turn des = getTurnOfFunctionary(fun, day.getDate(), 0, -1);
-                        if (des == null) {
-                            cal.setTime(day.getDate());
-                            if (cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY && !isHolyDay(day.getDate()).booleanValue()) {
+                        if (day.getTotalTrop() < maxTurns) {
+                            Turn des = getTurnOfFunctionary(fun, day.getDate(), 0, -1);
+                            if (des == null) {
+                                cal.setTime(day.getDate());
+                                if (cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY && !isHolyDay(day.getDate()).booleanValue()) {
 
-                                if (isTurnDayMax(day, week.getTotalDays(), Type.TROP)) {
-                                    Calendar c = Calendar.getInstance();
-                                    c.setTime(day.getDate());
-                                    Period period = new Period(0L, "", 0, 24);
-                                    Position position = new Position(0L, "TROP");
-                                    Turn rest = new Turn(period, position, fun, 0L);
-                                    rest.setType(ProgramacionTotalServiceBean.Type.TROP);
-                                    rest.setPermiteHorasExtra(false);
-                                    day.addTurn(rest);
-                                    write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + rest.getPeriod().getAlias() + rest.getPosition().getAlias() + ";;OK;");
-                                    break;
+                                    if (isTurnDayMax(day, maxTurns, Type.TROP)) {
+                                        Calendar c = Calendar.getInstance();
+                                        c.setTime(day.getDate());
+                                        Period period = new Period(0L, "", 0, 24);
+                                        Position position = new Position(0L, "TROP");
+                                        Turn rest = new Turn(period, position, fun, 0L);
+                                        rest.setType(ProgramacionTotalServiceBean.Type.TROP);
+                                        rest.setPermiteHorasExtra(false);
+                                        day.addTurn(rest);
+                                        day.setTotalTrop(day.getTotalTrop() + 1);
+                                        write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + rest.getPeriod().getAlias() + rest.getPosition().getAlias() + ";;OK;");
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -1140,6 +1160,8 @@ public class ProgramacionTotalServiceBean
         int count;
         for (int i = 0; i < this.weeks.size(); i++) {
             Week week = this.weeks.get(i);
+            double limit = (double) this.functionaries.size() / week.getTotalDays();
+            int maxTurns = (int) Math.round(limit);
             float percent = this.functionaries.size() / week.getDays().size();
             count = 0;
             for (Functionary fun : this.functionaries) {
@@ -1148,21 +1170,24 @@ public class ProgramacionTotalServiceBean
                     if (!isTropWeek(fun, week)) {
                         week.setRandomDays();
                         for (Day d : week.getDays()) {
-                            if ((isRestSunday(d.getDate(), fun)) && (!isHolyDay(d.getDate()).booleanValue())) {
-                                Turn des = getTurnOfFunctionary(fun, d.getDate(), 0, -1);
-                                if (des == null && isTurnDayMax(d, week.getTotalDays(), Type.TROP)) {
-                                    Calendar c = Calendar.getInstance();
-                                    c.setTime(d.getDate());
+                            if (d.getTotalDesc() < maxTurns) {
+                                if ((isRestSunday(d.getDate(), fun)) && (!isHolyDay(d.getDate()).booleanValue())) {
+                                    Turn des = getTurnOfFunctionary(fun, d.getDate(), 0, -1);
+                                    if (des == null && isTurnDayMax(d, maxTurns, Type.TROP)) {
+                                        Calendar c = Calendar.getInstance();
+                                        c.setTime(d.getDate());
 
-                                    Period period = new Period(0L, "", 0, 24);
-                                    Position position = new Position(0L, "TROP");
-                                    Turn turn = new Turn(period, position, fun, 0L);
-                                    turn.setType(ProgramacionTotalServiceBean.Type.TROP);
-                                    turn.setPermiteHorasExtra(false);
-                                    d.addTurn(turn);
-                                    write("Trop;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;OK;");
-                                    count++;
-                                    break;
+                                        Period period = new Period(0L, "", 0, 24);
+                                        Position position = new Position(0L, "TROP");
+                                        Turn turn = new Turn(period, position, fun, 0L);
+                                        turn.setType(ProgramacionTotalServiceBean.Type.TROP);
+                                        turn.setPermiteHorasExtra(false);
+                                        d.addTurn(turn);
+                                        d.setTotalTrop(d.getTotalTrop() + 1);
+                                        write("Trop;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;OK;");
+                                        count++;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -1447,7 +1472,7 @@ public class ProgramacionTotalServiceBean
         Calendar c = Calendar.getInstance();
         c.setTime(date);
         if (validateOrdinaryTurnMorningNigth(fun, turn, date).booleanValue()) {
-            setNextTurnToExtra(fun, date, ProgramacionTotalServiceBean.TargetDay.NEXT, ProgramacionTotalServiceBean.Type.ORDINARY);
+            setNextTurnToExtra(fun, date, TargetDay.CURRENT, Type.ORDINARY);
 
             turn.setFunctionary(fun);
             turn.setType(Type.ORDINARY);
@@ -1708,14 +1733,12 @@ public class ProgramacionTotalServiceBean
     private boolean isTurnDayMax(Day day, int max, int type) {
         int contador = 0;
         String fecha = new SimpleDateFormat("dd/MM/yyyy").format(day.getDate());
-        double limit = (double) (this.functionaries.size() / max);
-        long maxTurns = Math.round(limit);
         for (Turn turn : day.getTurns()) {
             if ((turn.getFunctionary() != null) && ((turn.getType() == type))) {
                 contador++;
             }
         }
-        return contador < maxTurns;
+        return contador < max;
     }
 
     private boolean isDescAsigned(Functionary fun, Week week) {
@@ -1929,7 +1952,8 @@ public class ProgramacionTotalServiceBean
                         if (current.compareTo(this.programming.getProFechaInicio()) == 0) {
                             previous = getTurnLastDayFromLastProg(fun);
                         }
-                        Turn next = getTurnOfFunctionary(fun, current, ProgramacionTotalServiceBean.TargetDay.NEXT, ProgramacionTotalServiceBean.Type.ORDINARY);
+                        Turn next = getTurnOfFunctionary(fun, current, TargetDay.NEXT, Type.ORDINARY);
+                        Turn actual = getTurnOfFunctionary(fun, current, TargetDay.CURRENT, Type.ORDINARY);
                         if (next != null && turn != null) {
                             if (!satisfiesRestrictionPreviousPeriod(turn, next).booleanValue()) {
                                 write(s + "No cumple con la restricion de jornada restrictiva con respecto a la jornada anterior;" + next.getPeriod().getAlias() + next.getPosition().getAlias() + ";");
@@ -1943,11 +1967,15 @@ public class ProgramacionTotalServiceBean
                                         if (satisfiesInactivePosition(turn, current)) {
                                             if (satisfiesPetitions(turn, current, fun)) {
                                                 if (turn != null && turn.getPeriod().getAlias().equalsIgnoreCase("M")) {
-                                                    if (next != null && next.getPeriod().getAlias().equalsIgnoreCase("N")) {
-                                                        write(s + "OK;");
-                                                        return Boolean.valueOf(true);
+                                                    if (actual != null && actual.getPeriod().getAlias().equalsIgnoreCase("N")) {
+                                                        if (next != null && next.getPeriod().getAlias().equalsIgnoreCase("A")) {
+                                                            write(s + "OK;");
+                                                            return Boolean.valueOf(true);
+                                                        } else {
+                                                            write("La jornada siguiente no es amanece");
+                                                        }
                                                     } else {
-                                                        write(s + "La jornada siguiente no es Nocturna");
+                                                        write(s + "La jornada actual no es Nocturna");
                                                     }
                                                 } else {
                                                     write(s + "La jornada no es mañana");
@@ -2385,7 +2413,7 @@ public class ProgramacionTotalServiceBean
         for (Day day : this.days) {
             if (day.getDate().compareTo(eval.getTime()) == 0) {
                 for (Turn turn : turnSortByType(day.getTurns())) {
-                    if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && ((turn.getType() == ProgramacionTotalServiceBean.Type.ORDINARY) || (turn.getType() == type))) {
+                    if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && ((turn.getType() == Type.ORDINARY) || (turn.getType() == type))) {
                         turn.setType(Type.EXTRAORDINARY);
                         return;
                     }
@@ -2547,20 +2575,20 @@ public class ProgramacionTotalServiceBean
                     + "WHERE p.POS_ESTADO = 'Activo' "
                     + "AND p.POS_ID = ph.PH_POSICION "
                     + "AND ph.ph_funcionario = f.fun_id "
-                    + "AND f.fun_dependencia = "+depId+" "
+                    + "AND f.fun_dependencia = " + depId + " "
                     + "GROUP BY ph.ph_funcionario";
             //Query query = em.createQuery("SELECT p FROM PosicionHabilitada p WHERE p.funcionario.funId = :funId and p.posicion.posEstado= :estado and p.posicion.posId = :posId ");
             Query q = em.createNativeQuery(query);
             List<Object[]> result = q.getResultList();
             for (Object[] row : result) {
-            List<Long> ids = new ArrayList<Long>();
-            String[] data = ((String) row[1]).split(",");
-            for (String id : data) {
-                ids.add(new BigDecimal(id).longValue());
+                List<Long> ids = new ArrayList<Long>();
+                String[] data = ((String) row[1]).split(",");
+                for (String id : data) {
+                    ids.add(new BigDecimal(id).longValue());
+                }
+                enabledPositions.put(((BigDecimal) row[0]).longValue(), ids);
             }
-            enabledPositions.put(((BigDecimal)row[0]).longValue(), ids);
-        }
-        return enabledPositions;
+            return enabledPositions;
         } catch (NoResultException nre) {
             return new HashMap<Long, List<Long>>();
         }
