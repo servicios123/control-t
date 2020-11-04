@@ -25,6 +25,7 @@ public interface JornadaService{
     public Long getCount();
 
     public Jornada getJornadaAnterior(Jornada jornada);
+    public Jornada getJornadaAnteriorRionegro(Jornada jornada);
     
     public List<BigDecimal> getListaJornadasRestriccion(Jornada jornada);
     

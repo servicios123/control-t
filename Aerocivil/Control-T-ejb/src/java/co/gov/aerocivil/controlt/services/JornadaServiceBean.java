@@ -137,7 +137,24 @@ public class JornadaServiceBean implements JornadaService {
             return em.find(Jornada.class, jorId);
         }
         return null;
-    }    
+    }
+    
+    @Override
+    public Jornada getJornadaAnteriorRionegro(Jornada jornada) {
+        StringBuilder strQry = new StringBuilder();
+        strQry.append("Select j.jo_id from jornada_op j where ");
+        strQry.append(" to_char(to_date('").append(jornada.getJoHoraInicio()).append(":").append(jornada.getJoMinutoInicio()).append("','HH24:MI'),'HH24:MI') = ");
+        strQry.append("to_char(to_date(j.jo_hora_fin||':'||j.jo_min_fin,'HH24:MI'),'HH24:MI') ");
+        strQry.append(" and j.jo_estado='Activo' and j.jo_dependencia=").
+                append(jornada.getDependencia().getDepId());
+        Query q = em.createNativeQuery(strQry.toString());
+        //System.out.println(strQry.toString());
+        Long jorId = QueryUtil.getLongNativeQuery(q);
+        if(jorId!=null){
+            return em.find(Jornada.class, jorId);
+        }
+        return null;
+    }
     
     /**
      *

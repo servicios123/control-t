@@ -70,12 +70,15 @@ public class VistaProgramacionBBean {
         list_turn_cambio_1 = null;
         list_turn_cambio_2 = null;
         list_turn_anular = null;
+        list_turn_anular_ord = null;
         list_turn_asignar_esp = modificarTurnoServiceBean.getTurnoEspecial(logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId());
 
         date_cambio_1 = null;
-
+        turn_anular_ord = null;
         date_asignar = null;
         date_anular = null;
+        date_anular_ord = null;
+        fun_anular_ord = null;
         date_asignar_esp = null;
 
         return init();

@@ -120,7 +120,11 @@ public class JornadaBBean {
             }
         }
         editando = true;
-        jorOpAnterior = jornadaService.getJornadaAnterior(this.jornada);
+        if (this.jornada != null && this.jornada.getDependencia() != null && this.jornada.getDependencia().getDepId() == 290) {
+            jorOpAnterior = jornadaService.getJornadaAnteriorRionegro(jornada);
+        } else {
+            jorOpAnterior = jornadaService.getJornadaAnterior(this.jornada);
+        }
         //normal
         if (jorOpAnterior != null) {
             msgJornadaAnteriorRequerida = JsfUtil.formatMessage("jornadaAnteriorRequerida",

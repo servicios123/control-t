@@ -19,7 +19,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -715,6 +714,7 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
         if (te != null) {
             for (Week week : weeks) {
                 int i = 1;
+                Collections.shuffle(funcionarios);
                 for (Funcionario fun : funcionarios) {
                     System.out.println("fun i = " + i);
                     double limit = (double) funcionarios.size() / week.getDays().size();

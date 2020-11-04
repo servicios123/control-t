@@ -777,9 +777,13 @@ public class TurnoEspFuncionarioBBean {
     
     public String generateTrops(){
         turnoEspFuncionarioService.generateTrops(JsfUtil.getFuncionarioSesion().getDependencia().getDepId(), iniDate);
-        loadEventsFull(iniDate, iniDate);
+        asignando = true;
+        turnos = new ArrayList<TurnoEspFuncionario>();
+        iniDate = Calendar.getInstance().getTime();
+        FuncionarioBBean funcionarioBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);
+        
         JsfUtil.addManualInfoMessage("Asignacion de turnos TROP asignados correctamente");
-        return "crearTurnosEspFuncionario";
+        return crear();
     }
 
     private void cargarTurnoEspecialList() {
