@@ -178,6 +178,7 @@
                                 <p:ajax event="dateSelect" listener="#{turnoEspFuncionarioBBean.onDateSelectFull}" 
                                         update="tefTable2, messages, calendario, tefSelect" oncomplete="PF('myschedule').update();" />
                             </p:schedule> 
+                            <h:commandButton value="Asignar Trops" action="#{turnoEspFuncionarioBBean.generateTrops}" immediate="true"></h:commandButton>
                         </h:panelGrid>
                         <h:panelGrid style="width: 100%">
                             <p:separator style="background: transparent; border: 0px"/>

@@ -121,6 +121,7 @@ public class JornadaBBean {
         }
         editando = true;
         jorOpAnterior = jornadaService.getJornadaAnterior(this.jornada);
+        //normal
         if (jorOpAnterior != null) {
             msgJornadaAnteriorRequerida = JsfUtil.formatMessage("jornadaAnteriorRequerida",
                     jorOpAnterior.getJoAlias() + " (" + jorOpAnterior.getJoHoraInicio() + "-" + jorOpAnterior.getJoHoraFin() + ")",
@@ -128,6 +129,7 @@ public class JornadaBBean {
         } else {
             msgJornadaAnteriorRequerida = "";
         }
+        //rionegro 290
 
         /*cargarAeropuerto(jornada);
          cargarDependencia(jornada);*/

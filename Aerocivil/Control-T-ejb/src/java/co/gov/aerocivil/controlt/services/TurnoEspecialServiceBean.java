@@ -135,6 +135,12 @@ public class TurnoEspecialServiceBean implements TurnoEspecialService {
         return query;
     }
     
+    public TurnoEspecial getTropByDep(Long depId){
+        Query q = em.createQuery("Select te from TurnoEspecial te where te.dependencia.depId=:depId and te.teSigla = 'TROP'");
+        q.setParameter("depId", depId);
+        return (TurnoEspecial) q.getSingleResult();
+    }
+    
     @Override
     public Long getCount() {
         return count;

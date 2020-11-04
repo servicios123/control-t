@@ -4,15 +4,23 @@
  */
 package co.gov.aerocivil.controlt.services;
 
+import co.gov.aerocivil.controlt.entities.DiaFestivo;
 import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.entities.Turno;
 import co.gov.aerocivil.controlt.entities.TurnoEspFuncionario;
 import co.gov.aerocivil.controlt.entities.TurnoEspecial;
 import co.gov.aerocivil.controlt.enums.EstadoProgramacion;
+import co.gov.aerocivil.controlt.to.TurnTO;
 import co.gov.aerocivil.controlt.util.QueryUtil;
+import co.gov.aerocivil.models.Day;
+import co.gov.aerocivil.models.Week;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,6 +32,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -39,6 +48,23 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
     private AuditoriaService auditoria;
     @EJB
     private ProgramacionTurnosSession programacionService;
+    @EJB
+    private TurnoEspecialService turnoEspecialService;
+    private ArrayList<Day> days;
+    private ArrayList<Week> weeks;
+    private Iterable<DiaFestivo> holydays;
+    private List<TurnTO> turns;
+
+    public class Type {
+
+        public static final int ANY = -1;
+        public static final int ORDINARY = 1;
+        public static final int EXTRAORDINARY = 2;
+        public static final int SPECIAL = 3;
+        public static final int REST = 5;
+        public static final int LD = 4;
+        public static final int TROP = 8;
+    }
 
     @Override
     public List<TurnoEspFuncionario> getLista(TurnoEspFuncionario turnoEspFuncionario, int first, int pageSize,
@@ -246,8 +272,8 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
         if (qty >= 2) {
             return false;
         }
-        
-        if(qty>0 && (tef.getTurnoEspecial()!= null && (tef.getTurnoEspecial().getTeHinicio()==6 || tef.getTurnoEspecial().getTeHinicio()==0) && tef.getTurnoEspecial().getTeHfin()==23)){
+
+        if (qty > 0 && (tef.getTurnoEspecial() != null && (tef.getTurnoEspecial().getTeHinicio() == 6 || tef.getTurnoEspecial().getTeHinicio() == 0) && tef.getTurnoEspecial().getTeHfin() == 23)) {
             return false;
         }
 
@@ -671,5 +697,223 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
             result = "La fecha seleccionada ya tiene un turno especial programado";
         }
         return result;
+    }
+
+    @Override
+    public void generateTrops(Long depId, Date fecha) {
+        TurnoEspecial te = this.turnoEspecialService.getTropByDep(depId);
+        List<Funcionario> funcionarios = getFunctionaries(depId);
+        Calendar ini = Calendar.getInstance();
+        ini.setTime(fecha);
+        ini.set(Calendar.DAY_OF_MONTH, 1);
+        Calendar fin = Calendar.getInstance();
+        fin.setTime(fecha);
+        fin.set(Calendar.DAY_OF_MONTH, fin.getActualMaximum(Calendar.DAY_OF_MONTH));
+        deleteTrops(depId, ini.getTime(), fin.getTime());
+        turns = turnsByDate(ini.getTime(), fin.getTime(), depId);
+        prepareDays(ini, fin);
+        if (te != null) {
+            for (Week week : weeks) {
+                int i = 1;
+                for (Funcionario fun : funcionarios) {
+                    System.out.println("fun i = " + i);
+                    double limit = (double) funcionarios.size() / week.getDays().size();
+                    int maxTurns = (int) Math.round(limit);
+                    if (!isTropWeek(fun, week)) {
+                        for (Day day : week.getDays()) {
+                            System.out.println(day.getFecha());
+                            if (!isTurnPresent(fun, day)) {
+                                Calendar cal = Calendar.getInstance();
+                                cal.setTime(day.getDate());
+                                if (cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY && !isHolyDay(day.getDate()).booleanValue()) {
+
+                                    if (isTurnDayMax(day, maxTurns, Type.TROP)) {
+
+                                        try {
+                                            TurnoEspFuncionario tef = new TurnoEspFuncionario();
+                                            tef.setTurnoEspecial(te);
+                                            tef.setFuncionario(fun);
+                                            tef.setTefFini(day.getDate());
+                                            tef.setTefFfin(day.getDate());
+                                            tef.setGroupId(obtenerGrupoId());
+                                            tef.setTefEstado("Programado");
+                                            TurnoEspFuncionario turnoAsignado = (TurnoEspFuncionario) auditoria.auditar(tef, fun);
+                                            TurnTO turnTO = new TurnTO();
+                                            turnTO.setDate(day.getDate());
+                                            turnTO.setFuncionario(turnoAsignado.getFuncionario());
+                                            turnTO.setTurnoEspecial(turnoAsignado.getTurnoEspecial());
+                                            turnTO.setType(Type.TROP);
+                                            turns.add(turnTO);
+                                            break;
+                                        } catch (Exception ex) {
+                                            System.out.println("NO pudo asignar el turno especial trop");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    i++;
+                }
+            }
+        }
+    }
+
+    private void prepareDays(Calendar ini, Calendar fin) {
+        this.weeks = new ArrayList();
+        this.days = new ArrayList<Day>();
+        Calendar current = Calendar.getInstance();
+        while (ini.getTime().compareTo(fin.getTime()) <= 0) {
+            this.days.add(new Day(ini.getTime(), null, new SimpleDateFormat("dd/MM/yyyy").format(ini.getTime())));
+            ini.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        ini.setTime(new Date());
+        this.holydays = getDiaFestivo(ini.getTime(), fin.getTime());
+        Week week = new Week();
+        int holidays = 0;
+
+        for (Day day : this.days) {
+            current.setTime(day.getDate());
+            Calendar calSunday = Calendar.getInstance();
+            calSunday.setTime(day.getDate());
+            if (!isHolyDay(day.getDate()) && calSunday.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+                week.addDay(day);
+            }
+
+            if ((day.getDate().compareTo(ini.getTime()) != 0) && (current.get(7) == 1)) {
+                week.setTotalDays(week.getDays().size() - holidays);
+                this.weeks.add(week);
+                week = new Week();
+                holidays = 0;
+            }
+
+        }
+        if (week.getDays().size() > 0) {
+            if (holidays == 0) {
+                holidays++;
+            }
+            week.setTotalDays(week.getDays().size() - holidays);
+            this.weeks.add(week);
+        }
+    }
+
+    private Boolean isHolyDay(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
+        for (DiaFestivo day : this.holydays) {
+            boolean areDatesEquals = sdf.format(day.getDfFecha()).equalsIgnoreCase(sdf.format(date));
+            if (areDatesEquals) {
+                return Boolean.valueOf(true);
+            }
+        }
+        return Boolean.valueOf(false);
+    }
+
+    public List<DiaFestivo> getDiaFestivo(Date start, Date finish) {
+        try {
+            Query query = this.em.createQuery("SELECT d FROM DiaFestivo d WHERE d.dfFecha between :start and :finish");
+            query.setParameter("start", start, TemporalType.DATE);
+            query.setParameter("finish", finish, TemporalType.DATE);
+            return query.getResultList();
+        } catch (NoResultException nre) {
+        }
+        return null;
+    }
+
+    private List<Funcionario> getFunctionaries(Long depId) {
+        try {
+            Calendar actual = Calendar.getInstance();
+            Query query = this.em.createQuery("SELECT f FROM Funcionario f WHERE f.dependencia.depId =:depId and f.funEstado= :estado and f.fuNivel IN (2,3,4,5,6)");
+            query.setParameter("depId", depId);
+            query.setParameter("estado", "Activo");
+            return query.getResultList();
+        } catch (NoResultException nre) {
+        }
+        return null;
+    }
+
+    private List<TurnTO> turnsByDate(Date ini, Date fin, Long depId) {
+        List<TurnTO> turns = new ArrayList<TurnTO>();
+        Query q = em.createQuery("Select t from TurnoEspFuncionario t where t.tefFini between :ini and :fin and t.tefFfin between :ini and :fin and t.funcionario.dependencia.depId = :depId");
+        q.setParameter("ini", ini);
+        q.setParameter("fin", fin);
+        q.setParameter("depId", depId);
+        List<TurnoEspFuncionario> tefList = q.getResultList();
+
+        for (TurnoEspFuncionario tef : tefList) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(tef.getTefFini());
+            while (calendar.getTime().compareTo(tef.getTefFfin()) <= 0) {
+                TurnTO turnTO = new TurnTO();
+                turnTO.setDate(calendar.getTime());
+                turnTO.setFuncionario(tef.getFuncionario());
+                turnTO.setTurnoEspecial(tef.getTurnoEspecial());
+                turnTO.setType(Type.SPECIAL);
+                turns.add(turnTO);
+                calendar.add(Calendar.DATE, 1);
+            }
+        }
+
+        return turns;
+    }
+
+    private boolean isTurnPresent(Funcionario fun, Day day) {
+        SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
+        for (TurnTO turn : turns) {
+            boolean areDatesEquals = sdf.format(day.getDate()).equalsIgnoreCase(sdf.format(turn.getDate()));
+            if (areDatesEquals && turn.getFuncionario() != null && turn.getFuncionario().getFunId() == fun.getFunId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isTropWeek(Funcionario fun, Week week) {
+        SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
+        String[] turnsOneForWeek = new String[]{"TROP", "VAC", "LIC"};
+        List<String> turnsOneForWeekList = Arrays.asList(turnsOneForWeek);
+        String[] turnsTwoForWeek = new String[]{"PERS", "CEA", "SIN", "SIND", "CAP"};
+        List<String> turnsTwoForWeekList = Arrays.asList(turnsTwoForWeek);
+        int total = 0;
+        for (Day day : week.getDays()) {
+            for (TurnTO turn : turns) {
+                boolean areDatesEquals = sdf.format(day.getDate()).equalsIgnoreCase(sdf.format(turn.getDate()));
+                if (turn.getFuncionario() != null && turn.getFuncionario().getFunId() == fun.getFunId() && areDatesEquals) {
+                    String alias = turn.getTurnoEspecial().getTeSigla();
+                    if (turnsTwoForWeekList.contains(alias)) {
+                        total++;
+                        if (total > 2) {
+                            return true;
+                        }
+                    }
+                    if (turnsOneForWeekList.contains(alias)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isTurnDayMax(Day day, int max, int type) {
+        SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
+        int contador = 0;
+        for (TurnTO turn : this.turns) {
+            boolean areDatesEquals = sdf.format(day.getDate()).equalsIgnoreCase(sdf.format(turn.getDate()));
+            if (areDatesEquals && (turn.getFuncionario() != null) && ((turn.getType() == type))) {
+                contador++;
+            }
+        }
+        return contador < max;
+    }
+
+    private void deleteTrops(Long depId, Date ini, Date fin) {
+        Query q = em.createQuery("Select tef from TurnoEspFuncionario tef where tef.tefFini BETWEEN :ini and :fin and tef.funcionario.dependencia.depId = :depId and tef.turnoEspecial.teSigla = 'TROP'");
+        q.setParameter("ini", ini);
+        q.setParameter("fin", fin);
+        q.setParameter("depId", depId);
+        List<TurnoEspFuncionario> resultList = q.getResultList();
+        for (TurnoEspFuncionario tef : resultList) {
+            em.remove(tef);
+        }
     }
 }

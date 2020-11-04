@@ -774,6 +774,13 @@ public class TurnoEspFuncionarioBBean {
         showPrev = !(Calendar.getInstance().get(Calendar.MONTH) == iniDate.getMonth());
         return "crearTurnosEspFuncionario";
     }
+    
+    public String generateTrops(){
+        turnoEspFuncionarioService.generateTrops(JsfUtil.getFuncionarioSesion().getDependencia().getDepId(), iniDate);
+        loadEventsFull(iniDate, iniDate);
+        JsfUtil.addManualInfoMessage("Asignacion de turnos TROP asignados correctamente");
+        return "crearTurnosEspFuncionario";
+    }
 
     private void cargarTurnoEspecialList() {
 

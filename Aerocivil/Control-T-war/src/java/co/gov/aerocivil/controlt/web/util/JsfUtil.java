@@ -111,6 +111,11 @@ public class JsfUtil {
         FacesMessage mensaje = new FacesMessage(FacesMessage.SEVERITY_WARN, messageDescription, messageDescription);
         getFacesContext().addMessage(null, mensaje);
     }
+    
+    public static void addManualInfoMessage(String messageDescription) {
+        FacesMessage mensaje = new FacesMessage(FacesMessage.SEVERITY_INFO, messageDescription, messageDescription);
+        getFacesContext().addMessage(null, mensaje);
+    }
 
     public static void addWarningMessage(String messageId, String... params) {
         addMessage(FacesMessage.SEVERITY_WARN, messageId, params);

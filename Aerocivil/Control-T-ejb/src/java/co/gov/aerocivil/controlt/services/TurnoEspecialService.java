@@ -20,7 +20,7 @@ public interface TurnoEspecialService {
     
     public List<TurnoEspecial> getLista(TurnoEspecial turnoEspecial, int first, int pageSize, 
             String sortField, String sortOrder);
-    
+    public TurnoEspecial getTropByDep(Long depId);
     public Long getCount(); 
     public co.gov.aerocivil.controlt.entities.TurnoEspecial findBySigla(co.gov.aerocivil.controlt.entities.TurnoEspecial especial);
 }

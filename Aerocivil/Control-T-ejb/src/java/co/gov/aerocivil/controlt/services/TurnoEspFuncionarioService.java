@@ -40,4 +40,6 @@ public interface TurnoEspFuncionarioService {
     public boolean isRangoTurnoDisponible(TurnoEspFuncionario tef);
 
     public java.util.List<TurnoEspFuncionario> listarTurnosAsignacion(TurnoEspFuncionario turnoEspFuncionario);
+    
+    public void generateTrops(Long depId, Date fecha);
 }

@@ -166,6 +166,7 @@ public class ControlDiarioPosicionesBBean {
         diarioFiltro = new DiarioPosicion();
         diarioFiltro.setFuncionario(fun);
         diarioFiltro.setTurno(new Vistaprogramacion());
+        lazyList = null;
         dataModel = new ListDataModel<Vistaprogramacion>();
     }
 

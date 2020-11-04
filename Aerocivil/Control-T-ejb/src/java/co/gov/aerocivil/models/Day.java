@@ -13,20 +13,28 @@ import java.util.List;
  * @author Administrador
  */
 public class Day {
+
     private Date date;
     private int totalTrop;
     private int TotalDesc;
     private ArrayList<Turn> turns;
+    private String fecha;
 
-    public Day(Date date) 
-    {
-        this.date = date;  
-        
+    public Day(Date date) {
+        this.date = date;
+
     }
+
     public Day(Date date, ArrayList<Turn> turns) {
         this.date = date;
         this.turns = turns;
-        
+
+    }
+
+    public Day(Date date, ArrayList<Turn> turns, String fecha) {
+        this.date = date;
+        this.turns = turns;
+        this.fecha = fecha;
     }
 
     /**
@@ -56,9 +64,8 @@ public class Day {
     public void setTurns(ArrayList<Turn> turns) {
         this.turns = turns;
     }
-    
-    public void addTurn(Turn turn)
-    {
+
+    public void addTurn(Turn turn) {
         this.turns.add(turn);
     }
 
@@ -77,8 +84,12 @@ public class Day {
     public void setTotalDesc(int TotalDesc) {
         this.TotalDesc = TotalDesc;
     }
-    
-    
 
-  
+    public String getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(String fecha) {
+        this.fecha = fecha;
+    }
 }
