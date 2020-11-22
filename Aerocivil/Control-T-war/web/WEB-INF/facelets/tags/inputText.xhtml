@@ -11,7 +11,7 @@
         <c:if test="${empty rendered}">
             <c:set var="rendered" value="true"/>
         </c:if>
-        
+
         <c:if test="${empty id}">
             <c:set var="id" value="${fieldName}"/>
         </c:if>
@@ -24,23 +24,23 @@
         <c:if test="${empty tabindex}">
             <c:set var="tabindex" value="0"/>
         </c:if>
-        
-         <c:if test="${rendered}">
-        <h:outputLabel id="${id}Label"
-                       value="${label}" for="#{fieldName}"
-                       styleClass="${required and !readonly?'required':''}"/>        
-        <h:outputText id="${id}_ou" value="#{entity[fieldName]}" rendered="${readonly}"/>
-        <h:panelGroup rendered="${!readonly}">
-            <p:inputText id="#{id}" value="#{entity[fieldName]}" tabindex="${tabindex}"
-                         required="${required}" disabled="${disabled}" styleClass="${styleClass}"
-                         validatorMessage="${validatorMessage}" style="${style}}">
-                <ui:insert />
-            </p:inputText>        
-            <br/>
-            <h:message id="${id}Message" 
-                       styleClass="error"
-                       for="#{fieldName}" />
-        </h:panelGroup>
-         </c:if>
+
+        <c:if test="${rendered}">
+            <h:outputLabel id="${id}Label"
+                           value="${label}" for="#{fieldName}"
+                           styleClass="${required and !readonly?'required':''}"/>        
+            <h:outputText id="${id}_ou" value="#{entity[fieldName]}" rendered="${readonly}"/>
+            <h:panelGroup rendered="${!readonly}">
+                <p:inputText id="#{id}" value="#{entity[fieldName]}" tabindex="${tabindex}"
+                             required="${required}" disabled="${disabled}" styleClass="${styleClass}"
+                             validatorMessage="${validatorMessage}" style="${style}}">
+                    <ui:insert />
+                </p:inputText>        
+                <br/>
+                <h:message id="${id}Message" 
+                           styleClass="error"
+                           for="#{fieldName}" />
+            </h:panelGroup>
+        </c:if>
     </ui:composition>
 </html>

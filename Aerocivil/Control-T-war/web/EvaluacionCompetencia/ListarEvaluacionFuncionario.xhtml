@@ -18,8 +18,14 @@
 
             <ui:define name="contenido">
 
+                <h:panelGroup rendered="#{loginBBean.funcionarioTO.funcionario.dependencia.depcategoria.dcId==4}">
+                    <div class="ui-message-warn" >
+                        <span class="ui-message-warn-icon"/>
+                        <span class="ui-message-warn-detail">Esta opción no está disponible para su dependencia.</span>
+                    </div>
+                </h:panelGroup>
                 <br></br>
-                <h:form>
+                <h:form rendered="#{loginBBean.funcionarioTO.funcionario.dependencia.depcategoria.dcId!=4}">
                     <ui:include src="../Funcionario/filtroFuncionario.xhtml">
                         <ui:param name="filtro2" value="#{funcionarioBBean.columns[2]}"/>
                         <ui:param name="filtro4" value="true"/>

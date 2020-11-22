@@ -68,6 +68,7 @@ public class FuncionarioBBean {
     private Funcionario funcionarioSeleccionado;
     private Funcionario funcionarioFiltro;
     private LazyDataModel<Funcionario> lazyList;
+    private List<Funcionario> exportTable;
     private List<Aeropuerto> listAeropuerto;
     private List<Dependencia> listDependencia;
     private List<Posicion> listPosicion;
@@ -265,7 +266,7 @@ public class FuncionarioBBean {
         }
         return filtrar();
     }
-    
+
     public String listar(String sortField) {
         funcionarioFiltro = new Funcionario();
         funcionarioFiltro.setSortField(sortField);
@@ -451,14 +452,15 @@ public class FuncionarioBBean {
     public String filtrar() {
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         Funcionario funcionarioSesion = logbbean.getFuncionarioTO().getFuncionario();
-        if(funcionarioSesion!=null && funcionarioSesion.getFuNivel()==RolEnum.LINEA_3000.getRolId()){
+        if (funcionarioSesion != null && funcionarioSesion.getFuNivel() == RolEnum.LINEA_3000.getRolId()) {
             funcionarioFiltro.setFunEstado("Bloqueado");
         }
-        
-        if(funcionarioSesion!=null && funcionarioSesion.getFuNivel()==RolEnum.NIVEL_A1.getRolId()){
+
+        if (funcionarioSesion != null && funcionarioSesion.getFuNivel() == RolEnum.NIVEL_A1.getRolId()) {
             funcionarioFiltro.setFunEstado(null);
         }
         lazyList = new FuncionarioLazyList(funcionarioService, funcionarioFiltro);
+        exportTable = funcionarioService.getListaPag(funcionarioFiltro, null, null, null, null);
         return "listarFuncionario";
     }
 
@@ -633,17 +635,16 @@ public class FuncionarioBBean {
         JsfUtil.addManualSuccessMessage("Operacion Cancelada");
     }
 
-     public void actualiza(SelectEvent evento) {
+    public void actualiza(SelectEvent evento) {
         Calendar c = Calendar.getInstance();
-        c.setTime((Date)evento.getObject());
+        c.setTime((Date) evento.getObject());
         c.add(Calendar.YEAR, 1);
         this.fechaVenceEvaluacion = (c.getTime());
-        this.fechaRealizaEvaluacion = (Date)evento.getObject();
+        this.fechaRealizaEvaluacion = (Date) evento.getObject();
     }
 
-    
-    public void seleccionarTodasEvent(){
-        for(Funcionario f : funcionariosDisponibles){
+    public void seleccionarTodasEvent() {
+        for (Funcionario f : funcionariosDisponibles) {
             f.setSeleccionado(!this.seleccionarTodas);
         }
     }
@@ -840,6 +841,12 @@ public class FuncionarioBBean {
     public void setSeleccionarTodas(boolean seleccionarTodas) {
         this.seleccionarTodas = seleccionarTodas;
     }
-    
-    
+
+    public List<Funcionario> getExportTable() {
+        return exportTable;
+    }
+
+    public void setExportTable(List<Funcionario> exportTable) {
+        this.exportTable = exportTable;
+    }
 }

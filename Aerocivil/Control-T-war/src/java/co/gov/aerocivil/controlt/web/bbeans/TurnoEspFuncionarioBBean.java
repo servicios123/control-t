@@ -540,7 +540,7 @@ public class TurnoEspFuncionarioBBean {
             }
             i++;
         }
-        if (JsfUtil.getFuncionarioSesion().getFuNivel() == 3) {
+        if (JsfUtil.getFuncionarioSesion().getFuNivel() == 3 && comision!=null && comision.getTeId()!=null) {
             listTurnoEspecial = new ArrayList<TurnoEspecial>();
             listTurnoEspecial.add(comision);
         }

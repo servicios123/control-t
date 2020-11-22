@@ -158,13 +158,7 @@
                     </p:dataTable>
 
 
-                    <p:dataTable style="display: none;" value="#{funcionarioBBean.lazyList}" var="item" styleClass="tabla_lista"
-                                 paginator="true" paginatorPosition="bottom" rows="15"  
-                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
-                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
-                                 rowsPerPageTemplate="10,15,20" id="exportTable" draggableColumns="true"
-                                 emptyMessage="#{msg.emptyList}" paginatorAlwaysVisible="false"
-                                 >
+                    <p:dataTable style="display: none;" value="#{funcionarioBBean.exportTable}" var="item" styleClass="tabla_lista" id="exportTable">
                         <p:column sortBy="#{item.funNombre}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.nombre}"/>

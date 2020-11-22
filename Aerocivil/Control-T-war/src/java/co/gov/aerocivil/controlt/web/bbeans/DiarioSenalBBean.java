@@ -78,6 +78,8 @@ public class DiarioSenalBBean {
     }
 
     public String listarTodas() {
+        this.dependencia = "";
+        this.dependenciaFiltro = "";
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         diarioSenalFiltro = new DiarioSenal();
 
@@ -134,7 +136,8 @@ public class DiarioSenalBBean {
     }
 
     public String listar() {
-
+        this.dependencia = "";
+        this.dependenciaFiltro = "";
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         if (logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId() == 306) {
             return diarioespecial();
@@ -144,6 +147,8 @@ public class DiarioSenalBBean {
     }
 
     public String diarioespecial() {
+        this.dependencia = "";
+        this.dependenciaFiltro = "";
         DiarioSenalEspecialBBean dse = (DiarioSenalEspecialBBean) JsfUtil.getManagedBean(DiarioSenalEspecialBBean.class);
         return dse.listar();
     }
@@ -179,12 +184,13 @@ public class DiarioSenalBBean {
     }
 
     public String crear() {
+        this.dependencia = "";
+        this.dependenciaFiltro = "";
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         if (logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId() == 306) {
             DiarioSenalEspecialBBean dse = (DiarioSenalEspecialBBean) JsfUtil.getManagedBean(DiarioSenalEspecialBBean.class);
             return dse.registrar();
         } else {
-            cargarDependencias();
             Dependencia dependencia = new Dependencia();
             Regional regional = new Regional();
             Aeropuerto aeropuerto = new Aeropuerto();
@@ -199,13 +205,25 @@ public class DiarioSenalBBean {
             listAeropuerto = null;
             listDependencia = null;
             cargarDsTipo();
+            cargarDependencias();
             return "editDiarioSenal";
         }
     }
 
     public void cargarDependencias() {
         dependenciaList = new ArrayList<LugarSucesoDto>();
-        Dependencia dep = JsfUtil.getFuncionarioSesion().getDependencia();
+        boolean isDepFiltro = diarioSenalFiltro != null && diarioSenalFiltro.getDependencia() != null;
+        Dependencia dep = null;
+
+        if (isDepFiltro) {
+            if (diarioSenalFiltro.getDependencia().getDepId() == null) {
+                dep = JsfUtil.getFuncionarioSesion().getDependencia();
+            } else {
+                dep = dependenciaService.findByd(diarioSenalFiltro.getDependencia().getDepId());
+            }
+        } else {
+            dep = JsfUtil.getFuncionarioSesion().getDependencia();
+        }
         DepCategoria categoria = dep.getDepcategoria();
         Aeropuerto aeropuerto = dep.getAeropuerto();
         Regional regional = aeropuerto.getRegional();
@@ -274,7 +292,7 @@ public class DiarioSenalBBean {
                 dependenciaList.add(opcion);
                 show = true;
             }
-        } else if (categoria.getDcNombre().equalsIgnoreCase(ValoresLugarSuceso.ATS.toString())) {
+        } else if (categoria.getDcNombre().equalsIgnoreCase(ValoresLugarSuceso.ATS.toString()) && regional.getRegNombre() != null) {
             if (regional.getRegNombre().equalsIgnoreCase(ValoresLugarSuceso.CUNDINAMARCA.toString())
                     && (aeropuerto.getAeId().equals(new Long(ValoresLugarSuceso.ELDORADO.toString())))) {
                 LugarSucesoDto opcion = new LugarSucesoDto();
@@ -285,6 +303,10 @@ public class DiarioSenalBBean {
                 opcion2.setLabel("SKEDZGZA");
                 opcion2.setValue("SKEDZGZA");
                 dependenciaList.add(opcion2);
+                LugarSucesoDto opcion3 = new LugarSucesoDto();
+                opcion3.setLabel("SIMULADOR");
+                opcion3.setValue("SIMULADOR");
+                dependenciaList.add(opcion3);
                 show = true;
             } else if (regional.getRegNombre().equalsIgnoreCase(ValoresLugarSuceso.ATLANTICO.toString())
                     && (aeropuerto.getAeId().equals(new Long(ValoresLugarSuceso.CORTISSOZ.toString())))) {
@@ -300,24 +322,46 @@ public class DiarioSenalBBean {
             } else if (regional.getRegNombre().equalsIgnoreCase(ValoresLugarSuceso.NORTE_SANTANDER.toString())
                     && (aeropuerto.getAeId().equals(new Long(ValoresLugarSuceso.CAMILO_DAZA.toString())))) {
                 LugarSucesoDto opcion = new LugarSucesoDto();
-                opcion.setLabel("SKCCZTZX");
-                opcion.setValue("SKCCZTZX");
+                opcion.setLabel("SKCCTWR");
+                opcion.setValue("SKCCTWR");
                 dependenciaList.add(opcion);
                 LugarSucesoDto opcion2 = new LugarSucesoDto();
-                opcion2.setLabel("SKCCZAZX");
-                opcion2.setValue("SKCCZAZX");
+                opcion2.setLabel("SKCCAPP");
+                opcion2.setValue("SKCCAPP");
                 dependenciaList.add(opcion2);
                 show = true;
             } else if (regional.getRegNombre().equalsIgnoreCase(ValoresLugarSuceso.NORTE_SANTANDER.toString())
                     && (aeropuerto.getAeId().equals(new Long(ValoresLugarSuceso.PALONEGRO.toString())))) {
                 LugarSucesoDto opcion = new LugarSucesoDto();
-                opcion.setLabel("SKBGZTZX");
-                opcion.setValue("SKBGZTZX");
+                opcion.setLabel("SKBGTWR");
+                opcion.setValue("SKBGTWR");
                 dependenciaList.add(opcion);
                 LugarSucesoDto opcion2 = new LugarSucesoDto();
-                opcion2.setLabel("SKBGZAZX");
-                opcion2.setValue("SKBGZAZX");
+                opcion2.setLabel("SKBGAPP");
+                opcion2.setValue("SKBGAPP");
                 dependenciaList.add(opcion2);
+                show = true;
+            } else if (regional.getRegNombre().equalsIgnoreCase(ValoresLugarSuceso.ANTIOQUIA.toString())
+                    && (aeropuerto.getAeId().equals(new Long(ValoresLugarSuceso.JOSE_MARIA_CORDOBA.toString())))) {
+                LugarSucesoDto opcion2 = new LugarSucesoDto();
+                opcion2.setLabel("ZKRGZTZX");
+                opcion2.setValue("ZKRGZTZX");
+                dependenciaList.add(opcion2);
+                LugarSucesoDto opcion3 = new LugarSucesoDto();
+                opcion3.setLabel("ZKRGZAZX");
+                opcion3.setValue("ZKRGZAZX");
+                dependenciaList.add(opcion3);
+                show = true;
+            } else if (regional.getRegNombre().equalsIgnoreCase(ValoresLugarSuceso.ANTIOQUIA.toString())
+                    && (aeropuerto.getAeId().equals(new Long(ValoresLugarSuceso.OLAYA_HERRERA.toString())))) {
+                LugarSucesoDto opcion2 = new LugarSucesoDto();
+                opcion2.setLabel("SKMDZTZX");
+                opcion2.setValue("SKMDZTZX");
+                dependenciaList.add(opcion2);
+                LugarSucesoDto opcion3 = new LugarSucesoDto();
+                opcion3.setLabel("SKMDZAZX");
+                opcion3.setValue("SKMDZAZX");
+                dependenciaList.add(opcion3);
                 show = true;
             } else {
                 LugarSucesoDto opcion = new LugarSucesoDto();
@@ -411,6 +455,18 @@ public class DiarioSenalBBean {
 
     public void cargarDependenciaListado() {
         cargarDependencia(diarioSenalFiltro);
+    }
+
+    public void caragarTipoSenal() {
+        if ("SIMULADOR".equalsIgnoreCase(dependencia)) {
+            for (DsTipo dt : listTipoSenal) {
+                if (dt.getDstNombre().equalsIgnoreCase("Administrativo")) {
+                    diarioSenal.setDsTipo(dt);
+                    break;
+                }
+
+            }
+        }
     }
 
     private void cargarDependencia(DiarioSenal f) {

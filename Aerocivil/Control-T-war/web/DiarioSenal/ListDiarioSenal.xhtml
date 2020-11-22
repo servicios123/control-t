@@ -25,13 +25,13 @@
             </ui:define>
 
             <ui:define name="contenido">
-                
+
                 <h:form>
                     <f:facet name="header" ><h:outputText value="#{msg.filtros}" ></h:outputText></f:facet>
                     <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0" style="width: 60%;">
                         <h:outputText value="#{msg.depCategoria}" rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel == 1 or loginBBean.funcionarioTO.funcionario.fuNivel == 8}"/>
                         <p:selectOneMenu value="#{diarioSenalBBean.diarioSenalFiltro.dependencia.depcategoria.dcId}" id="dcId"
-                                          rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel == 1 or loginBBean.funcionarioTO.funcionario.fuNivel == 8}">  
+                                         rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel == 1 or loginBBean.funcionarioTO.funcionario.fuNivel == 8}">  
                             <f:selectItems value="#{listadosBBean.listaDepCategoria}" var="dc" itemValue="#{dc.dcId}" itemLabel="#{dc.dcNombre}"/> 
                         </p:selectOneMenu> 
                         <h:outputText value="#{msg.regId}" rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}"/>
@@ -43,25 +43,24 @@
                         </p:selectOneMenu> 
                         <h:outputText value="#{msg.aeId}" rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}"/>
                         <p:selectOneMenu id="aeId" value="#{diarioSenalBBean.diarioSenalFiltro.dependencia.aeropuerto.aeId}"
-                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}"  >  
+                                         rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}"  >  
+                            <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}"/>
                             <f:selectItems value="#{diarioSenalBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
                             <p:ajax update="depId"  
                                     listener="#{diarioSenalBBean.cargarDependenciaListado}" /> 
                         </p:selectOneMenu> 
                         <h:outputText value="#{msg.depId}" rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}"/>
                         <p:selectOneMenu id="depId" value="#{diarioSenalBBean.diarioSenalFiltro.dependencia.depId}" 
-                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}">
+                                         rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}">
+                            <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}"/>
                             <f:selectItems value="#{diarioSenalBBean.listDependencia}" var="reg" itemValue="#{reg.depId}" itemLabel="#{reg.depNombre}"/>
+                            <p:ajax update="depId2"  
+                                    listener="#{diarioSenalBBean.cargarDependencias}" /> 
                         </p:selectOneMenu>
-                        <h:outputText value="#{msg.dstId}" rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>3 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}"/>
-                        <p:selectOneMenu id="dstId" value="#{diarioSenalBBean.diarioSenalFiltro.dsTipo.dstId}" 
-                                         rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>3 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}">
-                            <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}" />
-                            <f:selectItems value="#{diarioSenalBBean.listDsTipo}" var="tp" itemValue="#{tp.dstId}" itemLabel="#{tp.dstNombre}"/>
-                        </p:selectOneMenu>
-                        <h:outputText value="#{msg.lugarSuceso}" rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>3 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}"/>
 
-                        <h:panelGroup rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>3 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}">
+                        <h:outputText value="#{msg.lugarSuceso}" rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>=2 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}"/>
+
+                        <h:panelGroup rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>=2 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}">
                             <p:selectOneMenu id="depId2" value="#{diarioSenalBBean.dependenciaFiltro}" required="false" style="width:100%;">
                                 <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}"/>
                                 <f:selectItems value="#{diarioSenalBBean.dependenciaList}" var="ts" itemValue="#{ts.value}" itemLabel="#{ts.label}"/>
@@ -71,22 +70,31 @@
                                        styleClass="error" 
                                        for="depId2" />
                         </h:panelGroup>
-                   
-                         </h:panelGrid> 
-                          <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
-                            <xf:calendar  entity="#{diarioSenalBBean.diarioSenalFiltro}" fieldName="dsenFechaSuceso" label="#{msg.dsenFechaSucesoEntre}"/> 
-                            <xf:calendar  entity="#{diarioSenalBBean.diarioSenalFiltro}" fieldName="dsenFechaSucesoFinal"/> 
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+                        <h:outputText value="#{msg.dstId}" rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>3 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}"/>
+                        <p:selectOneMenu id="dstId" value="#{diarioSenalBBean.diarioSenalFiltro.dsTipo.dstId}" 
+                                         rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>3 and loginBBean.funcionarioTO.funcionario.fuNivel != 8}">
+                            <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}" />
+                            <f:selectItems value="#{diarioSenalBBean.listDsTipo}" var="tp" itemValue="#{tp.dstId}" itemLabel="#{tp.dstNombre}"/>
+                        </p:selectOneMenu>
 
-                            <xf:calendar  entity="#{diarioSenalBBean.diarioSenalFiltro}" fieldName="dsenFechaRegistro" label="#{msg.dsenFechaRegistroEntre}"/> 
-                            <xf:calendar  entity="#{diarioSenalBBean.diarioSenalFiltro}" fieldName="dsenFechaRegistroFinal"/> 
 
-                            <h:commandButton  action="#{diarioSenalBBean.filtrar}" value="#{msg.buscar}"  />
-                            <h:commandButton  rendered="#{(loginBBean.funcionarioTO.funcionario.fuNivel==2 or loginBBean.funcionarioTO.funcionario.fuNivel==3) and loginBBean.funcionarioTO.funcionario.dependencia.depcategoria.dcId==4}"  action="#{diarioSenalBBean.diarioespecial}" value="Diario Publicaciones"  />
-                        </h:panelGrid> 
-                       
-                    
+                    </h:panelGrid> 
+                    <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
+                        <xf:calendar  entity="#{diarioSenalBBean.diarioSenalFiltro}" fieldName="dsenFechaSuceso" label="#{msg.dsenFechaSucesoEntre}"/> 
+                        <xf:calendar  entity="#{diarioSenalBBean.diarioSenalFiltro}" fieldName="dsenFechaSucesoFinal"/> 
 
-                   
+                        <xf:calendar  entity="#{diarioSenalBBean.diarioSenalFiltro}" fieldName="dsenFechaRegistro" label="#{msg.dsenFechaRegistroEntre}"/> 
+                        <xf:calendar  entity="#{diarioSenalBBean.diarioSenalFiltro}" fieldName="dsenFechaRegistroFinal"/> 
+
+                        <h:commandButton  action="#{diarioSenalBBean.filtrar}" value="#{msg.buscar}"  />
+                        <h:commandButton  rendered="#{(loginBBean.funcionarioTO.funcionario.fuNivel==2 or loginBBean.funcionarioTO.funcionario.fuNivel==3) and loginBBean.funcionarioTO.funcionario.dependencia.depcategoria.dcId==4}"  action="#{diarioSenalBBean.diarioespecial}" value="Diario Publicaciones"  />
+                    </h:panelGrid> 
+
+
+
+
                 </h:form>
                 <br></br>
                 <h:form>
@@ -97,8 +105,8 @@
                                  rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
                                  emptyMessage="#{msg.emptyList}" 
                                  rowStyleClass="#{item.resaltar?'destacado':null}"
-                                >
-                        
+                                 >
+
                         <p:column sortBy="#{item.dsenId}" style="text-align:left; width:8%;">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.dsenId}"/>
@@ -157,7 +165,7 @@
                         </p:column>
 
                     </p:dataTable>
-                    
+
                     <h:commandButton action="#{diarioSenalBBean.exportPDF}" value="Generar Reporte PDF"
                                      rendered="#{not empty diarioSenalBBean.lista}"/>
                     <h:commandButton  value="Generar Reporte XLS">

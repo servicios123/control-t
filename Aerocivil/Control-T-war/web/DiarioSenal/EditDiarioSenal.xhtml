@@ -24,6 +24,8 @@
                         <h:panelGroup>
                             <p:selectOneMenu id="depId" value="#{diarioSenalBBean.dependencia}" required="true" >
                                 <f:selectItems value="#{diarioSenalBBean.dependenciaList}" var="ts" itemValue="#{ts.value}" itemLabel="#{ts.label}"/>
+                                <p:ajax update="dsTipoId"  
+                                        listener="#{diarioSenalBBean.caragarTipoSenal}" /> 
                             </p:selectOneMenu>
                             <br/>
                             <h:message id="depIdMessage" 
@@ -31,7 +33,7 @@
                                        for="depId" />
                         </h:panelGroup>
                         <h:outputText value="#{msg.dsenTipo}"/>
-                        <p:selectOneMenu value="#{diarioSenalBBean.diarioSenal.dsTipo.dstId}" required="true">
+                        <p:selectOneMenu id="dsTipoId" value="#{diarioSenalBBean.diarioSenal.dsTipo.dstId}" required="true">
                             <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}"/>
                             <f:selectItems value="#{diarioSenalBBean.listDsTipo}" var="ts" itemValue="#{ts.dstId}" itemLabel="#{ts.dstNombre}"/>
                         </p:selectOneMenu>

@@ -135,7 +135,7 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
                     + "where t1.turFecha = :fecha "
                     + "and t1.funcionario.dependencia.depId = :depId "
                     + "and t1.turHInicio = 0 and t1.turHFin = 23)"
-                    + "");
+                    + "ORDER BY f.funAlias ASC");
             System.out.println("query = " + query.toString());
             query.setParameter("depId", dependencia.getDepId());
             query.setParameter("estado", "Activo");

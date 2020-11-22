@@ -115,6 +115,10 @@ public class PosicionHabilitadaServiceBean implements PosicionHabilitadaService 
             condiciones.add("t.funcionario.funId = :funcid ");
             params.put("funcid", posicionHabilitada.getFuncionario().getFunId());
         }
+        if (posicionHabilitada.getFuncionario().getFunAlias() != null && !"".equalsIgnoreCase(posicionHabilitada.getFuncionario().getFunAlias())) {
+            condiciones.add("t.funcionario.funAlias = :funAlias ");
+            params.put("funAlias", posicionHabilitada.getFuncionario().getFunAlias().toUpperCase());
+        }
         if (posicionHabilitada.getFechaini() != null && posicionHabilitada.getFechafin() != null) {
             condiciones.add("t.phFvencimiento between :fini and :ffin ");
             params.put("fini", posicionHabilitada.getFechaini());

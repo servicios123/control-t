@@ -17,6 +17,34 @@
            
 
             <ui:define name="contenido">
+                <h:form id="form_asignar">
+                    <strong><h:outputText value="#{msg.asignarPosNoAsignada}"/></strong>
+                    <br/><br/>
+                    <h:panelGrid columns="6" styleClass="tabla_formulario" cellpadding="5" cellspacing="0">
+                        <h:outputText value="#{msg.fechaTransporte}"/>
+                        <p:calendar  required="true" value="#{vistaProgramacionBBean.date_asignar}"  id="date_asignar" >
+                            <p:ajax event="dateSelect" listener="#{vistaProgramacionBBean.onDateAsignar}" update="form_asignar"/>
+                        </p:calendar>
+                        <h:outputText value="#{msg.posnoAsig}"/>
+                        <p:selectOneMenu  required="true" id="turn_asignar" value="#{vistaProgramacionBBean.turn_asignar}"> 
+                            <f:selectItem itemValue="#{null}" itemLabel="#{msg.selectItemNull}"/>
+                            <f:selectItems value="#{vistaProgramacionBBean.list_turn_asignar}" var="tur" itemValue="#{tur}" itemLabel="#{tur.posicionJornada.pjAlias}"/>   
+                            <f:converter converterId="PosNoAsigConverter" binding="#{PosNoAsigConverter}"/>
+                            <p:ajax event="change" listener="#{vistaProgramacionBBean.onTurnoChange}" update="form_asignar"/>
+                        </p:selectOneMenu>
+                        <h:outputText value="#{msg.funcionario}"/>
+                        <p:selectOneMenu  required="true" id="fun_asignar" value="#{vistaProgramacionBBean.fun_asignar}">
+                            <f:selectItem itemValue="#{null}" itemLabel="#{msg.selectItemNull}"/>
+                            <f:selectItems value="#{vistaProgramacionBBean.list_fun_asignar}" var="fun" itemValue="#{fun}" itemLabel="#{fun.funAlias}"/>   
+                            <f:converter converterId="FuncionarioConverter" binding="#{FuncionarioConverter}"/>
+                        </p:selectOneMenu>  
+                        <h:panelGroup>
+                            <h:commandButton action="#{vistaProgramacionBBean.asignar}" value="#{msg.asignar}"/>
+                        </h:panelGroup>
+                    </h:panelGrid>   
+                    
+                       <br/><br/><hr/><br/><br/>
+                </h:form>
                 <h:form id="form_change">
                     <strong><h:outputText value="#{msg.intercambiarTurnos}"/></strong>
                    <br/><br/>
@@ -88,34 +116,7 @@
                     <br/><br/><hr/><br/><br/>
                 </h:form>
                 
-                <h:form id="form_asignar">
-                    <strong><h:outputText value="#{msg.asignarPosNoAsignada}"/></strong>
-                    <br/><br/>
-                    <h:panelGrid columns="6" styleClass="tabla_formulario" cellpadding="5" cellspacing="0">
-                        <h:outputText value="#{msg.fechaTransporte}"/>
-                        <p:calendar  required="true" value="#{vistaProgramacionBBean.date_asignar}"  id="date_asignar" >
-                            <p:ajax event="dateSelect" listener="#{vistaProgramacionBBean.onDateAsignar}" update="form_asignar"/>
-                        </p:calendar>
-                        <h:outputText value="#{msg.posnoAsig}"/>
-                        <p:selectOneMenu  required="true" id="turn_asignar" value="#{vistaProgramacionBBean.turn_asignar}"> 
-                            <f:selectItem itemValue="#{null}" itemLabel="#{msg.selectItemNull}"/>
-                            <f:selectItems value="#{vistaProgramacionBBean.list_turn_asignar}" var="tur" itemValue="#{tur}" itemLabel="#{tur.posicionJornada.pjAlias}"/>   
-                            <f:converter converterId="PosNoAsigConverter" binding="#{PosNoAsigConverter}"/>
-                            <p:ajax event="change" listener="#{vistaProgramacionBBean.onTurnoChange}" update="form_asignar"/>
-                        </p:selectOneMenu>
-                        <h:outputText value="#{msg.funcionario}"/>
-                        <p:selectOneMenu  required="true" id="fun_asignar" value="#{vistaProgramacionBBean.fun_asignar}">
-                            <f:selectItem itemValue="#{null}" itemLabel="#{msg.selectItemNull}"/>
-                            <f:selectItems value="#{vistaProgramacionBBean.list_fun_asignar}" var="fun" itemValue="#{fun}" itemLabel="#{fun.funAlias}"/>   
-                            <f:converter converterId="FuncionarioConverter" binding="#{FuncionarioConverter}"/>
-                        </p:selectOneMenu>  
-                        <h:panelGroup>
-                            <h:commandButton action="#{vistaProgramacionBBean.asignar}" value="#{msg.asignar}"/>
-                        </h:panelGroup>
-                    </h:panelGrid>   
-                    
-                       <br/><br/><hr/><br/><br/>
-                </h:form>
+                
                 
                 <h:form id="form_anular">
                     <strong><h:outputText value="#{msg.anularTurnoEspecial}"/></strong>

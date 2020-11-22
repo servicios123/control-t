@@ -504,9 +504,9 @@ public class ProgramacionTotalServiceBean
                             solveTropByWeekPeriodRecess();
                         }*/
                     }
-                    fullAssignTrops(funcionario.getDependencia() != null && funcionario.getDependencia().getDepcategoria() != null && funcionario.getDependencia().getDepcategoria().getDcId() != null && funcionario.getDependencia().getDepcategoria().getDcId() == 1L);
+                    //fullAssignTrops(funcionario.getDependencia() != null && funcionario.getDependencia().getDepcategoria() != null && funcionario.getDependencia().getDepcategoria().getDcId() != null && funcionario.getDependencia().getDepcategoria().getDcId() == 1L);
 
-                    //solveDescByWeekPeriodRecessFull();
+                    solveDescByWeekPeriodRecessFull();
                     this.auditoriaService.auditar(getProcesoProgramacion("Descansos", inicio, new Date()), funcionario);
                     System.out.println("[PROCESO] Descansos Fin: " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
                 }

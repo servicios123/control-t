@@ -36,6 +36,7 @@ public class VistaProgramacionBBean {
     private Vistaprogramacion turn_cambio_1, turn_cambio_2, turn_anular, turn_anular_ord;
     private List<Vistaprogramacion> list_turn_cambio_1, list_turn_cambio_2, list_turn_anular, list_turn_anular_ord;
     private PosNoAsig turn_asignar;
+    private PosNoAsig turn_asignar_no_asig;
     private List<PosNoAsig> list_turn_asignar;
     private TurnoEspecial turn_asignar_esp;
     private List<TurnoEspecial> list_turn_asignar_esp;
@@ -80,6 +81,13 @@ public class VistaProgramacionBBean {
         date_anular_ord = null;
         fun_anular_ord = null;
         date_asignar_esp = null;
+        
+        if(turn_asignar_no_asig != null){
+            date_asignar = turn_asignar_no_asig.getFecha();
+            onDateAsignar(null);
+            turn_asignar = turn_asignar_no_asig;
+            onTurnoChange();
+        }
 
         return init();
     }
@@ -183,7 +191,13 @@ public class VistaProgramacionBBean {
     public void onDateAsignar(SelectEvent ev) {
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         turn_asignar = new PosNoAsig();
-        list_turn_asignar = modificarTurnoServiceBean.getPosNoAsigPorFecha((Date) ev.getObject(), logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId());
+        Date fechaNoAsig;
+        if(ev!=null){
+            fechaNoAsig = (Date) ev.getObject();
+        }else{
+            fechaNoAsig = turn_asignar_no_asig.getFecha();
+        }
+        list_turn_asignar = modificarTurnoServiceBean.getPosNoAsigPorFecha(fechaNoAsig, logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId());
         //System.out.println("Entra a onDateAsignar \t N. "+list_turn_asignar.size());
     }
 
@@ -627,5 +641,13 @@ public class VistaProgramacionBBean {
 
     public void setList_turn_anular_ord(List<Vistaprogramacion> list_turn_anular_ord) {
         this.list_turn_anular_ord = list_turn_anular_ord;
+    }
+
+    public PosNoAsig getTurn_asignar_no_asig() {
+        return turn_asignar_no_asig;
+    }
+
+    public void setTurn_asignar_no_asig(PosNoAsig turn_asignar_no_asig) {
+        this.turn_asignar_no_asig = turn_asignar_no_asig;
     }
 }

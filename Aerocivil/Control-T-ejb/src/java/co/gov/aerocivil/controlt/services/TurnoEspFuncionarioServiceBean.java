@@ -153,7 +153,7 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
 
 
 
-        if (turnoEspFuncionario.getTurnoEspecial().getTeId() != null) {
+        if (turnoEspFuncionario.getTurnoEspecial() != null && turnoEspFuncionario.getTurnoEspecial().getTeId() != null) {
             condiciones.add("d.turnoEspecial.teId = :turEs ");
             params.put("turEs", turnoEspFuncionario.getTurnoEspecial().getTeId());
         }
@@ -705,6 +705,9 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
         Calendar ini = Calendar.getInstance();
         ini.setTime(fecha);
         ini.set(Calendar.DAY_OF_MONTH, 1);
+        Calendar firstDate = Calendar.getInstance();
+        firstDate.setTime(fecha);
+        firstDate.set(Calendar.DAY_OF_MONTH, 1);
         Calendar fin = Calendar.getInstance();
         fin.setTime(fecha);
         fin.set(Calendar.DAY_OF_MONTH, fin.getActualMaximum(Calendar.DAY_OF_MONTH));
@@ -717,7 +720,8 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
                 Collections.shuffle(funcionarios);
                 for (Funcionario fun : funcionarios) {
                     System.out.println("fun i = " + i);
-                    double limit = (double) funcionarios.size() / week.getDays().size();
+                    int days = week.getDays().size() == 1 ? Calendar.SATURDAY - 1 : week.getDays().size();
+                    double limit = (double) funcionarios.size() / days;
                     int maxTurns = (int) Math.round(limit);
                     if (!isTropWeek(fun, week)) {
                         for (Day day : week.getDays()) {
@@ -726,27 +730,27 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
                                 Calendar cal = Calendar.getInstance();
                                 cal.setTime(day.getDate());
                                 if (cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY && !isHolyDay(day.getDate()).booleanValue()) {
-
                                     if (isTurnDayMax(day, maxTurns, Type.TROP)) {
-
-                                        try {
-                                            TurnoEspFuncionario tef = new TurnoEspFuncionario();
-                                            tef.setTurnoEspecial(te);
-                                            tef.setFuncionario(fun);
-                                            tef.setTefFini(day.getDate());
-                                            tef.setTefFfin(day.getDate());
-                                            tef.setGroupId(obtenerGrupoId());
-                                            tef.setTefEstado("Programado");
-                                            TurnoEspFuncionario turnoAsignado = (TurnoEspFuncionario) auditoria.auditar(tef, fun);
-                                            TurnTO turnTO = new TurnTO();
-                                            turnTO.setDate(day.getDate());
-                                            turnTO.setFuncionario(turnoAsignado.getFuncionario());
-                                            turnTO.setTurnoEspecial(turnoAsignado.getTurnoEspecial());
-                                            turnTO.setType(Type.TROP);
-                                            turns.add(turnTO);
-                                            break;
-                                        } catch (Exception ex) {
-                                            System.out.println("NO pudo asignar el turno especial trop");
+                                        if (day.getDate().after(firstDate.getTime()) || day.getDate().equals(firstDate.getTime())) {
+                                            try {
+                                                TurnoEspFuncionario tef = new TurnoEspFuncionario();
+                                                tef.setTurnoEspecial(te);
+                                                tef.setFuncionario(fun);
+                                                tef.setTefFini(day.getDate());
+                                                tef.setTefFfin(day.getDate());
+                                                tef.setGroupId(obtenerGrupoId());
+                                                tef.setTefEstado("Programado");
+                                                TurnoEspFuncionario turnoAsignado = (TurnoEspFuncionario) auditoria.auditar(tef, fun);
+                                                TurnTO turnTO = new TurnTO();
+                                                turnTO.setDate(day.getDate());
+                                                turnTO.setFuncionario(turnoAsignado.getFuncionario());
+                                                turnTO.setTurnoEspecial(turnoAsignado.getTurnoEspecial());
+                                                turnTO.setType(Type.TROP);
+                                                turns.add(turnTO);
+                                                break;
+                                            } catch (Exception ex) {
+                                                System.out.println("NO pudo asignar el turno especial trop");
+                                            }
                                         }
                                     }
                                 }
@@ -763,6 +767,9 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
         this.weeks = new ArrayList();
         this.days = new ArrayList<Day>();
         Calendar current = Calendar.getInstance();
+        while (ini.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
+            ini.add(Calendar.DAY_OF_MONTH, -1);
+        }
         while (ini.getTime().compareTo(fin.getTime()) <= 0) {
             this.days.add(new Day(ini.getTime(), null, new SimpleDateFormat("dd/MM/yyyy").format(ini.getTime())));
             ini.add(Calendar.DAY_OF_MONTH, 1);
@@ -781,7 +788,6 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
             }
 
             if ((day.getDate().compareTo(ini.getTime()) != 0) && (current.get(7) == 1)) {
-                week.setTotalDays(week.getDays().size() - holidays);
                 this.weeks.add(week);
                 week = new Week();
                 holidays = 0;
@@ -789,10 +795,6 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
 
         }
         if (week.getDays().size() > 0) {
-            if (holidays == 0) {
-                holidays++;
-            }
-            week.setTotalDays(week.getDays().size() - holidays);
             this.weeks.add(week);
         }
     }
@@ -833,8 +835,14 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
 
     private List<TurnTO> turnsByDate(Date ini, Date fin, Long depId) {
         List<TurnTO> turns = new ArrayList<TurnTO>();
+        Calendar CalendarIni = Calendar.getInstance();
+        CalendarIni.setTime(ini);
+        while (CalendarIni.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
+            CalendarIni.add(Calendar.DAY_OF_MONTH, -1);
+        }
+
         Query q = em.createQuery("Select t from TurnoEspFuncionario t where t.tefFini between :ini and :fin and t.tefFfin between :ini and :fin and t.funcionario.dependencia.depId = :depId");
-        q.setParameter("ini", ini);
+        q.setParameter("ini", CalendarIni.getTime());
         q.setParameter("fin", fin);
         q.setParameter("depId", depId);
         List<TurnoEspFuncionario> tefList = q.getResultList();
@@ -869,7 +877,7 @@ public class TurnoEspFuncionarioServiceBean implements TurnoEspFuncionarioServic
 
     private boolean isTropWeek(Funcionario fun, Week week) {
         SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
-        String[] turnsOneForWeek = new String[]{"TROP", "VAC", "LIC"};
+        String[] turnsOneForWeek = new String[]{"TROP", "VAC", "LIC","JEFA"};
         List<String> turnsOneForWeekList = Arrays.asList(turnsOneForWeek);
         String[] turnsTwoForWeek = new String[]{"PERS", "CEA", "SIN", "SIND", "CAP"};
         List<String> turnsTwoForWeekList = Arrays.asList(turnsTwoForWeek);
