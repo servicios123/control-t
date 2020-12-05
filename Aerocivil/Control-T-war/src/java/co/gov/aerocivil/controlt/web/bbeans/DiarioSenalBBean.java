@@ -344,13 +344,17 @@ public class DiarioSenalBBean {
             } else if (regional.getRegNombre().equalsIgnoreCase(ValoresLugarSuceso.ANTIOQUIA.toString())
                     && (aeropuerto.getAeId().equals(new Long(ValoresLugarSuceso.JOSE_MARIA_CORDOBA.toString())))) {
                 LugarSucesoDto opcion2 = new LugarSucesoDto();
-                opcion2.setLabel("ZKRGZTZX");
-                opcion2.setValue("ZKRGZTZX");
+                opcion2.setLabel("SKRGZTZX");
+                opcion2.setValue("SKRGZTZX");
                 dependenciaList.add(opcion2);
                 LugarSucesoDto opcion3 = new LugarSucesoDto();
-                opcion3.setLabel("ZKRGZAZX");
-                opcion3.setValue("ZKRGZAZX");
+                opcion3.setLabel("SKRGZAZX");
+                opcion3.setValue("SKRGZAZX");
                 dependenciaList.add(opcion3);
+                LugarSucesoDto opcion4 = new LugarSucesoDto();
+                opcion4.setLabel("SKMDZTZX");
+                opcion4.setValue("SKMDZTZX");
+                dependenciaList.add(opcion4);
                 show = true;
             } else if (regional.getRegNombre().equalsIgnoreCase(ValoresLugarSuceso.ANTIOQUIA.toString())
                     && (aeropuerto.getAeId().equals(new Long(ValoresLugarSuceso.OLAYA_HERRERA.toString())))) {

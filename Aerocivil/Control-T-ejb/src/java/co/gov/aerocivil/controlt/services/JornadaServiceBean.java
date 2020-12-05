@@ -140,6 +140,26 @@ public class JornadaServiceBean implements JornadaService {
     }
     
     @Override
+    public List<Jornada> getJornadasAnteriores(Jornada jornada) {
+        List<Jornada> jornadas = new ArrayList<Jornada>();
+        StringBuilder strQry = new StringBuilder();
+        strQry.append("Select j.jo_id from jornada_op j where ");
+        strQry.append(" to_char(to_date('").append(jornada.getJoHoraInicio()).append("','HH24:MI'),'HH24:MI') = ");
+        strQry.append("to_char(to_date(j.jo_hora_fin||':'||j.jo_min_fin,'HH24:MI')+1/1440,'HH24:MI') ");
+        strQry.append(" and j.jo_estado='Activo' and j.jo_dependencia=").
+                append(jornada.getDependencia().getDepId());
+        Query q = em.createNativeQuery(strQry.toString());
+        //System.out.println(strQry.toString());
+        List<BigDecimal> ids = QueryUtil.getLongListNativeQuery(q);
+        if(ids!=null && !ids.isEmpty()){
+            for(BigDecimal id : ids){
+             jornadas.add(em.find(Jornada.class, id.longValue()));
+            }
+        }
+        return jornadas;
+    }
+    
+    @Override
     public Jornada getJornadaAnteriorRionegro(Jornada jornada) {
         StringBuilder strQry = new StringBuilder();
         strQry.append("Select j.jo_id from jornada_op j where ");

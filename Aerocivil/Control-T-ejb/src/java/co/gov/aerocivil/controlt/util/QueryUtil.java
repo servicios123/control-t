@@ -5,6 +5,7 @@
 package co.gov.aerocivil.controlt.util;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +65,17 @@ public class QueryUtil {
             return null;
         }
         return vLong;
+    }
+    
+    public static List<BigDecimal> getLongListNativeQuery(Query q){        
+        List<BigDecimal> ids=new ArrayList<BigDecimal>();
+        try{
+            ids = q.getResultList();
+        }
+        catch(NoResultException nre){
+            return null;
+        }
+        return ids;
     }
     
 }

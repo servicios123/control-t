@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+                <h:outputText value="#{msg.diarioPosiciones}" ></h:outputText>
+            </ui:define>
+
+            <ui:define name="contenido">
+                <p:growl id="growl" autoUpdate="true"/>
+                <br></br>
+                <h:form>
+                    <ui:include src="filtroFuncionarioDependencia.xhtml">
+                        <ui:param name="funFiltroVisible" value="false"/>
+                    </ui:include>
+                </h:form>
+                <h:form>
+                    <div class="divOverFlow">
+                        <p:dataTable value="#{controlDiarioPosicionesBBean.dataModel}" var="item" 
+                                     styleClass="tabla_lista" id="carTable" 
+                                     editable="true" emptyMessage="#{msg.emptyList}" >
+
+                            <p:column headerText="Pos">
+                                <h:outputText value="#{item.pjAlias}" />
+                            </p:column>
+                            <p:column headerText="FP">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.funAlias}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <h:outputText value="#{item.funAlias}"/>
+                                    </f:facet>
+                                </p:cellEditor>                            
+                            </p:column>
+                            <p:column headerText="FA">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.diarioPosicion.funcionario.funAlias}"/>
+                                    </f:facet>
+                                    <f:facet name="input" >
+                                        <p:inputText value="#{item.diarioPosicion.funcionario.funAlias}" style="width: 30px"                                                 
+                                                     id="funAliasTipo" />
+                                    </f:facet>
+                                </p:cellEditor>                            
+                            </p:column>
+                            <p:column headerText="#{msg.dposTipoRealizacion}" >
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.diarioPosicion.dposTipoRealizacion}"/>
+                                    </f:facet>
+                                    <f:facet name="input">                                    
+                                        <p:selectOneRadio value="#{item.diarioPosicion.dposTipoRealizacion}"
+                                                          layout="pageDirection">
+                                            <f:selectItem itemLabel="TN" itemValue="TN"/>
+                                            <f:selectItem itemLabel="CP" itemValue="CP"/>
+                                            <f:selectItem itemLabel="CS" itemValue="CS"/>
+                                            <f:selectItem itemLabel="HE" itemValue="HE"/>
+                                            <f:selectItem itemLabel="C" itemValue="C"/>
+                                        </p:selectOneRadio>
+                                    </f:facet>
+                                </p:cellEditor>                            
+                            </p:column>
+                            <p:column headerText="#{msg.horaLlegada}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.diarioPosicion.horaInicioStr}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <xf:timeSelectorAll entity="#{item.diarioPosicion}" 
+                                                            fieldName="dposHoraIngreso" minFieldName="dposMinutoIngreso" />
+                                    </f:facet>
+                                </p:cellEditor>                            
+                            </p:column>
+                            <p:column headerText="#{msg.horaSalida}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.diarioPosicion.horaFinStr}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <xf:timeSelectorAll entity="#{item.diarioPosicion}" 
+                                                            fieldName="dposHoraSalida" minFieldName="dposMinutoSalida" />
+                                    </f:facet>
+                                </p:cellEditor>                            
+                            </p:column>
+                            <p:column headerText="#{msg.dposObservaciones}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.diarioPosicion.dposObservaciones}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <h:inputTextarea style="margin: 0px; height: 97px; width: 243px;" value="#{item.diarioPosicion.dposObservaciones}" />
+                                    </f:facet>
+                                </p:cellEditor>                            
+                            </p:column>
+
+                            <p:column headerText="#{msg.dposNotificacion}" >
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.diarioPosicion.dposNotificacion}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:selectOneRadio value="#{item.diarioPosicion.dposNotificacion}"
+                                                          layout="pageDirection">
+                                            <f:selectItem itemLabel="Inc" title="Incumplimiento" itemValue="I"/>
+                                            <f:selectItem itemLabel="Ret" itemValue="R"/>
+                                            <f:selectItem itemLabel="Caldom" itemValue="C"/>
+                                            <f:selectItem itemLabel="Nopre" itemValue="N"/>
+                                        </p:selectOneRadio>
+                                    </f:facet>
+                                </p:cellEditor>                            
+                            </p:column>
+
+                            <p:column headerText="#{msg.accion}">  
+                                <p:rowEditor rendered="#{!controlDiarioPosicionesBBean.diarioCerrado}"/>  
+                            </p:column> 
+                            <p:ajax event="rowEdit" listener="#{controlDiarioPosicionesBBean.actualizar}" />
+                            <p:ajax event="rowSelect" listener="#{controlDiarioPosicionesBBean.onSelect}" />      
+                            <!--p:ajax event="rowEditCancel" listener="{controlDiarioPosicionesBBean.onSelect}" /-->
+                        </p:dataTable>
+
+                    </div>
+                    <h:commandButton action="#{controlDiarioPosicionesBBean.cerrarDiario}" 
+                                     value="#{msg.cerrarDiario}" rendered="#{!controlDiarioPosicionesBBean.diarioCerrado}"/>
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

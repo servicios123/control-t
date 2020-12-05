@@ -10,6 +10,7 @@ import co.gov.aerocivil.controlt.entities.Jornada;
 import co.gov.aerocivil.controlt.entities.Regional;
 import co.gov.aerocivil.controlt.enums.RolEnum;
 import co.gov.aerocivil.controlt.services.JornadaService;
+import co.gov.aerocivil.controlt.to.JornadaTo;
 import co.gov.aerocivil.controlt.web.lazylist.JornadaLazyList;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.math.BigDecimal;
@@ -44,41 +45,10 @@ public class JornadaBBean {
     private boolean jornadaOpAnteriorChecked;
     private boolean editando;
     private List<Jornada> jorDisponibles;
+    private List<Jornada> jorDisponiblesObligatorias;
+    private List<JornadaTo> jorDisponiblesObligatoriasTo;
     private Jornada jorOpAnterior;
-
-    public Jornada getJorOpAnterior() {
-        return jorOpAnterior;
-    }
-
-    public String getMsgJornadaAnteriorRequerida() {
-        return msgJornadaAnteriorRequerida;
-    }
-    private String msgJornadaAnteriorRequerida;
-
-    public List<Jornada> getJorDisponibles() {
-        return jorDisponibles;
-    }
     private Long[] jorRestricciones;
-
-    public Long[] getJorRestricciones() {
-        return jorRestricciones;
-    }
-
-    public void setJorRestricciones(Long[] jorRestricciones) {
-        this.jorRestricciones = jorRestricciones;
-    }
-
-    public boolean isEditando() {
-        return editando;
-    }
-
-    public boolean isJornadaOpAnteriorChecked() {
-        return jornadaOpAnteriorChecked;
-    }
-
-    public void setJornadaOpAnteriorChecked(boolean jornadaOpAnteriorChecked) {
-        this.jornadaOpAnteriorChecked = jornadaOpAnteriorChecked;
-    }
 
     public String crear() {
 
@@ -103,11 +73,13 @@ public class JornadaBBean {
 
     public String editar() {
 
+        jorDisponiblesObligatorias = jornadaService.getJornadasAnteriores(jornada);
         jorDisponibles = jornadaService.getListaJornadasDisponibles(this.jornada.getDependencia(), jornada.getJoId());
         jorRestricciones = new Long[jorDisponibles.size()];
         jornadaOpAnteriorChecked = false;
         if (jornada.getJornadaObligatoria() != null) {
             this.jornadaOpAnteriorChecked = true;
+            jorOpAnterior = jornada.getJornadaObligatoria();
         }
         //System.out.println("jorDisponibles.size(): " + jorDisponibles.size());
         List<BigDecimal> lista = jornadaService.getListaJornadasRestriccion(this.jornada);
@@ -120,19 +92,25 @@ public class JornadaBBean {
             }
         }
         editando = true;
-        if (this.jornada != null && this.jornada.getDependencia() != null && this.jornada.getDependencia().getDepId() == 290) {
-            jorOpAnterior = jornadaService.getJornadaAnteriorRionegro(jornada);
-        } else {
-            jorOpAnterior = jornadaService.getJornadaAnterior(this.jornada);
-        }
+        /*if (this.jornada != null && this.jornada.getDependencia() != null && this.jornada.getDependencia().getDepId() == 290) {
+         jorOpAnterior = jornadaService.getJornadaAnteriorRionegro(jornada);
+         } else {
+         jorOpAnterior = jornadaService.getJornadaAnterior(this.jornada);
+         }*/
+
         //normal
-        if (jorOpAnterior != null) {
-            msgJornadaAnteriorRequerida = JsfUtil.formatMessage("jornadaAnteriorRequerida",
-                    jorOpAnterior.getJoAlias() + " (" + jorOpAnterior.getJoHoraInicio() + "-" + jorOpAnterior.getJoHoraFin() + ")",
-                    this.jornada.getJoAlias());
-        } else {
-            msgJornadaAnteriorRequerida = "";
+        jorDisponiblesObligatoriasTo = new ArrayList<JornadaTo>();
+        if (jorDisponiblesObligatorias != null && !jorDisponiblesObligatorias.isEmpty()) {
+            for (Jornada j : jorDisponiblesObligatorias) {
+                JornadaTo jornadaTo = new JornadaTo();
+                jornadaTo.setJornada(j);
+                jornadaTo.setMensaje(JsfUtil.formatMessage("jornadaAnteriorRequerida",
+                        j.getJoAlias() + " (" + j.getJoHoraInicio() + "-" + j.getJoHoraFin() + ")",
+                        this.jornada.getJoAlias()));
+                jorDisponiblesObligatoriasTo.add(jornadaTo);
+            }
         }
+        msgJornadaAnteriorRequerida = "Marque esta opción si NO hay jornada requerida para la jornada " + this.jornada.getJoAlias();
         //rionegro 290
 
         /*cargarAeropuerto(jornada);
@@ -167,7 +145,7 @@ public class JornadaBBean {
                     this.listaJornadaRestriccion.add(j);
                 }
             }
-            if (jornadaOpAnteriorChecked) {
+            if (jorOpAnterior != null && jorOpAnterior.getJoId() != null) {
                 jornada.setJornadaObligatoria(this.jorOpAnterior);
             } else {
                 jornada.setJornadaObligatoria(null);
@@ -372,5 +350,58 @@ public class JornadaBBean {
 
     public void setListaJornadaRestriccion(List<Jornada> listaJornadaRestriccion) {
         this.listaJornadaRestriccion = listaJornadaRestriccion;
+    }
+
+    public List<Jornada> getJorDisponiblesObligatorias() {
+        return jorDisponiblesObligatorias;
+    }
+
+    public void setJorDisponiblesObligatorias(List<Jornada> jorDisponiblesObligatorias) {
+        this.jorDisponiblesObligatorias = jorDisponiblesObligatorias;
+    }
+
+    public Jornada getJorOpAnterior() {
+        return jorOpAnterior;
+    }
+
+    public String getMsgJornadaAnteriorRequerida() {
+        return msgJornadaAnteriorRequerida;
+    }
+    private String msgJornadaAnteriorRequerida;
+
+    public List<Jornada> getJorDisponibles() {
+        return jorDisponibles;
+    }
+
+    public Long[] getJorRestricciones() {
+        return jorRestricciones;
+    }
+
+    public void setJorRestricciones(Long[] jorRestricciones) {
+        this.jorRestricciones = jorRestricciones;
+    }
+
+    public boolean isEditando() {
+        return editando;
+    }
+
+    public boolean isJornadaOpAnteriorChecked() {
+        return jornadaOpAnteriorChecked;
+    }
+
+    public void setJornadaOpAnteriorChecked(boolean jornadaOpAnteriorChecked) {
+        this.jornadaOpAnteriorChecked = jornadaOpAnteriorChecked;
+    }
+
+    public List<JornadaTo> getJorDisponiblesObligatoriasTo() {
+        return jorDisponiblesObligatoriasTo;
+    }
+
+    public void setJorDisponiblesObligatoriasTo(List<JornadaTo> jorDisponiblesObligatoriasTo) {
+        this.jorDisponiblesObligatoriasTo = jorDisponiblesObligatoriasTo;
+    }
+
+    public void setJorOpAnterior(Jornada jorOpAnterior) {
+        this.jorOpAnterior = jorOpAnterior;
     }
 }

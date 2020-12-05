@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <h:form prependId="false">
+        <p:dataTable value="#{funcionario.listaEvaluaciones}" var="item" styleClass="tabla_lista"
+                     paginator="true" paginatorPosition="bottom" rows="15"  
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                     currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                     rowsPerPageTemplate="10,15,20" id="carTable2" draggableColumns="true"
+                     sortBy="#{item.evFechaVence}" sortOrder="descending"
+                     emptyMessage="#{msg.emptyList}" paginatorAlwaysVisible="false">
+            <p:column sortBy="#{item.evFechaVence}">
+                <f:facet name="header">
+                    <h:outputText value="#{msg.evFechaVence}"/>
+                </f:facet>
+                <h:outputText value="#{item.evFechaVence}">
+                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                </h:outputText>
+            </p:column>
+            <p:column>
+                <f:facet name="header">
+                    <h:outputText value="#{msg.evFechaRealiza}"/>
+                </f:facet>
+                <h:outputText value="#{item.evFechaRealiza}">
+                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                </h:outputText>
+            </p:column>
+            <p:column>
+                <f:facet name="header">
+                    <h:outputText value="#{msg.evDescripcion}"/>
+                </f:facet>
+                <h:outputText value="#{item.evDescripcion}"/>
+            </p:column>        
+            <p:column>
+                <f:facet name="header">
+                    <h:outputText value="#{msg.evResultado}"/>
+                </f:facet>
+                <h:outputText value="#{item.evResultado}"/>
+            </p:column>        
+        </p:dataTable>                   
+    </h:form>
+</html>

@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="horas_extras_ats" language="groovy" pageWidth="1008" pageHeight="612" orientation="Landscape" columnWidth="968" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2aef0d6d-8ad9-4deb-a81c-a83a86990132">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#FFBFBF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Table Dataset 1" uuid="ee53977b-2c04-4dbb-9b13-5552e9fd7d62"/>
+	<subDataset name="New Dataset 1" uuid="3304f136-0995-4f48-9a40-10ac7407cda1">
+		<queryString language="SQL">
+			<![CDATA[SELECT * FROM REP_HORAS_EXTRAS]]>
+		</queryString>
+		<field name="FECHA" class="java.sql.Timestamp"/>
+		<field name="COL2" class="java.math.BigDecimal"/>
+		<field name="COL3" class="java.math.BigDecimal"/>
+		<field name="COL4" class="java.math.BigDecimal"/>
+		<field name="COL5" class="java.math.BigDecimal"/>
+		<field name="COL6" class="java.math.BigDecimal"/>
+		<field name="COL7" class="java.math.BigDecimal"/>
+		<field name="COL8" class="java.math.BigDecimal"/>
+		<field name="COL9" class="java.math.BigDecimal"/>
+		<field name="COL10" class="java.math.BigDecimal"/>
+		<field name="COL11" class="java.math.BigDecimal"/>
+		<field name="COL12" class="java.math.BigDecimal"/>
+		<field name="COL13" class="java.math.BigDecimal"/>
+		<field name="COL14" class="java.lang.String"/>
+		<field name="COL15" class="java.lang.String"/>
+		<field name="COL16" class="java.lang.String"/>
+		<field name="FUNCIONARIO" class="java.math.BigDecimal"/>
+		<group name="FUNCIONARIO">
+			<groupExpression><![CDATA[$F{FUNCIONARIO}]]></groupExpression>
+		</group>
+	</subDataset>
+	<subDataset name="Table Dataset 2" uuid="85e167d5-85f5-4de9-b122-3ec03e2986cc"/>
+	<parameter name="funcionario_id" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="dependencia_id" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="fini" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ffin" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select rh.* from rep_horas_extras rh where funcionario=$P{funcionario_id}
+and dependencia=$P{dependencia_id} and fecha between $P{fini} and $P{ffin}]]>
+	</queryString>
+	<field name="EX_ID" class="java.math.BigDecimal"/>
+	<field name="FUNCIONARIO" class="java.math.BigDecimal"/>
+	<field name="FECHA" class="java.sql.Timestamp"/>
+	<field name="DEPENDENCIA" class="java.math.BigDecimal"/>
+	<field name="COL2" class="java.math.BigDecimal"/>
+	<field name="COL3" class="java.math.BigDecimal"/>
+	<field name="COL4" class="java.math.BigDecimal"/>
+	<field name="COL5" class="java.math.BigDecimal"/>
+	<field name="COL6" class="java.math.BigDecimal"/>
+	<field name="COL7" class="java.math.BigDecimal"/>
+	<field name="COL8" class="java.math.BigDecimal"/>
+	<field name="COL9" class="java.math.BigDecimal"/>
+	<field name="COL10" class="java.math.BigDecimal"/>
+	<field name="COL11" class="java.math.BigDecimal"/>
+	<field name="COL12" class="java.math.BigDecimal"/>
+	<field name="COL13" class="java.math.BigDecimal"/>
+	<field name="COL14" class="java.lang.String"/>
+	<field name="COL15" class="java.lang.String"/>
+	<field name="COL16" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="81" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="8b3017d7-301a-4c94-96b2-0bfa439b54d7" x="0" y="0" width="24" height="81"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[DIA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="65e5f252-4210-433e-88a7-a7f58b9be861" x="24" y="20" width="50" height="61"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[DIURNA
+EXTRA
+125%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d795cb93-3c92-4aa9-b2ce-a01c8055a8bc" x="74" y="20" width="50" height="61"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[NOCTURNA
+EXTRA
+175%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="600b5219-2d64-4030-8b2c-ae6ebd1a44a9" x="174" y="20" width="50" height="61"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[COMPEN.
+100%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cdee4b3b-0f43-415d-845b-5bdb2b74535e" x="224" y="20" width="50" height="61"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[JORNADA
+ORDINARIA
+200%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="16058abd-cdbd-4c34-8416-93da65f299e5" x="274" y="20" width="50" height="61"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[DIURNA
+EXTRA
+225%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="41a89855-100a-414e-86e5-38f30399ca79" x="324" y="20" width="50" height="61"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[NOCTURNA
+EXTRA
+275%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b933f730-3959-45e3-a70a-21759daaf00a" x="374" y="20" width="50" height="61"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[DIFERENCIA
+HORARIA
+75%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ac4150e3-9afb-4555-ab21-3e382fc73163" x="424" y="40" width="50" height="41"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[DIURNA
+EXTRA
+125%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f2729cf3-c04a-40b1-9622-beb1594c549d" x="474" y="40" width="50" height="41"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[NOCTURNA
+EXTRA
+175%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ba1afb8f-123a-429d-b12f-4bfb120b2c40" x="524" y="40" width="50" height="41"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[DIURNA
+EXTRA
+225%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9ce55f2e-8f90-4ec0-9bda-94824f293c68" x="574" y="40" width="50" height="41"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[NOCTURNA
+EXTRA
+275%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5e9b2325-58b7-453a-9428-b57ca5cbaea0" x="624" y="0" width="50" height="81"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[JORNADA
+ORDINARIA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8c0181df-4a85-4764-8a99-498cc93bf8db" x="674" y="0" width="50" height="81"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[JORNADA
+EXTRA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a0c2bec0-7af1-4070-b65c-9951addece5d" x="724" y="0" width="242" height="81"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[OBSERVACIONES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="65bf5188-077c-4263-992c-c923e8ddb007" x="24" y="0" width="150" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[ORDINARIAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f1791f8a-d059-4d29-be5a-9e2a32c7cf3c" x="124" y="20" width="50" height="61"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[DIFERENCIA
+HORARIA
+35%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="edc554a5-fd88-42c8-a3c9-88d4ffadd65c" x="174" y="0" width="150" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[DOMINICALES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="610dff4e-a513-4db0-891d-07106dd857dc" x="324" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[FESTIVOS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cb950d73-6f75-4bbe-b3b3-403f59f69b64" x="424" y="20" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[ORDINARIAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="31a29e63-9bdd-4a81-97e4-16bf0290f6a5" x="524" y="20" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[DOMINICALES FESTIVOS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="97a54f99-46a6-43a3-9df1-77de5f5f9790" x="424" y="0" width="200" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[TIEMPO COMPENSATORIO POR EXCESO H.E.]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="f831b0dc-dbcc-4e7c-8290-5b5d4ed935cc" x="0" y="0" width="24" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FECHA}.getDate()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="276fbdd0-0986-459d-b0c1-5ea24e25ff2a" x="24" y="0" width="50" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL2}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="8cf26c05-f02e-47a5-a86b-82c882cf849b" x="74" y="0" width="50" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL3}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="435edd59-fd9e-4586-b34f-915ba5fb84bd" x="124" y="0" width="50" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL4}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="e347b0e5-5819-4fe2-9271-29707cba0d11" x="174" y="0" width="50" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL5}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="54c95661-eff6-4e87-b973-ae2ef98ce8c8" x="224" y="0" width="50" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL6}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="c0bd36ad-40a5-4b47-a0e8-917c727adc5f" x="274" y="0" width="50" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL7}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="065c19aa-a4b9-4274-a5f4-a44e494e5724" x="324" y="0" width="50" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL8}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="8a4749d6-6271-4049-a4b4-1a2c2c8a20cd" x="374" y="0" width="50" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL9}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="13a5488c-9252-49bb-abfd-f92f1d1c6ba6" x="424" y="0" width="50" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL10}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="63e3be78-c8c7-4587-b580-f94d1da340eb" x="474" y="0" width="50" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL11}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="4bba6eb9-5ac4-47e2-b6ae-9af98792c4b5" x="524" y="0" width="50" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL12}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="2b8e1f51-f10a-4ba2-96cb-d27aaf864917" x="574" y="0" width="50" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL13}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="2d94c725-e12e-45dc-9515-661eaa1ca567" x="624" y="0" width="50" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL14}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="261fbfc9-ef47-4bd0-8f01-4aece9cec278" x="674" y="0" width="50" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL15}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="bad7393b-b06c-4905-b18d-d1084d087115" x="724" y="0" width="242" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COL16}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="5" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="5" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

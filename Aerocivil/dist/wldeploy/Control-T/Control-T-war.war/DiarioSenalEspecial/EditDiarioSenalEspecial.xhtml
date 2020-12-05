@@ -1,0 +1,362 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">   
+    <h:body>
+        <ui:composition template="../template_interior.xhtml">
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.dseConfigurarDiarioSenalesEspeciales}" ></h:outputText>
+
+            </ui:define>
+            <ui:define name="contenido">
+               <style>
+                    .ui-widget-header
+                    { 
+                        color: #fff;
+                        background: #253979 !important;
+                    }
+                    .ui-tabs-nav
+                    {                        
+                        background: -moz-linear-gradient(center top , rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0)) repeat scroll 0% 0% #C4C4C4 !important;
+                    }
+                    .tabla_coloreada tbody tr:nth-child(odd)
+                    {
+                       background:#eee; 
+                    }
+                    .ui-tabs-left > .ui-tabs-nav
+                    {
+                        height:auto;
+                        width:20%;
+                    }
+                    .ui-tabs-left > .ui-tabs-panels
+                    {
+                        width:78%;
+                        overflow-x:auto;
+                    }
+                    .ui-tabs.ui-tabs-left > .ui-tabs-nav li
+                    {
+                        margin:0;
+                        font-weight:normal;
+                    }
+                    .ui-tabs .ui-tabs-nav li a 
+                    {
+                        padding:.5em .2em;
+                        font-weight:normal;
+                    }
+                    .ui-tabs.ui-tabs-top > .ui-tabs-nav li {
+                        /*max-width: 14%;*/
+                        overflow: hidden;
+                    }
+                   
+                     textarea
+                    {
+                        width:100% !important;
+                    }
+                    .sinBorde tr, .sinBorde  td
+                    {
+                        border:none !important;
+                    }
+                    .tabla_obs_llegada tr td:nth-child(1)
+                    {
+                        width:10%;
+                    }
+                    .tabla_obs_llegada tr td textarea
+                    {
+                        width:50% !important;
+                    }
+                    .tabla_info_importante tr td:nth-child(odd)
+                    {
+                        width:8%;
+                    }
+                    .tabla_info_importante tr td:nth-child(2)
+                    {
+                        width:26%;
+                    }
+                     .tabla_info_importante tr td:nth-child(4),.tabla_info_importante tr td:nth-child(6)
+                    {
+                        width:15%;
+                    }
+                      .tabla_info_importante tr td:nth-child(8)
+                    {
+                        width:15%;
+                    }
+                    .tabla_categoria_serie tr td:nth-child(1),
+                    .tabla_resto_info tr td:nth-child(1)
+                    {
+                        width:100px;
+                    }
+                    .tabla_categoria_serie tr td:nth-child(2)
+                    {
+                        width:180px;
+                    }
+                    .tabla_categoria_serie tr td table tr td:nth-child(odd)
+                    {
+                        width:10px;
+                    }
+                    .tabla_actividades tr td:nth-child(1)
+                    {
+                        width:10%;
+                    }
+                     .tabla_actividades tr td:nth-child(4)
+                    {
+                        width:55%;
+                    }
+                      .tabla_actividades tr td:nth-child(3)
+                    {
+                        width:15%;
+                    }
+                     .tabla_actividades tr td:nth-child(2)
+                    {
+                        width:20%;
+                    }
+                    #dsfSaleTemprano textarea
+                    {
+                        width:550px !important;
+                    }
+                    
+                </style>
+                <p:panel styleClass="marginTop" header="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstNombre}" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiId != null}">
+                       <h:form rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId!=null and diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId==1}">
+                         
+                             
+                             <h:panelGrid columns="4" styleClass="tabla_formulario  tabla_categoria_serie" >
+                                   <xf:selectOneMenu entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiCategoria">
+                                        <f:selectItems value="#{diarioSenalEspecialBBean.diarioSenalCategorias}" var="categoria" itemValue="#{categoria}" itemLabel="#{categoria.dscNombre}"/>
+                                        <f:converter converterId="DiarioSenalCategoriaConverter" binding="#{DiarioSenalCategoriaConverter}" />
+                                        <p:ajax event="change" update="Serie_1" />
+                                    </xf:selectOneMenu> 
+                                    
+                                    <h:panelGroup  id="Serie_1">
+                                        <h:panelGrid columns="2">
+                                           
+                                             <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiSerieA" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiCategoria.dscId!=null}" />
+                                            <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiSerieB" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiCategoria.dscId==1}" />
+                                            <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiSerieC" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiCategoria.dscId!=null}" />
+                                            <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiSerieD" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiCategoria.dscId!=null}" />
+                                            <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiSerieVa" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiCategoria.dscId==1}"/>
+                                        </h:panelGrid>                                        
+                                    </h:panelGroup> 
+                            </h:panelGrid>
+                             
+                             <h:panelGrid columns="6" styleClass="tabla_formulario tabla_resto_info" >
+                                <h:outputText value="#{msg.dsiLocalizacion}"/>
+                                <h:panelGroup >
+                                     <h:panelGrid columns="3">
+                                         <p:inputText style="width:80%;" id="Busqueda_1" value="#{diarioSenalEspecialBBean.busqueda}">
+                                             <p:ajax event="keyup" update="localizacionSelect_1"/>
+                                             <p:ajax event="click" update="localizacionSelect_1"/>                                                
+                                         </p:inputText>
+                                         <p:watermark style="width:0%;" value="#{msg.dsiBusquedaLocalizacion}" for="Busqueda_1"/>
+                                         <h:panelGroup style="width:80%;" id="localizacionSelect_1">
+                                             <p:selectOneMenu  value="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiLocalizacion}">
+                                                 <f:selectItems value="#{diarioSenalEspecialBBean.diarioSenalLocalizaciones}" var="localizacion" itemValue="#{localizacion}" itemLabel="#{localizacion.dslAlias}" />
+                                                 <f:converter converterId="DiarioSenalLocalizacionConverter" binding="#{DiarioSenalLocalizacionConverter}" />
+                                             </p:selectOneMenu>
+                                         </h:panelGroup>                                      
+
+                                     </h:panelGrid>
+                                 </h:panelGroup>
+                                
+                                 <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiCodigo" />
+                                                        
+                                 <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiSolicitud" />
+                                
+                                 <h:outputText value="#{msg.dsiObservacion}"/>
+                                 <p:inputTextarea style="resize: none;height:100px;overflow:auto;" value="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiObservacion}"/>
+                                 
+                                 <f:facet name="footer">                                     
+                                    <h:commandButton  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.actualizarDsi}" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId!=null}"/>
+                                    <h:commandButton  value="#{msg.volver}" action="#{diarioSenalEspecialBBean.registrar}" />
+                                 </f:facet>   
+                             </h:panelGrid>                    
+                        </h:form>
+                         
+                        <!-- Form 2 -->
+                        <h:form rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId!=null and diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId==2}"> 
+                          
+                            
+                            <h:panelGrid columns="4" styleClass="tabla_formulario  tabla_categoria_serie" >
+                                   <xf:selectOneMenu entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiCategoria">
+                                        <f:selectItems value="#{diarioSenalEspecialBBean.diarioSenalCategorias}" var="categoria" itemValue="#{categoria}" itemLabel="#{categoria.dscNombre}"/>
+                                        <f:converter converterId="DiarioSenalCategoriaConverter" binding="#{DiarioSenalCategoriaConverter}" />
+                                        <p:ajax event="change" update="Serie_2" />
+                                    </xf:selectOneMenu> 
+                                    
+                                    <h:panelGroup  id="Serie_2">
+                                        <h:panelGrid columns="2">
+                                            <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiSerieA" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiCategoria.dscId!=null}" />
+                                            <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiSerieB" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiCategoria.dscId==1}" />
+                                            <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiSerieC" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiCategoria.dscId!=null}" />
+                                            <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiSerieD" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiCategoria.dscId!=null}" />
+                                            <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiSerieVa" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiCategoria.dscId==1}"/>                                        
+                                        </h:panelGrid>                                        
+                                    </h:panelGroup> 
+                            </h:panelGrid>
+                            
+                             <h:panelGrid columns="6" styleClass="tabla_formulario tabla_resto_info" >
+                                <h:outputText value="#{msg.dsiLocalizacion}"/>
+                                <h:panelGroup >
+                                     <h:panelGrid columns="3">
+                                         <p:inputText style="width:80%;" id="Busqueda_2" value="#{diarioSenalEspecialBBean.busqueda}">
+                                             <p:ajax event="keyup" update="localizacionSelect_2"/>
+                                             <p:ajax event="click" update="localizacionSelect_2"/>                                                
+                                         </p:inputText>
+                                         <p:watermark style="width:0%;" value="#{msg.dsiBusquedaLocalizacion}" for="Busqueda_2"/>
+                                         <h:panelGroup style="width:80%;" id="localizacionSelect_2">
+                                             <p:selectOneMenu  value="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiLocalizacion}">
+                                                 <f:selectItems value="#{diarioSenalEspecialBBean.diarioSenalLocalizaciones}" var="localizacion" itemValue="#{localizacion}" itemLabel="#{localizacion.dslAlias}" />
+                                                 <f:converter converterId="DiarioSenalLocalizacionConverter" binding="#{DiarioSenalLocalizacionConverter}" />
+                                             </p:selectOneMenu>
+                                         </h:panelGroup>                                      
+
+                                     </h:panelGrid>
+                                 </h:panelGroup>
+                                
+                                 <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiCodigo" />
+                                                        
+                                 <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiSolicitud" />
+                                 
+                                 <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiAutorizado" />
+                                
+                                 <h:outputText value="#{msg.dsiErroresInternos}" />
+                                 <p:inputText  style="width:40%;"  value="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiErroresInternos}" />
+
+
+                                 <h:outputText value="#{msg.dsiErroresExternos}" />
+                                 <p:inputText  style="width:40%;"  value="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiErroresExternos}" />                                    
+                                
+                                 <f:facet name="footer">                                     
+                                    <h:commandButton  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.actualizarDsi}" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId!=null}"/>
+                                    <h:commandButton  value="#{msg.volver}" action="#{diarioSenalEspecialBBean.registrar}" />
+                                </f:facet>  
+                             </h:panelGrid>                    
+                        </h:form>
+                        
+                        <!--Form 3 -->
+                        <h:form rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId!=null and diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId==3}"> 
+                                          
+                          
+                            <h:panelGrid columns="4" styleClass="tabla_formulario tabla_actividades" >
+                                  <xf:selectOneMenu  style="width:40%;"  entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiPosicionTrabajo"  required="true">
+                                       <f:selectItems value="#{diarioSenalEspecialBBean.posiciones}" var="ts" itemValue="#{ts.posicionNacional.pnAlias}" itemLabel="#{ts.posicionNacional.pnAlias}"/>                                                                                                
+                                   </xf:selectOneMenu>   
+
+                                   <h:outputText style="width:100px;" value="#{msg.dsiActividad}" />
+                                   <p:inputTextarea  style="resize: none;height:100px;overflow:auto;" value="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiActividad}" />
+                            </h:panelGrid>
+                           <h:panelGrid columns="6" styleClass="tabla_formulario tabla_resto_info" >
+                            
+                               <f:facet name="footer">                                     
+                                  <h:commandButton  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.actualizarDsi}" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId!=null}"/>
+                                  <h:commandButton  value="#{msg.volver}" action="#{diarioSenalEspecialBBean.registrar}" />
+                              </f:facet>  
+                           </h:panelGrid>                    
+                      </h:form>
+                        
+                        <!--Form 4 -->
+                        <h:form rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId!=null and diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId==4}"> 
+                          
+                          
+                           <h:panelGrid columns="6" styleClass="tabla_formulario tabla_resto_info" >
+                               <h:outputText value="#{msg.dsiLocalizacion}"/>
+                                <h:panelGroup>
+                                    <h:panelGrid columns="3">
+                                        <p:inputText style="width:80%;" id="Busqueda_4" value="#{diarioSenalEspecialBBean.busqueda}">
+                                            <p:ajax event="keyup" update="localizacionSelect_4"/>
+                                            <p:ajax event="click" update="localizacionSelect_4"/>                                                
+                                        </p:inputText>
+                                        <p:watermark style="width:0%;" value="#{msg.dsiBusquedaLocalizacion}" for="Busqueda_4"/>
+                                        <h:panelGroup style="width:80%;" id="localizacionSelect_4">
+                                            <p:selectOneMenu  value="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiLocalizacion}">
+                                                <f:selectItems value="#{diarioSenalEspecialBBean.diarioSenalLocalizaciones}" var="localizacion" itemValue="#{localizacion}" itemLabel="#{localizacion.dslAlias}" />
+                                                <f:converter converterId="DiarioSenalLocalizacionConverter" binding="#{DiarioSenalLocalizacionConverter}" />
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>                                    
+
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                               <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiDocumento"/>
+                               <h:outputText value="#{msg.dsiObservacion}" />
+                               <p:inputTextarea style="resize: none;height:100px;overflow:auto;" value="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiObservacion}" />
+                                    
+                              <f:facet name="footer">                                     
+                                  <h:commandButton  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.actualizarDsi}" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId!=null}"/>
+                                  <h:commandButton  value="#{msg.volver}" action="#{diarioSenalEspecialBBean.registrar}" />
+                              </f:facet>  
+                           </h:panelGrid>                    
+                      </h:form>
+                        
+                      <!-- Form 5 -->
+                      <h:form rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId!=null and diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId==5}"> 
+                                           
+                          
+                          
+                           <h:panelGrid columns="6" styleClass="tabla_formulario tabla_resto_info" >
+                                <h:outputText value="#{msg.dsiHoraUtc}"  />
+                                <h:panelGroup>
+                                    <h:panelGrid columns="2" style="width:40%;">
+                                        <p:selectOneMenu value="#{diarioSenalEspecialBBean.horaUTC}" required="true" >
+                                            <f:selectItem itemValue="#{null}" itemLabel=""/>
+                                            <f:selectItems value="#{diarioSenalEspecialBBean.horasUTC}" var="hora" itemValue="#{hora}" itemLabel="#{hora}"/>
+                                        </p:selectOneMenu>
+                                        <p:selectOneMenu value="#{diarioSenalEspecialBBean.minutoUTC}" required="true" >
+                                            <f:selectItem itemValue="#{null}" itemLabel=""/>
+                                            <f:selectItems value="#{diarioSenalEspecialBBean.minutosUTC}" var="minuto" itemValue="#{minuto}" itemLabel="#{minuto}"/>
+                                        </p:selectOneMenu>
+                                    </h:panelGrid>
+                                </h:panelGroup> 
+                                <xf:inputText entity="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado}" fieldName="dsiEquipoSoftware" />
+
+                                <h:outputText value="#{msg.dsiFalla}" />
+                                <p:inputTextarea style="resize: none;height:100px;overflow:auto;" value="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiFalla}" />               
+
+                                <h:outputText value="#{msg.dsiObservacion}" />
+                                <p:inputTextarea style="resize: none;height:100px;overflow:auto;" value="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiObservacion}" />
+
+                              <f:facet name="footer">                                     
+                                  <h:commandButton  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.actualizarDsi}" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId!=null}"/>
+                                  <h:commandButton  value="#{msg.volver}" action="#{diarioSenalEspecialBBean.registrar}" />
+                              </f:facet>  
+                           </h:panelGrid>                    
+                      </h:form>
+                      <!-- Form 6 -->
+                      <h:form rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId!=null and diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId==6}"> 
+                                          
+                          
+                          
+                           <h:panelGrid columns="6" styleClass="tabla_formulario tabla_resto_info" >
+                                <h:outputText value="#{msg.dsiHoraUtc}" />
+                                <h:panelGroup>
+                                    <h:panelGrid columns="2" style="width:40%;">
+                                        <p:selectOneMenu value="#{diarioSenalEspecialBBean.horaUTC}" required="true" >
+                                            <f:selectItem itemValue="#{null}" itemLabel=""/>
+                                            <f:selectItems value="#{diarioSenalEspecialBBean.horasUTC}" var="hora" itemValue="#{hora}" itemLabel="#{hora}"/>
+                                        </p:selectOneMenu>
+                                        <p:selectOneMenu value="#{diarioSenalEspecialBBean.minutoUTC}" required="true" >
+                                            <f:selectItem itemValue="#{null}" itemLabel=""/>
+                                            <f:selectItems value="#{diarioSenalEspecialBBean.minutosUTC}" var="minuto" itemValue="#{minuto}" itemLabel="#{minuto}"/>
+                                        </p:selectOneMenu>
+                                    </h:panelGrid>
+                                </h:panelGroup>               
+
+                                <h:outputText value="#{msg.dsiObservacion}" />
+                                <p:inputTextarea style="resize: none;height:100px;overflow:auto;" value="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiObservacion}" />
+
+                              <f:facet name="footer">                                     
+                                  <h:commandButton  value="#{msg.dsiGuardar}" action="#{diarioSenalEspecialBBean.actualizarDsi}" rendered="#{diarioSenalEspecialBBean.diarioSenalInfoSeleccionado.dsiTipo.dstId!=null}"/>
+                                  <h:commandButton  value="#{msg.volver}" action="#{diarioSenalEspecialBBean.registrar}" />
+                              </f:facet>  
+                           </h:panelGrid>                    
+                      </h:form>
+                    
+                    </p:panel>
+            </ui:define>
+        </ui:composition>
+    </h:body>    
+</html>
+

@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"      
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.editar} #{msg.solicitud}" rendered="#{solicitudBBean.solicitud.solId !=null}" ></h:outputText>
+                <h:outputText value="#{msg.crear} #{msg.solicitud}" rendered="#{solicitudBBean.solicitud.solId==null}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                <h:form>
+                    <h:panelGrid styleClass="tabla_formulario" columns="2">
+                        
+                        <xf:inputText entity="#{solicitudBBean.solicitud}" fieldName="solTipo" required="true" readonly="true" />
+                        <xf:calendar entity="#{solicitudBBean.solicitud}" fieldName="solFechaCambio" required="true" readonly="true" />
+                        <xf:inputText entity="#{solicitudBBean.solicitud.turno}" fieldName="pjAlias" required="true" readonly="true" />
+                        <xf:inputText entity="#{solicitudBBean.solicitud.funcionario_reem}" label="Funcionario Reemplaza" fieldName="funId" required="true" readonly="true" >
+                            <!--p:ajax event="blur" listener="{solicitudBBean.validarFuncionario}" update="validacion" /-->
+                        </xf:inputText>
+                        <xf:inputText entity="#{solicitudBBean.solicitud.funcionario_reem}"  fieldName="funAlias" required="true" readonly="true" >
+                            <!--p:ajax event="blur" listener="{solicitudBBean.validarFuncionario}" update="validacion" /-->
+                        </xf:inputText>
+                       
+                        <xf:calendar entity="#{solicitudBBean.solicitud}" fieldName="solFechaPago" required="true" readonly="true" />
+                        
+                        <xf:inputText entity="#{solicitudBBean.solicitud}" id="oiuyt" fieldName="solEstado" required="true" rendered="#{solicitudBBean.solicitud.solEstado != 'Aprobado Funcionario'}" readonly="#{solicitudBBean.solicitud.solEstado != 'Aprobado Funcionario' }" />
+                        
+                        
+                        <xf:selectOneMenu entity="#{solicitudBBean.solicitud}" fieldName="solEstado" rendered="#{solicitudBBean.solicitud.solEstado == 'Aprobado Funcionario'}">  
+                            <f:selectItem itemLabel="Aprobado Funcionario" itemValue="Aprobado Funcionario" /> 
+                           <f:selectItem itemLabel="Aprobado" itemValue="Aprobado" /> 
+                            <f:selectItem itemLabel="Negado" itemValue="Negado" /> 
+                        </xf:selectOneMenu>
+                       
+                        <f:facet name="footer">
+                            <h:commandButton  action="#{solicitudBBean.actualizar}" value="#{msg.actualizar}" rendered="#{solicitudBBean.solicitud.solEstado=='Aprobado Funcionario'}"  />
+                            <h:commandButton  action="#{solicitudBBean.listar}" value="#{msg.cancelar}" immediate="true" />
+                        </f:facet>
+                    </h:panelGrid>
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

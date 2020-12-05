@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"      
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+                <h:outputText value="#{msg.generarProgramacion}"/>
+            </ui:define>
+
+            <ui:define name="contenido">
+                <style>
+                    .ui-datepicker-calendar
+                    {
+                        display:none;
+                    }
+                    .tabla tr td
+                    {
+                        padding-top:10px;                        
+                    }
+                </style>
+
+                <style type="text/css">
+                    .animated .ui-progressbar-value { 
+                        background-image: url("#{resource['img/pbar-ani.gif']}"); 
+                    }
+                </style>
+
+                                <h:form id="formulario">
+                    <h:panelGrid columns="2" styleClass="tabla">
+                        <h:outputText value="#{msg.mes}"/>
+                        <p:calendar style="display:block; margin-left:10px;" value="#{programacionTurnosBBean.programacion.proFechaInicio}"
+                                    mode="inline" navigator="true" effect="slideDown" 
+                                    id="calendario" mindate="#{programacionTurnosBBean.minDate}" maxdate="#{programacionTurnosBBean.maxDate}"/>
+
+
+
+                        <h:commandButton value="#{msg.descargarLog}" action="#{programacionTurnosBBean.descargarUltimoLog}" rendered="#{tempVerProgramacionBBean.funcionario.fuNivel == 1}"/>
+                        <h:commandButton id="generar" value="#{msg.Next}" action="#{programacionTurnosBBean.generandoProgramacion}" onclick="resolveCalendar();PF('loading').show()"/>
+                        <p:dialog widgetVar="loading" modal="true" showEffect="slide" hideEffect="slide" closable="false" 
+                                  showHeader="false" resizable="false" style="box-shadow: none;background: transparent;border: none">
+                            <p:progressBar style="height:20px;width:400px;background-image: url('#{resource['img/pbar-ani.gif']}');"
+                                           mode="indeterminate"/>
+
+                        </p:dialog>
+                    </h:panelGrid>
+
+                </h:form>
+
+                <script>
+                    function resolveCalendar()
+                    {
+                        var year=$("#formulario\\:calendario .ui-datepicker-year").val();
+                        var month=$("#formulario\\:calendario .ui-datepicker-month").val();
+                        month++;                   
+                        
+                        $("#formulario\\:calendario_input").val("1/"+("0"+month).slice(-2)+"/"+year);
+                        //$("#formulario\\:generar").prop( "disabled", true );
+                        console.log($("#formulario\\:calendario_input").val())                        
+                    }
+                    
+                </script>    
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

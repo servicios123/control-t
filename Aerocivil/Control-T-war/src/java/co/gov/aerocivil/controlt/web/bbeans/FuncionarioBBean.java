@@ -259,10 +259,14 @@ public class FuncionarioBBean {
         funcionarioFiltro.setDependencia(getDependenciaXNivelUsuario());
         funcionarioFiltro.getDependencia().setDepcategoria(new DepCategoria());
         funcionarioFiltro.setFunEstado("Activo");
+        Long fuNivel = JsfUtil.getFuncionarioSesion().getFuNivel();
         //columns = new boolean[3];
         columns = new boolean[]{true, false, false};
-        if (JsfUtil.getFuncionarioSesion().getFuNivel().equals(RolEnum.NIVEL_A4.getRolId())) {
+        if (fuNivel.equals(RolEnum.NIVEL_A4.getRolId())) {
             columns[1] = true;
+        }
+        if (RolEnum.NIVEL_A2.getRolId().equals(fuNivel) || RolEnum.NIVEL_A3.getRolId().equals(fuNivel)) {
+            funcionarioFiltro.setDependencia(JsfUtil.getFuncionarioSesion().getDependencia());
         }
         return filtrar();
     }

@@ -444,8 +444,8 @@ public class ProgramacionTotalServiceBean
             solvePeriodsRecessAndRequired();
             solveRestByWeekPeriodRecess();
             /*if (funcionario.getDependencia() != null && funcionario.getDependencia().getDepcategoria() != null && funcionario.getDependencia().getDepcategoria().getDcId() != null && funcionario.getDependencia().getDepcategoria().getDcId() == 1L) {
-                solveTropByWeekPeriodRecess();
-            }*/
+             solveTropByWeekPeriodRecess();
+             }*/
             solveDescByWeekPeriodRecessFull();
 
 //            solveTop(10);
@@ -500,9 +500,9 @@ public class ProgramacionTotalServiceBean
 
                     for (int i = 0; i < 2; i++) {
                         solveRestByWeekPeriodRecess();
-                       /* if (funcionario.getDependencia() != null && funcionario.getDependencia().getDepcategoria() != null && funcionario.getDependencia().getDepcategoria().getDcId() != null && funcionario.getDependencia().getDepcategoria().getDcId() == 1L) {
-                            solveTropByWeekPeriodRecess();
-                        }*/
+                        /* if (funcionario.getDependencia() != null && funcionario.getDependencia().getDepcategoria() != null && funcionario.getDependencia().getDepcategoria().getDcId() != null && funcionario.getDependencia().getDepcategoria().getDcId() == 1L) {
+                         solveTropByWeekPeriodRecess();
+                         }*/
                     }
                     //fullAssignTrops(funcionario.getDependencia() != null && funcionario.getDependencia().getDepcategoria() != null && funcionario.getDependencia().getDepcategoria().getDcId() != null && funcionario.getDependencia().getDepcategoria().getDcId() == 1L);
 
@@ -708,7 +708,11 @@ public class ProgramacionTotalServiceBean
             if (jornada.getJornadaObligatoria() != null) {
                 long required = jornada.getJornadaObligatoria().getJoId().longValue();
                 long period = jornada.getJoId().longValue();
-                solvePeriodRequired(period, required);
+                if (jornada.getJoAlias().contains("A")) {
+                    solvePeriodRequired(period, required);
+                } else {
+                    solvePeriodRequiredAditionalRestrictions(period, required);
+                }
             }
         }
         orderFunctionaries();
@@ -1662,14 +1666,63 @@ public class ProgramacionTotalServiceBean
                                     }
                                 }
                             }
-//                            } else {
-//                                if (turn.getFunctionary() != null) {
-//                                    write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;El funcionario ya tiene ocupado este turno;");
-//                                }
-//                                if (turn.getPeriod().getId() != period) {
-//                                    write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;La jornada no es restrictiva;");
-//                                }
-//                            }
+                        } else {
+                            write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;El funcionario no tiene la posicion habilitada;");
+                        }
+                    }
+                }
+            }
+            Turn turn;
+            setFunctionariesAvailable();
+        }
+    }
+
+    private void solvePeriodRequiredAditionalRestrictions(long period, long required) {
+        setFunctionariesAvailable();
+        for (Day day : this.days) {
+            setFunctionariesBusy(day.getTurns());
+            Calendar c = Calendar.getInstance();
+            c.setTime(day.getDate());
+            String fecha = new SimpleDateFormat("ddMMyy").format(day.getDate());
+            for (Turn turn : day.getTurns()) {
+                if ((turn.getFunctionary() == null) && (turn.getPeriod().getId() == period)) {
+                    for (Functionary fun : this.functionaries) {
+                        if ((fun.isAvailable().booleanValue()) && (satisfiesEnabledPosition(fun.getId(), turn.getPosition().getId()).booleanValue())) {
+//                            if ((turn.getFunctionary() == null) && (turn.getPeriod().getId() == period)) {
+                            Turn actual = getTurnOfFunctionary(fun, day.getDate(), 0, -1);
+                            if (actual == null) {
+                                actual = getTurnDateByPeriodPosition(day.getDate(), 0, required, turn.getPosition().getId());
+                                Turn previous = getTurnOfFunctionary(fun, day.getDate(), 0, -1);
+                                if ((actual != null) && ((previous == null) || (previous.getPeriod().getId() != this.setting.getPeriodId()))) {
+                                    if (satisfiesPetitions(turn, day.getDate(), fun) && satisfiesPetitions(actual, day.getDate(), fun)) {
+                                        if (satisfiesInactivePosition(turn, day.getDate())) {
+                                            if (!isJornadaNoLaboral(turn, fun)) {
+                                                turn.setFunctionary(fun);
+                                                write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;OK;");
+                                                actual.setFunctionary(fun);
+                                                c.add(5, -1);
+                                                write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + actual.getPeriod().getAlias() + actual.getPosition().getAlias() + ";;OK;");
+                                                c.setTime(day.getDate());
+
+                                                fun.setAvailable(Boolean.valueOf(false));
+
+                                                Functionary aux = fun;
+                                                this.functionaries.remove(fun);
+                                                this.functionaries.add(aux);
+                                                break;
+                                            } else {
+                                                write("Ordinario;" + "El funcionario " + fun.getAlias() + " esta configurado con la jornada " + turn.getPeriod().getAlias() + " como no laboral;;;;");
+                                            }
+                                        } else {
+                                            write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + "La posicion: " + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + " esta inactiva el dia: " + new SimpleDateFormat("dd/MM/yy").format(day.getDate()));
+                                        }
+                                    } else {
+                                        write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + actual.getPeriod().getAlias() + actual.getPosition().getAlias() + ";;Tiene una peticion aprobada este dia;");
+                                    }
+                                } else {
+                                    write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;Problemas de restriccion por el dia anterior o 2 dias anteriores;");
+                                }
+                            }
                         } else {
                             write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;El funcionario no tiene la posicion habilitada;");
                         }
@@ -2413,7 +2466,7 @@ public class ProgramacionTotalServiceBean
     }
 
     private Boolean satisfiesEnabledPosition(long funId, long posId) {
-        if(this.enabledPositionsFunctionaryMap==null){
+        if (this.enabledPositionsFunctionaryMap == null) {
             enabledPositionsFunctionaryMap = getEnabledPositionsFunctionaryMap(this.programming.getDependencia().getDepId());
         }
         List<Long> positionsIdsList = this.enabledPositionsFunctionaryMap.get(funId);

@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.consultar} #{msg.usuarios}" rendered="#{!funcionarioBBean.columns[2]}"></h:outputText>
+                <h:outputText value="#{msg.configEvalCompetencias}" rendered="#{funcionarioBBean.columns[2]}"></h:outputText>
+
+
+            </ui:define>
+
+            <ui:define name="contenido">
+
+                <br></br>
+                <h:form>
+                    <ui:include src="filtroFuncionario.xhtml">
+                    </ui:include>
+                    <p:dataTable value="#{funcionarioBBean.lazyList}" var="item" styleClass="tabla_lista"
+                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                 rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
+                                 emptyMessage="#{msg.emptyList}" paginatorAlwaysVisible="false"
+                                 scrollWidth="900">
+                        <!--p:column rendered="{funcionarioBBean.columns[0]}">
+                            <f:facet name="header" >
+                                <h:outputText value="{msg.seleccionar}"/>
+                            </f:facet>
+                            <h:commandLink value="{msg.seleccionar}" action="{funcionarioBBean.retornar}" >
+                                <f:setPropertyActionListener value="{item}" target="{funcionarioBBean.funcionario}"/>
+                            </h:commandLink>
+                        </p:column-->                        
+                        <p:column rendered="#{loginBBean.funNivel == 0}" >
+                            <f:facet name="header" >
+                                <h:outputText value="#{msg.editar}"/>
+                            </f:facet>
+                            <h:commandLink value="#{msg.editarCuenta}" action="#{funcionarioBBean.editarFuncCuenta}" >
+                                <f:setPropertyActionListener value="#{item}" target="#{funcionarioBBean.funcionario}"/>
+                            </h:commandLink>
+                        </p:column>
+                        <p:column rendered="#{loginBBean.funNivel == 1 and funcionarioBBean.columns[0]}">
+                            <f:facet name="header" >
+                                <h:outputText value="#{msg.editar}"/>
+                            </f:facet>
+                            <h:commandLink value="#{msg.editar}" action="#{funcionarioBBean.editar}" >
+                                <f:setPropertyActionListener value="#{item}" target="#{funcionarioBBean.funcionario}"/>
+                            </h:commandLink>
+                        </p:column>
+                        <p:column rendered="#{loginBBean.funNivel == 7}">
+                            <f:facet name="header" >
+                                <h:outputText value="#{msg.desbloquear}"/>
+                            </f:facet>
+                            <h:commandLink value="#{msg.desbloquear}" action="#{funcionarioBBean.desbloquearUsuario}" >
+                                <f:setPropertyActionListener value="#{item}" target="#{funcionarioBBean.funcionario}"/>
+                            </h:commandLink>
+                        </p:column>
+                        <p:column rendered="#{funcionarioBBean.columns[1]}"><!--loginBBean.funNivel == 4 or -->
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.asignar} #{msg.posicion}"/>
+                            </f:facet>                            
+                            <h:commandLink value="#{msg.editar}" action="#{posicionHabilitadaBBean.asignarPosicion}">
+                                <f:setPropertyActionListener value="#{item}" target="#{posicionHabilitadaBBean.funcionario}"/>
+                            </h:commandLink>
+                            &nbsp;|&nbsp;
+                            <h:commandLink value="#{msg.renovar}" action="#{posicionHabilitadaBBean.renovarPosicionesFuncionario}">
+                                <f:setPropertyActionListener value="#{item}" target="#{posicionHabilitadaBBean.funcionario}"/>
+                            </h:commandLink>                      
+
+                        </p:column>
+                        <p:column rendered="#{funcionarioBBean.columns[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.actualizar}"/>
+                            </f:facet>
+                            <h:commandLink value="#{msg.actualizar}" action="#{evaluacionCompetenciasBBean.crear}">
+                                <f:setPropertyActionListener value="#{item}" target="#{evaluacionCompetenciasBBean.funcionario}"/>
+                            </h:commandLink>
+                        </p:column>
+                        <p:column sortBy="#{item.funNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.nombre}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.funAlias}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.funAlias}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funAlias}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dependencia.depcategoria.dcNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.depCategoria}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dependencia.depcategoria.dcNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dependencia.aeropuerto.regional.regNombre}" rendered="#{loginBBean.funNivel le 2}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.regNombre}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dependencia.aeropuerto.regional.regNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dependencia.aeropuerto.aeNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.aeNombre}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dependencia.aeropuerto.aeNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dependencia.depNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dependencia}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dependencia.depNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.fuNivel}"
+                                  rendered="#{!funcionarioBBean.columns[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.fuNivel}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.rol.rolNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.funEstado}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.funEstado}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funEstado}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.funFvCurso}">
+                            <f:facet name="header">
+                                <h:outputText value="V. Recurrente"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funFvCurso}">
+                                <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{item.funFvEvaluacion}">
+                            <f:facet name="header">
+                                <h:outputText value="V. Evaluación"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funFvEvaluacion}">
+                                <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{item.funFvCertmedico}">
+                            <f:facet name="header">
+                                <h:outputText value="V. Medico"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funFvCertmedico}">
+                                <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+
+
+                    <p:dataTable style="display: none;" value="#{funcionarioBBean.exportTable}" var="item" styleClass="tabla_lista" id="exportTable">
+                        <p:column sortBy="#{item.funNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.nombre}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.funAlias}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.funAlias}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funAlias}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dependencia.depcategoria.dcNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.depCategoria}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dependencia.depcategoria.dcNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dependencia.aeropuerto.regional.regNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.regNombre}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dependencia.aeropuerto.regional.regNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dependencia.aeropuerto.aeNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.aeNombre}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dependencia.aeropuerto.aeNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dependencia.depNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dependencia}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dependencia.depNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.fuNivel}"
+                                  rendered="#{!funcionarioBBean.columns[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.fuNivel}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.rol.rolNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.funEstado}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.funEstado}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funEstado}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.funFvCurso}">
+                            <f:facet name="header">
+                                <h:outputText value="V. Recurrente"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funFvCurso}">
+                                <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{item.funFvEvaluacion}">
+                            <f:facet name="header">
+                                <h:outputText value="V. Evaluación"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funFvEvaluacion}">
+                                <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{item.funFvCertmedico}">
+                            <f:facet name="header">
+                                <h:outputText value="V. Medico"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funFvCertmedico}">
+                                <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+
+
+                    <h:commandButton action="#{funcionarioBBean.crear}" value="#{msg.crear} #{msg.funcionario}"
+                                     rendered="#{loginBBean.funNivel == 0 or loginBBean.funNivel == 1}"/>
+                    <h:commandButton  value="Generar reporte">
+                        <p:dataExporter type="xls" target="exportTable" fileName="funcionarios" encoding="ISO-8859-1"/>
+                    </h:commandButton>
+
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

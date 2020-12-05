@@ -347,17 +347,17 @@ public class FuncionarioServiceBean implements FuncionarioService {
         }
 
         if (funcionario.getFunFvCertmedico() != null) {
-            condiciones.add("f.funFvCertmedico = :fvCertmedico");
+            condiciones.add("f.funFvCertmedico <= :fvCertmedico");
             params.put("fvCertmedico", funcionario.getFunFvCertmedico());
         }
 
         if (funcionario.getFunFvCurso() != null) {
-            condiciones.add("f.funFvCurso = :fvCurso");
+            condiciones.add("f.funFvCurso <= :fvCurso");
             params.put("fvCurso", funcionario.getFunFvCurso());
         }
 
         if (funcionario.getFunFvEvaluacion() != null) {
-            condiciones.add("f.funFvEvaluacion = :fvEvaluacion");
+            condiciones.add("f.funFvEvaluacion <= :fvEvaluacion");
             params.put("fvEvaluacion", funcionario.getFunFvEvaluacion());
         }
 

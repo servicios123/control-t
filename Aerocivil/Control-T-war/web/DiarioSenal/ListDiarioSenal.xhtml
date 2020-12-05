@@ -37,6 +37,7 @@
                         <h:outputText value="#{msg.regId}" rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}"/>
                         <p:selectOneMenu  value="#{diarioSenalBBean.diarioSenalFiltro.dependencia.aeropuerto.regional.regId}" 
                                           id="regId" rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}">  
+                            <f:selectItem itemLabel="#{msg.selectItemNull}" itemValue="#{null}"/>
                             <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
                             <p:ajax update="aeId,depId"  
                                     listener="#{diarioSenalBBean.cargarAeropuertoListado}"  />  

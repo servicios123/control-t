@@ -79,7 +79,7 @@
                         <h:commandButton action="#{tempVerProgramacionBBean.exportPDF}" value="#{msg.generarReporte}" />
                         <h:commandButton actionListener="#{tempVerProgramacionBBean.obtenerProcesoResumen}" value="Tiempo del proceso" rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel == 1 or loginBBean.funcionarioTO.funcionario.fuNivel == 4}"/>
                         <h:commandButton  action="#{tempVerProgramacionBBean.exportXLS}" value="#{msg.generarReporteXls}" />
-                        
+                        <p:commandButton actionListener="#{tempVerProgramacionBBean.consultarConsolidado}" value="Ver consolidado" oncomplete="PF('wdgResumen').show()" update="resumen" immediate="true" rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel == 1 or loginBBean.funcionarioTO.funcionario.fuNivel == 4}"/>                        
 
 
                         <p:commandButton value="#{msg.descargarLog}" action="#{tempVerProgramacionBBean.descargarUltimoLog}" rendered="#{tempVerProgramacionBBean.funcionario.fuNivel == 1}"/>     
@@ -145,9 +145,9 @@
                                         <p:column headerText="Ordinarias" />
                                         <p:column headerText="Ordinarias" />
                                         <p:column colspan="2" headerText="Extra" />
-                                        <p:column colspan="2" headerText="Ordinarias" />
+                                        <p:column colspan="2" headerText="Ordinarias (DIF. HORARIA)" />
                                         <p:column colspan="2" headerText="Extra" />
-                                        <p:column colspan="2" headerText="Ordinarias" />
+                                        <p:column colspan="2" headerText="Ordinarias (DIF. HORARIA)" />
                                     </p:row>
                                     <p:row>
                                         <p:column headerText="L - D" />

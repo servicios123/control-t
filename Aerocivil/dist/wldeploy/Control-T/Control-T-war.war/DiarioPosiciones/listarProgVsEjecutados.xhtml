@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+                <h:outputText value="#{msg.turnosProgramadosVsEjecutados}" ></h:outputText>
+            </ui:define>
+
+            <ui:define name="contenido">
+
+                <br></br>
+                <h:form>
+                    <ui:include src="filtroProgVsEjecutado.xhtml"/>
+
+                    <p:dataTable value="#{turnosProgVsEjecutadosBBean.lazyList}" var="item" styleClass="tabla_lista"
+                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                 rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
+                                 emptyMessage="#{msg.emptyList}" paginatorAlwaysVisible="false"
+                                 sortBy="#{item.turFecha}" rendered="false">
+                        <p:column>
+                            <f:facet name="header"><h:outputText value="#{msg.posId}"/></f:facet>
+                            <h:outputText value="#{item.pjAlias}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.turFecha}">
+                            <f:facet name="header"><h:outputText value="#{msg.turFecha}"/></f:facet>
+                            <h:outputText value="#{item.turFecha}">
+                                <f:convertDateTime pattern="dd/MM/yyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{item.funAlias}">
+                            <f:facet name="header"><h:outputText value="#{msg.funProgramado}"/></f:facet>
+                            <h:outputText value="#{item.funAlias}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.funAlias}">
+                            <f:facet name="header"><h:outputText value="#{msg.funAsignado}"/></f:facet>
+                            <h:outputText value="#{item.diarioPosicion.funcionario.funAlias}"/>
+                        </p:column>
+                    </p:dataTable>
+
+                    <p:dataTable value="#{turnosProgVsEjecutadosBBean.lazyList}" var="item" styleClass="tabla_lista"
+                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                 rowsPerPageTemplate="10,15,20" id="pdfTable" draggableColumns="true"
+                                 emptyMessage="#{msg.emptyList}" paginatorAlwaysVisible="false"
+                                 sortBy="#{item.turFecha}"
+                                 rendered="false">
+                        <p:column>
+                            <f:facet name="header"><h:outputText value="#{msg.posId}"/></f:facet>
+                            <h:outputText value="#{item.pjAlias}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.funAlias}">
+                            <f:facet name="header"><h:outputText value="#{msg.funProgramado}"/></f:facet>
+                            <h:outputText value="#{item.funAlias}"/>
+                        </p:column>
+                        <p:column rendered="false">
+                            <f:facet name="header"><h:outputText value="C.SEC"/></f:facet>
+                            <h:outputText rendered="#{item.diarioPosicion.dposTipoRealizacion=='CS'}"
+                                          value="#{item.diarioPosicion.funcionario.funAlias}"/>
+                        </p:column>
+                        <p:column rendered="false">
+                            <f:facet name="header"><h:outputText value="C.POS"/></f:facet>
+                            <h:outputText rendered="#{item.diarioPosicion.dposTipoRealizacion=='CP'}"
+                                          value="#{item.diarioPosicion.funcionario.funAlias}"/>
+                        </p:column>
+                        <p:column rendered="false">
+                            <f:facet name="header"><h:outputText value="HACE"/></f:facet>
+                            <h:outputText rendered="#{item.diarioPosicion.dposTipoRealizacion=='H'}"
+                                          value="#{item.diarioPosicion.funcionario.funAlias}"/>
+                        </p:column>
+                        <p:column rendered="false">
+                            <f:facet name="header"><h:outputText value="MIN"/></f:facet>
+                            <h:outputText value="#{item.diarioPosicion.dposRetardo}"/>
+                        </p:column>
+                        <p:column rendered="false">
+                            <f:facet name="header"><h:outputText value="#{msg.observaciones}"/></f:facet>
+                            <h:outputText value="#{item.diarioPosicion.dposObservaciones}"/>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+                    <ui:include src="turnosProgVsEjecutados.xhtml">
+                        <ui:param value="true" name="renderPaginator"/>
+                    </ui:include>                    
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

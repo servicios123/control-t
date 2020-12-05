@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui">
+    <ui:composition >
+        
+        <c:if test="${empty tabindex}">
+            <c:set var="tabindex" value="0"/>
+        </c:if>
+        
+        <c:if test="${empty rendered}">
+            <c:set var="rendered" value="true"/>
+        </c:if>
+        
+        <c:if test="${empty id}">
+            <c:set var="id" value="${fieldName}"/>
+        </c:if>
+ 
+        <c:if test="${empty label}">
+            <c:set var="label" value="${fieldName}"/>
+        </c:if>
+        <c:if test="${empty fieldLabel}">
+            <c:set var="fieldLabel" value="${fieldName}"/>
+        </c:if>
+        
+        <c:if test="${empty width}">
+            <c:set var="width" value="400px"/>
+        </c:if>
+ 
+        <c:if test="${rendered}">
+            <h:outputLabel id="${id}Label"
+                           value="#{msg[label]}" for="#{id}"
+                           styleClass="${required and !readonly?'required':''}"/>  
+        
+            <h:outputText value="#{entity[fieldLabel]}" rendered="${readonly}"/>
+            
+            <h:panelGroup rendered="${!readonly}">
+                <p:selectOneMenu id="#{id}" 
+                                 value="#{entity[fieldName]}" required="${required}" 
+                                 disabled="${disabled}" style="width: ${width}; left:0px;margin-left: 0px;" tabindex="${tabindex}">
+                    <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}" rendered="${renderNull}"/>
+                    <ui:insert />
+                </p:selectOneMenu>
+                <br/>
+                <h:message id="${id}Message" 
+                           styleClass="error" 
+                           for="#{id}" />
+            </h:panelGroup>
+           
+        </c:if>
+    </ui:composition>
+</html>

@@ -178,7 +178,16 @@ public class TempVerProgramacionBBean {
 
         comprobar();
         System.out.println("Fin de la programacion " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
-        //resumenList = tempVerProgramacionService.obtenerResumen(programacion.getProId());
+        obtenerConsolidado();
+    }
+    
+    public void obtenerConsolidado(){
+        tempVerProgramacionService.obtenerResumen(programacion.getProId());
+        resumenList = tempVerProgramacionService.consultarResumen(programacion.getProId());
+    }
+    
+    public void consultarConsolidado(){
+        resumenList = tempVerProgramacionService.consultarResumen(programacion.getProId());
     }
 
     public String filtrar() {
@@ -202,10 +211,6 @@ public class TempVerProgramacionBBean {
 
 
         return "verProgramacion";
-    }
-
-    public void obtenerResumen() {
-        resumenList = tempVerProgramacionService.obtenerResumen(programacion.getProId());
     }
 
     public void obtenerProcesoResumen() {
