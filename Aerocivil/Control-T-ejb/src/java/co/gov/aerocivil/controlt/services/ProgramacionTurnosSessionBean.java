@@ -263,7 +263,7 @@ public class ProgramacionTurnosSessionBean implements ProgramacionTurnosSession 
         QueryUtil.setParameters(query, params);
         count = (Long) query.getSingleResult();
         
-        StringBuilder strQryFinal = new StringBuilder("Select t from Programacion t  ").
+        StringBuilder strQryFinal = new StringBuilder("Select distinct t from Programacion t  ").
                 append(strQry.toString());
         if (sortField != null && sortOrder != null) {
             strQryFinal.append("order by t.").append(sortField).append(" ").append(sortOrder);

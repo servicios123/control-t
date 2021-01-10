@@ -386,35 +386,39 @@ public class Funcionario implements Serializable {
 
     @Override
     public String toString() {
-        return "id: " + funId
-                + " alias: " + funAlias
-                + " nombre: " + funNombre
-                + " rol: " + fuNivel
-                + " grado: " + funGrado
-                + " cargo: " + funCargo
-                + " email: " + funCorreoElectronico
-                + " num Licencia: " + funNumLicencia
-                + " cert. medico: " + funCertMedico
-                + " f. venc. cert. medico: " + funFvCertmedico
-                + " direccion: " + funDireccion
-                + " telefono: " + funTelefono
-                + " celular: " + funCelular
-                + " f. ingreso: " + funFIngreso
-                + " f. ult. traslado: " + funFuTraslado
-                + " f. venc. curso: " + funFvCurso
-                + " f. venc. evaluacion: " + funFvEvaluacion
-                + " salario: " + funSueldo
-                + " estado: " + funEstado
-                + " dependencia: " + dependencia.getDepAbreviatura()
-                + " horas extras: " + funHorasExtras
-                + " puntaje: " + funPuntaje
-                + " máx. horas extras: " + funCantMaxHE
-                + " máx dominicales laborales: " + funCatDom
-                + " horas extras: " + funHorasExtras
-                + " descanso semanal: " + funDescansoSemana
-                + " horas ext. compensa: " + funHEExcedente
-                + " intentos ing. fallidos: " + intentosFallidos
-                + "";
+        try {
+            return "id: " + funId
+                    + " alias: " + funAlias
+                    + " nombre: " + funNombre
+                    + " rol: " + fuNivel
+                    + " grado: " + funGrado
+                    + " cargo: " + funCargo
+                    + " email: " + funCorreoElectronico
+                    + " num Licencia: " + funNumLicencia
+                    + " cert. medico: " + funCertMedico
+                    + " f. venc. cert. medico: " + funFvCertmedico
+                    + " direccion: " + funDireccion
+                    + " telefono: " + funTelefono
+                    + " celular: " + funCelular
+                    + " f. ingreso: " + funFIngreso
+                    + " f. ult. traslado: " + funFuTraslado
+                    + " f. venc. curso: " + funFvCurso
+                    + " f. venc. evaluacion: " + funFvEvaluacion
+                    + " salario: " + funSueldo
+                    + " estado: " + funEstado
+                    + " dependencia: " + dependencia.getDepAbreviatura()
+                    + " horas extras: " + funHorasExtras
+                    + " puntaje: " + funPuntaje
+                    + " máx. horas extras: " + funCantMaxHE
+                    + " máx dominicales laborales: " + funCatDom
+                    + " horas extras: " + funHorasExtras
+                    + " descanso semanal: " + funDescansoSemana
+                    + " horas ext. compensa: " + funHEExcedente
+                    + " intentos ing. fallidos: " + intentosFallidos
+                    + "";
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     public Dependencia getDependencia() {

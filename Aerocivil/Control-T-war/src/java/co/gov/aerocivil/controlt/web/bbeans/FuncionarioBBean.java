@@ -258,7 +258,7 @@ public class FuncionarioBBean {
         funcionarioFiltro = new Funcionario();
         funcionarioFiltro.setDependencia(getDependenciaXNivelUsuario());
         funcionarioFiltro.getDependencia().setDepcategoria(new DepCategoria());
-        funcionarioFiltro.setFunEstado("Activo");
+       // funcionarioFiltro.setFunEstado("Activo");
         Long fuNivel = JsfUtil.getFuncionarioSesion().getFuNivel();
         //columns = new boolean[3];
         columns = new boolean[]{true, false, false};
@@ -266,8 +266,14 @@ public class FuncionarioBBean {
             columns[1] = true;
         }
         if (RolEnum.NIVEL_A2.getRolId().equals(fuNivel) || RolEnum.NIVEL_A3.getRolId().equals(fuNivel)) {
-            funcionarioFiltro.setDependencia(JsfUtil.getFuncionarioSesion().getDependencia());
+            funcionarioFiltro.getDependencia().getDepcategoria().setDcId(JsfUtil.getFuncionarioSesion().getDependencia().getDepcategoria().getDcId());
+            funcionarioFiltro.setFunEstado("Activo");
         }
+        
+        if (RolEnum.NIVEL_A4.getRolId().equals(fuNivel)) {
+            funcionarioFiltro.setFunEstado("Activo");
+        }
+        
         return filtrar();
     }
 
@@ -281,6 +287,11 @@ public class FuncionarioBBean {
         columns = new boolean[]{true, false, false};
         if (JsfUtil.getFuncionarioSesion().getFuNivel().equals(RolEnum.NIVEL_A4.getRolId())) {
             columns[1] = true;
+        }
+        LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
+        Funcionario funcionarioSesion = logbbean.getFuncionarioTO().getFuncionario();
+        if (logbbean.isFuncionarioEnNivel(new RolEnum[]{RolEnum.NIVEL_A2, RolEnum.NIVEL_A3})) {
+            funcionarioFiltro.getDependencia().getDepcategoria().setDcId(funcionarioSesion.getDependencia().getDepcategoria().getDcId());
         }
         return filtrar();
     }
@@ -304,6 +315,11 @@ public class FuncionarioBBean {
         funcionarioFiltro = new Funcionario();
         funcionarioFiltro.setDependencia(getDependenciaXNivelUsuario());
         funcionarioFiltro.getDependencia().setDepcategoria(new DepCategoria());
+        LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
+        Funcionario funcionarioSesion = logbbean.getFuncionarioTO().getFuncionario();
+        if (logbbean.isFuncionarioEnNivel(new RolEnum[]{RolEnum.NIVEL_A2, RolEnum.NIVEL_A3})) {
+            funcionarioFiltro.getDependencia().getDepcategoria().setDcId(funcionarioSesion.getDependencia().getDepcategoria().getDcId());
+        }
         funcionarioFiltro.setFunEstado("Activo");
         Calendar c = Calendar.getInstance();
         funcionarioFiltro.setFechafin(c.getTime());
@@ -393,7 +409,13 @@ public class FuncionarioBBean {
         funcionarioFiltro = new Funcionario();
         funcionarioFiltro.setDependencia(getDependenciaXNivelUsuario());
         funcionarioFiltro.getDependencia().setDepcategoria(new DepCategoria());
+        LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
+        Funcionario funcionarioSesion = logbbean.getFuncionarioTO().getFuncionario();
+        if (logbbean.isFuncionarioEnNivel(new RolEnum[]{RolEnum.NIVEL_A2, RolEnum.NIVEL_A3})) {
+            funcionarioFiltro.getDependencia().getDepcategoria().setDcId(funcionarioSesion.getDependencia().getDepcategoria().getDcId());
+        }
         funcionarioFiltro.setEvalFecha(1);
+        funcionarioFiltro.setFunEstado("Activo");
         //columns = new boolean[3];
 
 
@@ -418,6 +440,11 @@ public class FuncionarioBBean {
         funcionarioFiltro.setDependencia(
                 getDependenciaXNivelUsuario());
         funcionarioFiltro.getDependencia().setDepcategoria(new DepCategoria());
+        LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
+        Funcionario funcionarioSesion = logbbean.getFuncionarioTO().getFuncionario();
+        if (logbbean.isFuncionarioEnNivel(new RolEnum[]{RolEnum.NIVEL_A2, RolEnum.NIVEL_A3})) {
+            funcionarioFiltro.getDependencia().getDepcategoria().setDcId(funcionarioSesion.getDependencia().getDepcategoria().getDcId());
+        }
 
         this.funcionariosDisponibles = new ArrayList<Funcionario>();
         funcionariosSeleccionados = new ArrayList<Funcionario>();
@@ -459,10 +486,11 @@ public class FuncionarioBBean {
         if (funcionarioSesion != null && funcionarioSesion.getFuNivel() == RolEnum.LINEA_3000.getRolId()) {
             funcionarioFiltro.setFunEstado("Bloqueado");
         }
-
+        
+/*
         if (funcionarioSesion != null && funcionarioSesion.getFuNivel() == RolEnum.NIVEL_A1.getRolId()) {
             funcionarioFiltro.setFunEstado(null);
-        }
+        }*/
         lazyList = new FuncionarioLazyList(funcionarioService, funcionarioFiltro);
         exportTable = funcionarioService.getListaPag(funcionarioFiltro, null, null, null, null);
         return "listarFuncionario";

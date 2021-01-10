@@ -159,6 +159,11 @@ public class Turn {
     public void setProgs(String[] progs) {
         this.progs = progs;
     }
+
+    @Override
+    public String toString() {
+        return period.getAlias()+position.getAlias();
+    }
     
-        
+    
 }

@@ -130,6 +130,10 @@ public class ListadosBBean {
         return listasService.obtenerTurnoEspeciaXDependencia(dependencia);
         //return null;
     }
+    public List<TurnoEspecial> obtenerTurnoEspeciaXDependenciaActivo(Long dependencia) {
+        return listasService.obtenerTurnoEspeciaXDependenciaActivo(dependencia);
+        //return null;
+    }
 
     public TurnoEspecial obtenerTurnoXDepAlias(TurnoEspecial te) {
         return listasService.obtenerTurnoXDepAlias(te);

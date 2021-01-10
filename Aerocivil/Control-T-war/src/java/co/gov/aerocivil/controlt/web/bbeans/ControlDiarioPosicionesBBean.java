@@ -9,34 +9,21 @@ import co.gov.aerocivil.controlt.entities.DiarioPosicion;
 import co.gov.aerocivil.controlt.entities.DiarioPosicionesIndividualVista;
 import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.entities.Jornada;
-import co.gov.aerocivil.controlt.entities.Notificacion;
-import co.gov.aerocivil.controlt.entities.Programacion;
-import co.gov.aerocivil.controlt.entities.Transporte;
 import co.gov.aerocivil.controlt.entities.Turno;
 import co.gov.aerocivil.controlt.entities.Vistaprogramacion;
 import co.gov.aerocivil.controlt.enums.ParametrosEnum;
+import co.gov.aerocivil.controlt.enums.RolEnum;
 import co.gov.aerocivil.controlt.enums.UnitTimeEnum;
 import co.gov.aerocivil.controlt.services.ControlDiarioPosicionesService;
 import co.gov.aerocivil.controlt.services.FuncionarioService;
 import co.gov.aerocivil.controlt.services.ListasService;
 import co.gov.aerocivil.controlt.services.TurnoService;
-import co.gov.aerocivil.controlt.services.VistaProgramacionService;
 import co.gov.aerocivil.controlt.to.ControlDiarioFuncionarioTO;
 import co.gov.aerocivil.controlt.web.enums.Months;
 import co.gov.aerocivil.controlt.web.lazylist.DiarioPosicionesLazyList;
-import co.gov.aerocivil.controlt.web.lazylist.TransporteFuncionarioLazyList;
-import co.gov.aerocivil.controlt.web.lazylist.TurnosProgEjecutadosLazyList;
 import co.gov.aerocivil.controlt.web.util.DateUtil;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import co.gov.aerocivil.controlt.web.util.MailUtil;
-import com.lowagie.text.BadElementException;
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.PageSize;
-import java.io.File;
-import java.io.IOException;
-import java.util.AbstractList;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -44,14 +31,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 import javax.faces.model.ListDataModel;
-import javax.servlet.ServletContext;
 import org.primefaces.model.LazyDataModel;
-import org.primefaces.event.RowEditEvent;
 
 /**
  *
@@ -161,6 +144,12 @@ public class ControlDiarioPosicionesBBean {
         FuncionarioBBean funcBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);
         funcBBean.inicializarPickList();
         dependenciaFiltro = funcBBean.getFuncionarioFiltro().getDependencia();
+        
+        LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
+        Funcionario funcionarioSesion = logbbean.getFuncionarioTO().getFuncionario();
+        if (logbbean.isFuncionarioEnNivel(new RolEnum[]{RolEnum.NIVEL_A2, RolEnum.NIVEL_A3})) {
+            dependenciaFiltro.getDepcategoria().setDcId(funcionarioSesion.getDependencia().getDepcategoria().getDcId());
+        }
         Funcionario fun = new Funcionario();
         fun.setDependencia(dependenciaFiltro);
         diarioFiltro = new DiarioPosicion();

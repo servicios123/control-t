@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -114,5 +115,30 @@ public class StringDateUtil {
         c.set(Calendar.MINUTE, minutes);
         c.set(Calendar.HOUR_OF_DAY, hours);
         return c.getTime();
+    }
+
+    public static Long getDifferenceBetwenDates(Date dateInicio, Date dateFinal, TimeUnit timeUnit) {
+        long diff = dateFinal.getTime() - dateInicio.getTime();
+        return timeUnit.convert(diff, TimeUnit.MILLISECONDS);
+    }
+    
+    public static Date getSpecificDateAmount(int amount){
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.DATE, amount);
+        return c.getTime();
+    }
+    
+    public static Date getSpecificDateAmount(Date date, int amount){
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.add(Calendar.DATE, amount);
+        return c.getTime();
+    }
+    
+    public static int getSpecificDayAmount(Date date, int amount){
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.add(Calendar.DATE, amount);
+        return c.get(Calendar.DAY_OF_MONTH);
     }
 }

@@ -7,12 +7,10 @@ package co.gov.aerocivil.controlt.web.bbeans;
 import co.gov.aerocivil.controlt.entities.Aeropuerto;
 import co.gov.aerocivil.controlt.entities.DepCategoria;
 import co.gov.aerocivil.controlt.entities.Dependencia;
-import co.gov.aerocivil.controlt.entities.Funcionario;
 
 import co.gov.aerocivil.controlt.entities.Programacion;
 import co.gov.aerocivil.controlt.entities.Regional;
 import co.gov.aerocivil.controlt.entities.RestriccionProgramacion;
-import co.gov.aerocivil.controlt.enums.ParametrosEnum;
 import co.gov.aerocivil.controlt.enums.RolEnum;
 import co.gov.aerocivil.controlt.services.FuncionarioService;
 import co.gov.aerocivil.controlt.services.PermisoService;
@@ -20,18 +18,14 @@ import co.gov.aerocivil.controlt.services.ProgramacionTotalService;
 import co.gov.aerocivil.controlt.services.ProgramacionTurnosSession;
 import co.gov.aerocivil.controlt.services.RestriccionesService;
 import co.gov.aerocivil.controlt.web.lazylist.ProgramacionLazyList;
-import co.gov.aerocivil.controlt.web.manager.ProgrammeHandler;
-import co.gov.aerocivil.controlt.web.util.DateUtil;
 
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
-import co.gov.aerocivil.controlt.web.util.MailUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -40,7 +34,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.faces.el.EvaluationException;
 import org.primefaces.model.LazyDataModel;
 
 /**

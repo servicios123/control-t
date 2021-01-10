@@ -177,9 +177,7 @@ public class ProgramacionTotalServiceBean
                             validateOrdinaryTurn(fun, turn, day.getDate());
                             tipo = 1;
                         } else if ((turn.getPeriod().getStart() < ordinary.getPeriod().getEnd()) && (ordinary.getPeriod().getTotal() + turn.getPeriod().getTotal() < 24)) {
-                            if (fun.getAlias().equalsIgnoreCase("ICG") && turn.getPeriod().getId() == 427) {
-                                System.out.println("poscision");
-                            }
+
                             turn.setFunctionary(fun);
                             validateExtraordinaryTurn(turn, ordinary, day.getDate(), ordinary.getFunctionary().getMaxHoursExtra(), true);
                             tipo = 2;
@@ -487,7 +485,7 @@ public class ProgramacionTotalServiceBean
                     Date inicio = new Date();
                     print_sec = print_sec + "4.Jornadas con jornada anterior obligatoria\n";
                     solvePeriodsRecessAndRequired();
-                    if (morning != null) {
+                    if (morning != null && this.programming.getDependencia().getDepId() != 290) {
                         solveOrdinaryTurnsOnlyMorning(morning.getJoId().longValue());
                         excludeMorning = !excludeMorning;
                     }
@@ -498,13 +496,7 @@ public class ProgramacionTotalServiceBean
                     Date inicio = new Date();
                     print_sec = print_sec + "5.Descansos\n";
 
-                    for (int i = 0; i < 2; i++) {
-                        solveRestByWeekPeriodRecess();
-                        /* if (funcionario.getDependencia() != null && funcionario.getDependencia().getDepcategoria() != null && funcionario.getDependencia().getDepcategoria().getDcId() != null && funcionario.getDependencia().getDepcategoria().getDcId() == 1L) {
-                         solveTropByWeekPeriodRecess();
-                         }*/
-                    }
-                    //fullAssignTrops(funcionario.getDependencia() != null && funcionario.getDependencia().getDepcategoria() != null && funcionario.getDependencia().getDepcategoria().getDcId() != null && funcionario.getDependencia().getDepcategoria().getDcId() == 1L);
+                    solveRestByWeekPeriodRecess();
 
                     solveDescByWeekPeriodRecessFull();
                     this.auditoriaService.auditar(getProcesoProgramacion("Descansos", inicio, new Date()), funcionario);
@@ -590,9 +582,6 @@ public class ProgramacionTotalServiceBean
                         if (other.getFunctionary().isAvailable()) {
                             if (other.getPeriod().getId() != today.getPeriod().getId()) {
                                 if (validateAllTurn(today, other.getFunctionary(), day.getDate(), ProgramacionTotalServiceBean.Type.ORDINARY)) {
-                                    if (today.getFunctionary().getAlias().equalsIgnoreCase("ICG") && other.getPeriod().getId() == 426) {
-                                        System.out.println("poscision");
-                                    }
                                     Functionary aux = other.getFunctionary();
                                     other.setFunctionary(today.getFunctionary());
                                     today.setFunctionary(aux);
@@ -615,9 +604,6 @@ public class ProgramacionTotalServiceBean
     private boolean validateAllTurn(Turn turn, Functionary fun, Date date, int type) {
 
         Functionary actual = turn.getFunctionary();
-        if (actual.getAlias().equalsIgnoreCase("ICG") && turn.getPeriod().getId() == 427) {
-            System.out.println("validate all turn");
-        }
         turn.setFunctionary(fun);
 
         Calendar tomorrow = Calendar.getInstance();
@@ -862,9 +848,6 @@ public class ProgramacionTotalServiceBean
                             if (fun.isAvailable().booleanValue()) {
                                 Turn previous = getTurnLastDayFromLastProgPrevMonth(fun);
                                 if ((previous != null) && (previous.getPeriod().getId() == required) && (previous.getPosition().getId() == turn.getPosition().getId())) {
-                                    if (fun.getAlias().equalsIgnoreCase("ICG") && turn.getPeriod().getId() == 427) {
-                                        System.out.println("poscision");
-                                    }
                                     turn.setFunctionary(fun);
                                     write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;OK;Empalmando mes anterior");
                                     fun.setAvailable(Boolean.valueOf(false));
@@ -888,8 +871,10 @@ public class ProgramacionTotalServiceBean
             head = head + cal.get(5) + ";";
         }
         for (Week week : this.weeks) {
-            double limit = (double) this.functionaries.size() / week.getTotalDays();
+            int days = week.getDays().size() == 1 ? Calendar.SATURDAY - 1 : week.getDays().size();
+            double limit = (double) functionaries.size() / days;
             int maxTurns = (int) Math.round(limit);
+            Collections.shuffle(this.functionaries);
             for (Functionary fun : this.functionaries) {
                 if (fun.isRestWeek().booleanValue()) {
                     if (!isRestWeek(fun, week)) {
@@ -897,7 +882,7 @@ public class ProgramacionTotalServiceBean
                             if (day.getTotalDesc() < maxTurns) {
                                 Turn des = getTurnOfFunctionary(fun, day.getDate(), 0, -1);
                                 if (des == null) {
-                                    if ((isRestSunday(day.getDate(), fun)) && (!isHolyDay(day.getDate()).booleanValue())) {
+                                    if (!isHolyDay(day.getDate()).booleanValue()) {
                                         Turn previous = null;
 
                                         previous = getTurnOfFunctionary(fun, day.getDate(), -1, 1);
@@ -905,15 +890,36 @@ public class ProgramacionTotalServiceBean
                                             if (isTurnDayMax(day, maxTurns, Type.REST)) {
                                                 Calendar c = Calendar.getInstance();
                                                 c.setTime(day.getDate());
-                                                Period period = new Period(0L, "", 0, 24);
-                                                Position position = new Position(0L, "DES");
-                                                Turn rest = new Turn(period, position, fun, 0L);
-                                                rest.setType(ProgramacionTotalServiceBean.Type.REST);
-                                                rest.setPermiteHorasExtra(false);
-                                                day.addTurn(rest);
-                                                day.setTotalDesc(day.getTotalDesc() + 1);
-                                                write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + rest.getPeriod().getAlias() + rest.getPosition().getAlias() + ";;OK;");
-                                                break;
+                                                if (c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+                                                    Calendar backward = Calendar.getInstance();
+                                                    backward.setTime(c.getTime());
+                                                    while (backward.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY
+                                                            && backward.get(Calendar.DAY_OF_MONTH) > 1) {
+                                                        backward.add(Calendar.DATE, -1);
+                                                        Turn turn = getTurnOfFunctionary(fun, backward.getTime(), 0, -1);
+                                                        if (turn == null) {
+                                                            Period period = new Period(0L, "", 0, 24);
+                                                            Position position = new Position(0L, "DES");
+                                                            Turn rest = new Turn(period, position, fun, 0L);
+                                                            rest.setType(ProgramacionTotalServiceBean.Type.REST);
+                                                            rest.setPermiteHorasExtra(false);
+                                                            day.addTurn(rest);
+                                                            day.setTotalDesc(day.getTotalDesc() + 1);
+                                                            write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + rest.getPeriod().getAlias() + rest.getPosition().getAlias() + ";;OK;");
+                                                            break;
+                                                        }
+                                                    }
+                                                } else {
+                                                    Period period = new Period(0L, "", 0, 24);
+                                                    Position position = new Position(0L, "DES");
+                                                    Turn rest = new Turn(period, position, fun, 0L);
+                                                    rest.setType(ProgramacionTotalServiceBean.Type.REST);
+                                                    rest.setPermiteHorasExtra(false);
+                                                    day.addTurn(rest);
+                                                    day.setTotalDesc(day.getTotalDesc() + 1);
+                                                    write("Descanso;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + rest.getPeriod().getAlias() + rest.getPosition().getAlias() + ";;OK;");
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
@@ -933,6 +939,7 @@ public class ProgramacionTotalServiceBean
             float percent = week.getDays().size() / 7.0F;
             max_count = percent * this.functionaries.size();
             count = 0;
+            Collections.shuffle(this.functionaries);
             for (Functionary fun : this.functionaries) {
                 if (fun.isRestWeek().booleanValue()) {
                     if ((i == 0) || (count <= max_count)) {
@@ -1288,12 +1295,12 @@ public class ProgramacionTotalServiceBean
         c.setTime(date);
         int count;
 
-        if ((fun.getCountRestSunday() != null) && (fun.getCountRestSunday() == 0) && (c.get(7) == 1)) {
+        if ((fun.getCountRestSunday() != null) && (fun.getCountRestSunday() == 0) && (c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)) {
 
             count = 0;
             for (Day day : this.days) {
                 c.setTime(day.getDate());
-                if (c.get(7) == 1) {
+                if (c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
                     for (Turn turn : day.getTurns()) {
                         if ((turn.getFunctionary() != null) && (turn.getFunctionary().getId() == fun.getId()) && (turn.getType() == 5)) {
                             count++;
@@ -1463,9 +1470,6 @@ public class ProgramacionTotalServiceBean
         Calendar c = Calendar.getInstance();
         c.setTime(date);
         if (validateOrdinaryTurn(fun, turn, date).booleanValue()) {
-            if (c.get(Calendar.DAY_OF_MONTH) == 1 && (turn.getPeriod().getAlias() + turn.getPosition().getAlias()).equalsIgnoreCase("AF")) {
-                System.out.println("c = " + c);
-            }
             turn.setFunctionary(fun);
             fun.setAvailable(Boolean.valueOf(false));
             return true;
@@ -1490,9 +1494,6 @@ public class ProgramacionTotalServiceBean
     private boolean solvingExtraOrdinaryTurn(Functionary fun, Turn extra, Boolean exceeded, Date date) {
         Calendar c = Calendar.getInstance();
         c.setTime(date);
-        if (c.get(Calendar.DAY_OF_MONTH) == 1 && (extra.getPeriod().getAlias() + extra.getPosition().getAlias()).equalsIgnoreCase("AF")) {
-            System.out.println("c = " + c);
-        }
         if (!fun.isAvailable().booleanValue()) {
             Turn turn = getTurnOfFunctionary(fun, date, 0, -1);
 
@@ -1510,9 +1511,6 @@ public class ProgramacionTotalServiceBean
                 int extraType = extra.getType();
                 int turnType = turn.getType();
                 if ((extra.getPeriod().getStart() < turn.getPeriod().getEnd()) && (turn.getPeriod().getTotal() + extra.getPeriod().getTotal() < 24)) {
-                    if (fun.getAlias().equalsIgnoreCase("ICG") && turn.getPeriod().getId() == 427) {
-                        System.out.println("poscision");
-                    }
                     extra.setFunctionary(fun);
                     extra.setType(ProgramacionTotalServiceBean.Type.ORDINARY);
                     turn.setType(ProgramacionTotalServiceBean.Type.EXTRAORDINARY);
@@ -1606,9 +1604,6 @@ public class ProgramacionTotalServiceBean
                                 previous = getTurnLastDayFromLastProg(fun);
 
                                 if ((previous != null) && (previous.getPeriod().getId() == required) && (previous.getPosition().getId() == turn.getPosition().getId())) {
-                                    if (fun.getAlias().equalsIgnoreCase("ICG") && turn.getPeriod().getId() == 427) {
-                                        System.out.println("poscision");
-                                    }
                                     turn.setFunctionary(fun);
                                     write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;OK;");
                                     fun.setAvailable(Boolean.valueOf(false));
@@ -1633,9 +1628,6 @@ public class ProgramacionTotalServiceBean
                                             if (satisfiesPetitions(turn, day.getDate(), fun) && satisfiesPetitions(previous, day.getDate(), fun)) {
                                                 if (satisfiesInactivePosition(turn, day.getDate())) {
                                                     if (!isJornadaNoLaboral(turn, fun)) {
-                                                        if (fun.getAlias().equalsIgnoreCase("ICG") && turn.getPeriod().getId() == 427) {
-                                                            System.out.println("poscision");
-                                                        }
                                                         turn.setFunctionary(fun);
                                                         write("Ordinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + fun.getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";;OK;");
                                                         previous.setFunctionary(fun);
@@ -1744,7 +1736,7 @@ public class ProgramacionTotalServiceBean
                 }
             }
             for (Turn turn : day.getTurns()) {
-                if ((turn.getFunctionary() != null) && (turn.getFunctionary().getId() == fun.getId()) && ((turn.getType() == 5) || ((turn.getType() == 3) && ((turn.getPeriod().getAlias() + turn.getPosition().getAlias()).equals("DESC"))))) {
+                if ((turn.getFunctionary() != null) && (turn.getFunctionary().getId() == fun.getId()) && (turn.getType() == Type.REST || (turn.getType() == Type.SPECIAL && turn.getPosition().getAlias().equals("DESC")))) {
                     return true;
                 }
             }
@@ -1925,9 +1917,6 @@ public class ProgramacionTotalServiceBean
         Calendar c = Calendar.getInstance();
         c.setTime(current);
 
-        if (c.get(Calendar.DAY_OF_MONTH) == 1 && (turn.getPeriod().getAlias() + turn.getPosition().getAlias()).equalsIgnoreCase("AF")) {
-            System.out.println("c = " + c);
-        }
 
         String s = "ExtraOrdinario;" + c.get(5) + "/" + (c.get(2) + 1) + ";" + turn.getFunctionary().getAlias() + ";" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";" + extra.getPeriod().getAlias() + extra.getPosition().getAlias() + ";";
         if (satisfiesInitialConditionalExtra(s, turn, extra, current, hourEval, exceeded).booleanValue()) {
@@ -1940,20 +1929,20 @@ public class ProgramacionTotalServiceBean
 
                 Turn next = getTurnOfFunctionary(turn.getFunctionary(), current, 1, 1);
                 if (next != null && turn != null) {
-                    if (!satisfiesRestrictionPreviousPeriod(turn, next).booleanValue()) {
+                    if (!satisfiesRestrictionPreviousPeriod(turn, next, false).booleanValue()) {
                         write(s + "No cumple con la restricion de jornada restrictiva con respecto a la jornada anterior;" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + ";");
                         return false;
                     }
                 }
                 if (next != null && extra != null) {
-                    if (!satisfiesRestrictionPreviousPeriod(extra, next).booleanValue()) {
+                    if (!satisfiesRestrictionPreviousPeriod(extra, next, true).booleanValue()) {
                         write(s + "No cumple con la restricion de jornada restrictiva con respecto a la jornada anterior;" + extra.getPeriod().getAlias() + extra.getPosition().getAlias() + ";");
                         return false;
                     }
                 }
                 if (satisfiesMaxContinuosPeriod(turn, extra, next, current).booleanValue()) {
                     if ((satisfiesRequiredPeriod(turn, extra).booleanValue()) && (satisfiesRequiredPeriod(extra, next).booleanValue())) {
-                        if ((satisfiesRestrictionPreviousPeriod(turn, extra).booleanValue()) && (satisfiesRestrictionPreviousPeriod(extra, next).booleanValue())) {
+                        if ((satisfiesRestrictionPreviousPeriod(turn, extra, true).booleanValue()) && (satisfiesRestrictionPreviousPeriod(extra, next, true).booleanValue())) {
                             if ((satisfiesRecessPeriod(turn, extra, Boolean.valueOf(true)).booleanValue()) && (satisfiesRecessPeriod(extra, next, Boolean.valueOf(false)).booleanValue())) {
                                 if ((satisfiesSequence(turn, extra).booleanValue()) && (satisfiesSequence(extra, next).booleanValue())) {
                                     if (!satisfiesInactivePosition(extra, current)) {
@@ -2023,21 +2012,18 @@ public class ProgramacionTotalServiceBean
                         }
                         Turn next = getTurnOfFunctionary(fun, current, ProgramacionTotalServiceBean.TargetDay.NEXT, ProgramacionTotalServiceBean.Type.ORDINARY);
                         if (next != null && turn != null) {
-                            if (!satisfiesRestrictionPreviousPeriod(turn, next).booleanValue()) {
+                            if (!satisfiesRestrictionPreviousPeriod(turn, next, false).booleanValue()) {
                                 write(s + "No cumple con la restricion de jornada restrictiva con respecto a la jornada anterior;" + next.getPeriod().getAlias() + next.getPosition().getAlias() + ";");
                                 return false;
                             }
                         }
                         if (satisfiesRequiredPeriod(previous, turn).booleanValue()) {
-                            if (satisfiesRestrictionPreviousPeriod(previous, turn).booleanValue()) {
+                            if (satisfiesRestrictionPreviousPeriod(previous, turn, false).booleanValue()) {
                                 if (satisfiesRecessPeriod(previous, turn, Boolean.valueOf(false), current).booleanValue()) {
                                     if (satisfiesSequence(previous, turn).booleanValue()) {
                                         if (satisfiesInactivePosition(turn, current)) {
                                             if (satisfiesPetitions(turn, current, fun)) {
                                                 write(s + "OK;");
-                                                if (c.get(Calendar.DAY_OF_MONTH) == 1 && (turn.getPeriod().getAlias() + turn.getPosition().getAlias()).equalsIgnoreCase("AF")) {
-                                                    System.out.println("c = " + c);
-                                                }
                                                 return Boolean.valueOf(true);
                                             } else {
                                                 write(s + "El funcionario tiene un peticion para la jornada: " + turn.getPeriod().getAlias() + " el dia: " + new SimpleDateFormat("dd/MM/yy").format(current));
@@ -2090,13 +2076,13 @@ public class ProgramacionTotalServiceBean
                         Turn next = getTurnOfFunctionary(fun, current, TargetDay.NEXT, Type.ORDINARY);
                         Turn actual = getTurnOfFunctionary(fun, current, TargetDay.CURRENT, Type.ORDINARY);
                         if (next != null && turn != null) {
-                            if (!satisfiesRestrictionPreviousPeriod(turn, next).booleanValue()) {
+                            if (!satisfiesRestrictionPreviousPeriod(turn, next, false).booleanValue()) {
                                 write(s + "No cumple con la restricion de jornada restrictiva con respecto a la jornada anterior;" + next.getPeriod().getAlias() + next.getPosition().getAlias() + ";");
                                 return false;
                             }
                         }
                         if (satisfiesRequiredPeriod(previous, turn).booleanValue()) {
-                            if (satisfiesRestrictionPreviousPeriod(previous, turn).booleanValue()) {
+                            if (satisfiesRestrictionPreviousPeriod(previous, turn, false).booleanValue()) {
                                 if (satisfiesRecessPeriod(previous, turn, Boolean.valueOf(false), current).booleanValue()) {
                                     if (satisfiesSequence(previous, turn).booleanValue()) {
                                         if (satisfiesInactivePosition(turn, current)) {
@@ -2302,19 +2288,23 @@ public class ProgramacionTotalServiceBean
         return Boolean.valueOf(true);
     }
 
-    private Boolean satisfiesRestrictionPreviousPeriod(Turn previous, Turn current) {
+    private Boolean satisfiesRestrictionPreviousPeriod(Turn previous, Turn current, boolean validateDiff) {
         if ((previous != null) && (current != null)) {
-            if (previous.getPeriod().getId() == 168 && current.getPeriod().getId() == 166) {
-                //System.out.println("current = " + previous.getPeriod().getAlias() + previous.getPosition().getAlias());
+            if(previous.getPeriod().getAlias().equalsIgnoreCase("MO") && current.getPeriod().getAlias().equalsIgnoreCase("T")){
+                System.out.println("validateDiff = " + validateDiff);
             }
             JornadaRestriccion result = getRestrictivePeriod(previous.getPeriod().getId(), current.getPeriod().getId());
-//            
-//            if(previous.getPeriod().getId() == setting.getPeriodId()){
-//                
-//            }
-//            
+//          
+            int diffHrs = current.getPeriod().getStart() - (previous.getPeriod().getEnd()-1);
+
             if (result != null) {
-                return false;
+                if (validateDiff) {
+                    return false;
+                }
+                
+                if(diffHrs < 1){
+                    return false;
+                }
             }
         }
         return Boolean.valueOf(true);
@@ -2527,6 +2517,10 @@ public class ProgramacionTotalServiceBean
                             return turn;
                         }
                         if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId()) && ((type == ProgramacionTotalServiceBean.Type.ANY) || (turn.getType() == type))) {
+                            return turn;
+                        }
+                    } else if (type == -2) {
+                        if ((turn.getFunctionary() != null) && (turn.getPeriod() != null) && (turn.getPosition() != null) && (turn.getFunctionary().getId() == fun.getId())) {
                             return turn;
                         }
                     } else {
@@ -3132,9 +3126,6 @@ public class ProgramacionTotalServiceBean
                             Turn next = getTurnOfFunctionary(fun, day.getDate(), ProgramacionTotalServiceBean.TargetDay.NEXT, ProgramacionTotalServiceBean.Type.ORDINARY);
                             if (next == null || (next != null && next.getPeriod().getRequiredPeriod() == ProgramacionTotalServiceBean.Type.ANY)) {
                                 if (validateOrdinaryTurn(fun, no_asign, day.getDate()).booleanValue()) {
-                                    if (fun.getAlias().equalsIgnoreCase("ICG") && no_asign.getPeriod().getId() == 426) {
-                                        System.out.println("poscision");
-                                    }
                                     no_asign.setFunctionary(fun);
                                     no_asign.setType(ProgramacionTotalServiceBean.Type.ORDINARY);
                                     fun.setAvailable(false);

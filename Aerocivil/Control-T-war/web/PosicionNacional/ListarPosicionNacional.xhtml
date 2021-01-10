@@ -44,8 +44,9 @@
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
                          currentPageReportTemplate="#{msg.currentPageReportTemplate}"
                          rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
-                         sortBy="#{item.pnAlias}" paginatorAlwaysVisible="false"
-                         emptyMessage="#{msg.emptyList}">
+                         paginatorAlwaysVisible="false"
+                         emptyMessage="#{msg.emptyList}"
+                         lazy="true">
                 <p:column>
                     <f:facet name="header">
                         <h:outputText value="#{msg.editar}"/>

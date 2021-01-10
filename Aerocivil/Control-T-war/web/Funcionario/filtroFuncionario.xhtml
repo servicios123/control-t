@@ -55,18 +55,15 @@
         </xf:selectOneMenu>
         
         <xf:selectOneMenu entity="#{funcionarioBBean.funcionarioFiltro.dependencia.depcategoria}" label="depCategoria"  fieldName="dcId"
-                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel == 8}">  
-                            <f:selectItems value="#{listadosBBean.listaDepCategoria}" var="dc" itemValue="#{dc.dcId}" itemLabel="#{dc.dcNombre}"/> 
+                          rendered="#{loginBBean.funNivel == 0 or loginBBean.funNivel == 1 or loginBBean.funNivel == 8 or loginBBean.funNivel == 2 or loginBBean.funNivel == 3}">  
+            <f:selectItems value="#{listadosBBean.listaDepCategoria}" var="dc" itemValue="#{dc.dcId}" itemLabel="#{dc.dcNombre}"/> 
         </xf:selectOneMenu> 
 
         <xf:selectOneMenu rendered="#{!filtro2}" entity="#{funcionarioBBean.funcionarioFiltro}" label="rolNombre"  fieldName="fuNivel">  
             <f:selectItems value="#{listadosBBean.listaRoles}" var="rol" itemValue="#{rol.rolId}" itemLabel="#{rol.rolNombre}"/> 
         </xf:selectOneMenu> 
         
-        <xf:selectOneMenu entity="#{funcionarioBBean.funcionarioFiltro.dependencia.depcategoria}" label="depCategoria"  fieldName="dcId"
-                          rendered="#{loginBBean.funNivel == 0 or loginBBean.funNivel == 1 or loginBBean.funNivel == 8}">  
-            <f:selectItems value="#{listadosBBean.listaDepCategoria}" var="dc" itemValue="#{dc.dcId}" itemLabel="#{dc.dcNombre}"/> 
-        </xf:selectOneMenu> 
+        
 
         <xf:selectOneMenu rendered="#{!filtro2 and loginBBean.funNivel != 7}" entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="funEstado">  
             <f:selectItem itemLabel="Activo" itemValue="Activo" />  

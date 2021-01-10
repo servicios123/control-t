@@ -112,6 +112,15 @@ public class ListasServiceBean implements ListasService {
         return em.createNamedQuery("TurnoEspecial.findByDependencia").setParameter("dep", dependencia).getResultList();
 
     }
+    
+    @Override
+    public List<TurnoEspecial> obtenerTurnoEspeciaXDependenciaActivo(Long dependencia) {
+
+        return em.createNamedQuery("TurnoEspecial.findByDependenciaAndEstado")
+                .setParameter("teEstado", "Activo")
+                .setParameter("dep", dependencia).getResultList();
+
+    }
 
     @Override
     public List<Jornada> obtenerJornadaXDependencia(Long dependencia) {

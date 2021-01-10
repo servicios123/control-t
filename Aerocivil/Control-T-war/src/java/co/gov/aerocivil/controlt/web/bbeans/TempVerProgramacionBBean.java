@@ -178,7 +178,7 @@ public class TempVerProgramacionBBean {
 
         comprobar();
         System.out.println("Fin de la programacion " + new SimpleDateFormat("HH:mm:ss aa").format(new Date()));
-        obtenerConsolidado();
+//        obtenerConsolidado();
     }
     
     public void obtenerConsolidado(){

@@ -66,11 +66,12 @@ public class CursoRecurrenteBBean {
         this.curso = curso;
     }
     public String crear(){
+        LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         listarCursos();
         curso = new CursoRecurrente();
         FuncionarioBBean funBBean = (FuncionarioBBean) JsfUtil.getManagedBean(FuncionarioBBean.class);        
         funBBean.inicializarPickList();
-        if(JsfUtil.getFuncionarioSesion().getRol().equals(RolEnum.NIVEL_A4)){
+        if (logbbean.isFuncionarioEnNivel(new RolEnum[]{RolEnum.NIVEL_A2, RolEnum.NIVEL_A3, RolEnum.NIVEL_A4})) {
             funBBean.filtrarSinPaginar();
         }
         return "editCursoRecurrente";

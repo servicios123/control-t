@@ -139,7 +139,7 @@
                                 <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
                             </h:outputText>
                         </p:column>
-                        <p:column sortBy="#{item.funFvEvaluacion}">
+                        <p:column sortBy="#{item.funFvEvaluacion}" rendered="#{loginBBean.funcionarioTO.funcionario.dependencia.depcategoria.dcId!=4}">
                             <f:facet name="header">
                                 <h:outputText value="V. Evaluación"/>
                             </f:facet>

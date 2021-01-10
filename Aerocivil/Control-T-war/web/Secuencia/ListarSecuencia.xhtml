@@ -23,6 +23,7 @@
 
                         <xf:selectOneMenu  entity="#{secuenciaBBean.secuenciaFiltro.dependencia.aeropuerto.regional}"  
                                            fieldName="regId" rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel}">  
+                            <f:selectItem itemValue="#{null}" itemLabel="#{msg.selectItemNull}"/>
                             <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
                             <p:ajax update="aeId,depId"  
                                     listener="#{secuenciaBBean.cargarAeropuertoListado}"  />  

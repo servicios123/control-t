@@ -64,5 +64,7 @@ public interface ListasService {
     public Programacion obtenerProgramacionXFecha(Date Fecha);
     
     public TurnoEspecial obtenerTurnoXDepAlias(TurnoEspecial te);
+
+    public java.util.List<TurnoEspecial> obtenerTurnoEspeciaXDependenciaActivo(Long dependencia);
     
 }

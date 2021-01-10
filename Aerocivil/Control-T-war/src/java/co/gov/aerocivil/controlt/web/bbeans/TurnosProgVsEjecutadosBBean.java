@@ -8,11 +8,10 @@ import co.gov.aerocivil.controlt.entities.Dependencia;
 import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.entities.Programacion;
 import co.gov.aerocivil.controlt.entities.Vistaprogramacion;
-import co.gov.aerocivil.controlt.enums.ParametrosEnum;
+import co.gov.aerocivil.controlt.enums.RolEnum;
 import co.gov.aerocivil.controlt.services.ControlDiarioPosicionesService;
 import co.gov.aerocivil.controlt.services.ListasService;
 import co.gov.aerocivil.controlt.web.enums.SortOrderEnum;
-import co.gov.aerocivil.controlt.web.lazylist.TurnosProgEjecutadosLazyList;
 import co.gov.aerocivil.controlt.web.util.DateUtil;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.util.HashMap;
@@ -20,8 +19,6 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.primefaces.model.LazyDataModel;
-import org.primefaces.model.SortOrder;
 
 /**
  *
@@ -46,7 +43,13 @@ public class TurnosProgVsEjecutadosBBean {
     
     
     
-    public String filtrarProgVsEjecutado(){        
+    public String filtrarProgVsEjecutado(){   
+        LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
+       
+        if (logbbean.isFuncionarioNivel(RolEnum.NIVEL_A2) || logbbean.isFuncionarioNivel(RolEnum.NIVEL_A3)) {
+            programacionFiltro.getDependencia().setDepcategoria(logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepcategoria());
+        }
+        
         lazyList = service.getListaProgramadoVsEjecutado(programacionFiltro, funcionario, null,null,
                 null, SortOrderEnum.ASC.getOrder());
         return "listarProgVsEjecutados";

@@ -9,11 +9,17 @@ import co.gov.aerocivil.controlt.entities.PosNoAsig;
 import co.gov.aerocivil.controlt.entities.TurnoEspecial;
 import co.gov.aerocivil.controlt.entities.Vistaprogramacion;
 import co.gov.aerocivil.controlt.services.ModificarTurnoService;
+import co.gov.aerocivil.controlt.services.PosicionInactivaService;
+import co.gov.aerocivil.controlt.services.PosicionService;
+import co.gov.aerocivil.controlt.services.VistaProgramacionService;
+import co.gov.aerocivil.controlt.web.util.DateUtil;
 import co.gov.aerocivil.controlt.web.util.JsfUtil;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -30,6 +36,10 @@ public class VistaProgramacionBBean {
 
     @EJB
     private ModificarTurnoService modificarTurnoServiceBean;
+    @EJB
+    private PosicionInactivaService posicionServiceBean;
+    @EJB
+    private VistaProgramacionService programacionService;
     private Date mes_actual, date_cambio_1, date_asignar, date_anular, date_asignar_esp, date_anular_ord;
     private Funcionario fun_cambio_1, fun_cambio_2, fun_asignar, fun_anular, fun_asignar_esp, fun_anular_ord;
     private List<Funcionario> list_fun_cambio_1, list_fun_cambio_2, list_fun_asignar, list_fun_anular, list_fun_asignar_esp, list_fun_anular_ord;
@@ -81,8 +91,8 @@ public class VistaProgramacionBBean {
         date_anular_ord = null;
         fun_anular_ord = null;
         date_asignar_esp = null;
-        
-        if(turn_asignar_no_asig != null){
+
+        if (turn_asignar_no_asig != null) {
             date_asignar = turn_asignar_no_asig.getFecha();
             onDateAsignar(null);
             turn_asignar = turn_asignar_no_asig;
@@ -192,9 +202,9 @@ public class VistaProgramacionBBean {
         LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
         turn_asignar = new PosNoAsig();
         Date fechaNoAsig;
-        if(ev!=null){
+        if (ev != null) {
             fechaNoAsig = (Date) ev.getObject();
-        }else{
+        } else {
             fechaNoAsig = turn_asignar_no_asig.getFecha();
         }
         list_turn_asignar = modificarTurnoServiceBean.getPosNoAsigPorFecha(fechaNoAsig, logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId());
@@ -246,6 +256,16 @@ public class VistaProgramacionBBean {
         //System.out.println("Fun onFunCambio2 \t "+fun_anular.getFunId()+"\t"+c.get(Calendar.DATE)+"/"+c.get(Calendar.MONTH));        
         list_turn_anular_ord = modificarTurnoServiceBean.getTurnoPorFunFecha(date_anular_ord, fun_anular_ord.getFunId(), false);
         //System.out.println("Entra a onFunAnular \t N. "+list_turn_anular.size());
+    }
+
+    public String inactivarPosicion() {
+        LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
+        Map<String, Integer[]> posicion = new HashMap<String, Integer[]>();
+        String key = DateUtil.formatDate(turn_asignar_no_asig.getFecha());
+        posicion.put(key, new Integer[]{turn_asignar_no_asig.getPosicionJornada().getPjId().intValue()});
+        posicionServiceBean.guardarPosiciones(posicion, fun_anular);
+        this.programacionService.eliminarPosNoAsignada(turn_asignar_no_asig); 
+        return "verProgramacion";
     }
 
     public String listarEspeciales() {

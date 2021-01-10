@@ -529,7 +529,7 @@ public class TurnoEspFuncionarioBBean {
 
     private void cargarTurnoEspecial(TurnoEspFuncionario f) {
 
-        listTurnoEspecial = JsfUtil.getListadosBBean().getListaTurnoEspeciaXDependencia(JsfUtil.getFuncionarioSesion().getDependencia().getDepId());
+        listTurnoEspecial = JsfUtil.getListadosBBean().obtenerTurnoEspeciaXDependenciaActivo(JsfUtil.getFuncionarioSesion().getDependencia().getDepId());
 
         TurnoEspecial comision = new TurnoEspecial();
         int i = 0;
