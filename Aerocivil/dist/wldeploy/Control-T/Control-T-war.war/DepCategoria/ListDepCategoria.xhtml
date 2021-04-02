@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.configuracionDepCategorias}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                <h:form>
+                    <p:dataTable value="#{depCategoriaBBean.lista}" var="item" styleClass="tabla_lista"
+                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                 rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
+                                 sortBy="#{item.dcNombre}"
+                                 emptyMessage="#{msg.emptyList}">
+
+                        <p:column >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.editar}"/>
+                            </f:facet>
+                            <h:commandLink value="#{msg.editar}" action="#{depCategoriaBBean.editar}">
+                                <f:setPropertyActionListener value="#{item}" target="#{depCategoriaBBean.depcategoria}"/>
+                            </h:commandLink>
+                        </p:column>
+                        <p:column sortBy="#{item.dcNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.depCategoria}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dcNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dcRop}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.ROP}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.rop}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dcRopGrado}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dcRopGrado}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dcRopGrado}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dcCantRop}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dcCantRop}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dcCantRop}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dcTransporte}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dcTransporte}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.transporte}"/>
+                        </p:column>
+                       
+
+                    </p:dataTable>
+                    
+                </h:form>
+
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

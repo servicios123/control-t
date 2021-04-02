@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <head>
+        <title>TODO supply a title</title>
+    </head>
+    <body>
+
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+ 
+                <h:outputText value="#{msg.consultar} #{msg.peticiones}" rendered="#{!permisoEspecialBBean.aprobando}"/>
+                <h:outputText value="#{msg.aprobar} #{msg.peticiones}" rendered="#{permisoEspecialBBean.aprobando}" />
+
+            </ui:define>
+            <ui:define name="contenido">
+                <h:form>
+
+                    <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
+                        <f:facet name="header" ><h:outputText value="#{msg.filtros}" ></h:outputText></f:facet>
+                        <xf:selectOneMenu  entity="#{permisoEspecialBBean.permisoFiltro.dependencia.aeropuerto.regional}"  
+                                           fieldName="regId" rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel}">  
+                            <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
+                            <p:ajax update="aeId,depId"  
+                                    listener="#{permisoEspecialBBean.cargarAeropuertoLista}"  />  
+                        </xf:selectOneMenu> 
+                        
+                        <xf:selectOneMenu entity="#{permisoEspecialBBean.permisoFiltro.dependencia.aeropuerto}" fieldName="aeId"
+                                         rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}"  >  
+                            <f:selectItems value="#{permisoEspecialBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
+                            <p:ajax update="depId"  
+                                    listener="#{permisoEspecialBBean.cargarDependenciaLista}" /> 
+                        </xf:selectOneMenu> 
+                        
+                        <xf:selectOneMenu entity="#{permisoEspecialBBean.permisoFiltro.dependencia}" 
+                                          rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}" fieldName="depId">
+                            <f:selectItems value="#{permisoEspecialBBean.listDependencia}" var="reg" itemValue="#{reg.depId}" itemLabel="#{reg.depNombre}"/>
+                        </xf:selectOneMenu>                       
+
+                        <xf:selectOneMenu entity="#{permisoEspecialBBean.permisoFiltro}" fieldName="peEstado"
+                                          rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>=3}">
+                            <f:selectItems value="#{listadosBBean.arrayEstadosPermiso}" var="it"
+                                           itemLabel="#{it.label}" itemValue="#{it.label}"/>
+                        </xf:selectOneMenu>
+                        <xf:inputText entity="#{permisoEspecialBBean.permisoFiltro.funcionario}" fieldName="funId"
+                                      rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>=3}" />
+                        <xf:inputText entity="#{permisoEspecialBBean.permisoFiltro.funcionario}" fieldName="funAlias"
+                                      rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>=3}" />
+                        <xf:calendar entity="#{permisoEspecialBBean.permisoFiltro}" fieldName="peFechaPermiso" 
+                                     rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>=3}"/>                        
+                        <xf:calendar entity="#{permisoEspecialBBean.permisoFiltro}" fieldName="peFechaRegistro" 
+                                     rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel>=3}"/>
+
+                        <f:facet name="footer" >
+                            <h:commandButton  action="#{permisoEspecialBBean.filtrar}" value="#{msg.buscar}"  />
+                        </f:facet>
+
+                    </h:panelGrid>
+                </h:form>
+                <br></br>
+                <h:form>
+                    <p:dataTable value="#{permisoEspecialBBean.lista}" var="item" styleClass="tabla_lista"
+                                 paginator="true" paginatorPosition="bottom" rows="15" lazy="true"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                 rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
+                                 sortBy="#{item.peFechaPermiso}"
+                                 emptyMessage="#{msg.emptyList}">
+
+                        <p:column rendered="#{loginBBean.funNivel == 3 || loginBBean.funNivel == 4}" style="width: 7%">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.aprobar}"/>
+                            </f:facet>
+                            <h:commandLink value="#{msg.aprobar}" action="#{permisoEspecialBBean.seleccionar}"
+                                           rendered="#{item.peEstado == 'Pendiente'  and permisoEspecialBBean.flagPermiso==false}">
+                                <f:setPropertyActionListener value="#{item}" target="#{permisoEspecialBBean.permiso}"/>
+                            </h:commandLink>
+                            
+                            <h:commandLink value="#{msg.editar}" action="#{permisoEspecialBBean.seleccionar}"
+                                           rendered="#{item.peEstado != 'Pendiente' || permisoEspecialBBean.flagPermiso==true}">
+                                <f:setPropertyActionListener value="#{item}" target="#{permisoEspecialBBean.permiso}"/>
+                            </h:commandLink>
+                        </p:column>
+                        <p:column sortBy="#{item.peFechaPermiso}" style="width: 18%">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.peFechaPermiso}">
+                                
+                                </h:outputText>
+                            </f:facet>
+                            <h:outputText value="#{item.peFechaPermiso}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                        </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{item.funcionario.funNombre}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.funcionario}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.funcionario.funNombre}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.peDescripcion}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.peDescripcion}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.peDescripcion}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.peFechaRegistro}" style="width: 11%">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.peFechaRegistro}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.peFechaRegistro}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                        </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{item.peEstado}" style="width: 8%">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.peEstado}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.peEstado}"/>
+                        </p:column>
+                        <p:column style="width: 9%">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.jornadas}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.jornadasRequeridas}"/>
+                        </p:column>
+                    </p:dataTable>
+
+                </h:form>
+
+
+            </ui:define>
+
+        </ui:composition>
+
+        
+    </body>
+</html>

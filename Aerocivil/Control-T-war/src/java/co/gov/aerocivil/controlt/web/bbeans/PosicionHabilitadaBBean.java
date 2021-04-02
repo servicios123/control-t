@@ -83,6 +83,7 @@ public class PosicionHabilitadaBBean {
         PosicionNacional posicionNac = new PosicionNacional();
         posicion.setPosicionNacional(posicionNac);
         Funcionario funcionario = new Funcionario();
+        funcionario.setFunEstado("Activo");
         aeropuerto.setRegional(regional);
         dependencia.setAeropuerto(aeropuerto);
         posicion.setDependencia(dependencia);
@@ -155,6 +156,7 @@ public class PosicionHabilitadaBBean {
         Aeropuerto aeropuerto = new Aeropuerto();
         Posicion posicion = new Posicion();
         Funcionario funcionario = new Funcionario();
+        funcionario.setFunEstado("Activo");
         aeropuerto.setRegional(regional);
         dependencia.setAeropuerto(aeropuerto);
         posicion.setDependencia(dependencia);

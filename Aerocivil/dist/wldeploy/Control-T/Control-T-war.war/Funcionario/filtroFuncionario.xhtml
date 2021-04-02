@@ -1,0 +1,95 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"                
+                xmlns:xf="http://www.xfaces.com/jsf">
+    <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
+        <f:facet name="header" >
+            <h:outputText value="#{msg.filtros}" />
+        </f:facet>
+
+        <xf:inputText entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="funNombre" />
+        <xf:inputText entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="funId" />
+        <xf:inputText entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="funAlias" />
+        <xf:selectOneMenu rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel==0 or loginBBean.funcionarioTO.funcionario.fuNivel==1 or loginBBean.funcionarioTO.funcionario.fuNivel==8}"
+                          entity="#{funcionarioBBean.funcionarioFiltro.dependencia.aeropuerto.regional}" fieldName="regId">  
+
+            <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
+            <p:ajax update="aeId,depId,dcId"  
+                    listener="#{funcionarioBBean.cargarAeropuertoListado}" />  
+        </xf:selectOneMenu> 
+        <xf:selectOneMenu rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel==2}"
+                          required="#{filtro2}"
+                          entity="#{funcionarioBBean.funcionarioFiltro.dependencia.aeropuerto.regional}" fieldName="regId">  
+
+            <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
+            <p:ajax update="aeId,depId"  
+                    listener="#{funcionarioBBean.cargarAeropuertoListado}" />  
+        </xf:selectOneMenu> 
+
+
+        <xf:selectOneMenu rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel==0 or loginBBean.funcionarioTO.funcionario.fuNivel==1 or loginBBean.funcionarioTO.funcionario.fuNivel==8}"
+                          required="#{filtro2}"
+                          entity="#{funcionarioBBean.funcionarioFiltro.dependencia.aeropuerto}" fieldName="aeId">  
+
+            <f:selectItems value="#{funcionarioBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
+            <p:ajax update="depId, dcId"  
+                    listener="#{funcionarioBBean.cargarDependenciaListado}" /> 
+        </xf:selectOneMenu> 
+        
+        <xf:selectOneMenu rendered="#{loginBBean.funcionarioTO.funcionario.fuNivel==3 or loginBBean.funcionarioTO.funcionario.fuNivel==2}"
+                          required="#{filtro2}"
+                          entity="#{funcionarioBBean.funcionarioFiltro.dependencia.aeropuerto}" fieldName="aeId">  
+
+            <f:selectItems value="#{funcionarioBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
+            <p:ajax update="depId"  
+                    listener="#{funcionarioBBean.cargarDependenciaListado}" /> 
+        </xf:selectOneMenu> 
+
+        <xf:selectOneMenu rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel or loginBBean.funcionarioTO.funcionario.fuNivel==8}" 
+                          required="#{filtro2}"
+                          entity="#{funcionarioBBean.funcionarioFiltro.dependencia}"  fieldName="depId" >                            
+            <f:selectItems value="#{funcionarioBBean.listDependencia}" var="res" itemValue="#{res.depId}" itemLabel="#{res.depNombre}"/>
+        </xf:selectOneMenu>
+        
+        <xf:selectOneMenu entity="#{funcionarioBBean.funcionarioFiltro.dependencia.depcategoria}" label="depCategoria"  fieldName="dcId"
+                          rendered="#{loginBBean.funNivel == 0 or loginBBean.funNivel == 1 or loginBBean.funNivel == 8 or loginBBean.funNivel == 2 or loginBBean.funNivel == 3}">  
+            <f:selectItems value="#{listadosBBean.listaDepCategoria}" var="dc" itemValue="#{dc.dcId}" itemLabel="#{dc.dcNombre}"/> 
+        </xf:selectOneMenu> 
+
+        <xf:selectOneMenu rendered="#{!filtro2}" entity="#{funcionarioBBean.funcionarioFiltro}" label="rolNombre"  fieldName="fuNivel">  
+            <f:selectItems value="#{listadosBBean.listaRoles}" var="rol" itemValue="#{rol.rolId}" itemLabel="#{rol.rolNombre}"/> 
+        </xf:selectOneMenu> 
+        
+        
+
+        <xf:selectOneMenu rendered="#{!filtro2 and loginBBean.funNivel != 7}" entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="funEstado">  
+            <f:selectItem itemLabel="Activo" itemValue="Activo" />  
+            <f:selectItem itemLabel="Inactivo" itemValue="Inactivo" /> 
+        </xf:selectOneMenu>
+        
+        <xf:calendar entity="#{funcionarioBBean.funcionarioFiltro}" rendered="#{filtro3}"
+                                     fieldName="funFvCurso" /> 
+        
+        <xf:calendar entity="#{funcionarioBBean.funcionarioFiltro}" rendered="#{filtro4}"
+                                     fieldName="funFvEvaluacion" /> 
+        
+        <xf:calendar entity="#{funcionarioBBean.funcionarioFiltro}" rendered="#{filtro4}"
+                                     fieldName="funFvCertmedico" /> 
+        
+        
+        
+
+        <f:facet name="footer" >
+            <h:commandButton rendered="#{!filtro2}"  action="#{funcionarioBBean.filtrar}" value="#{msg.buscar}"  />
+            <h:commandButton actionListener="#{funcionarioBBean.filtrarSinPaginar}" 
+                              rendered="#{filtro2}" value="#{msg.buscar}" />
+        </f:facet>
+
+
+
+    </h:panelGrid>    
+
+</ui:composition>

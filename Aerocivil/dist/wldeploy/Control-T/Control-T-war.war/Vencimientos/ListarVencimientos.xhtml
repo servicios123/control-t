@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <head>
+        <style type="text/css">
+            .ui-datatable,
+            .ui-datatable .ui-datatable-tablewrapper table {
+                font-size: 12px !important;
+            }
+
+            /* For Paginator */
+            .ui-datatable .ui-paginator .ui-paginator-first, 
+            .ui-datatable .ui-paginator .ui-paginator-prev, 
+            .ui-datatable .ui-paginator .ui-paginator-pages .ui-paginator-page, 
+            .ui-datatable .ui-paginator .ui-paginator-next, 
+            .ui-datatable .ui-paginator .ui-paginator-last, 
+            .ui-datatable .ui-paginator .ui-paginator-rpp-options {
+                font-size: 10px !important;
+            }
+
+            .ui-datatable .ui-paginator .ui-paginator-current {
+                font-size: 10px !important;
+            }
+
+            .fixed_td{
+                white-space: nowrap;
+                overflow:hidden;
+            }
+
+            .forty-percent {
+                width: 40%;
+            }
+            
+            .fivety-percent {
+                width: 50%;
+            }
+
+            .sixty-percent {
+                width: 60%;
+            }
+
+            .top-alignment {
+                vertical-align: top;
+            }
+        </style>
+    </head>
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+            <ui:define name="titulo">
+                <h:outputText value="#{msg.verVencimiento}" />
+            </ui:define>
+            <ui:define name="contenido">
+                <br></br>
+                <h:form>
+                    <h:panelGrid columns="2" style="width: 100%" columnClasses="fivety-percent top-alignment, fivety-percent top-alignment">
+                        <p:outputPanel>
+                            <h:outputLabel value="#{msg.evaluacionesVencer}" style="font-size: 14px; font-weight: bold"/>
+                            <h:outputText value="&lt;br/&gt;" escape="false" />
+                            <h:outputText value="&lt;br/&gt;" escape="false" />
+                            <p:dataTable value="#{vencimientosBBean.evaluaciones}" var="item" styleClass="tabla_lista"
+                                         paginator="true" paginatorPosition="bottom" rows="5"  
+                                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                         currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                         rowsPerPageTemplate="5,10,15,20" id="carTable1" draggableColumns="true"
+                                         style="height: 100% !important; width: 85% !important;"
+                                         rendered="#{vencimientosBBean.evaluacionesCnt>0}">
+                                <p:column sortBy="#{item.funNombre}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.nombre}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.funNombre}"/>
+                                </p:column>
+
+                                <p:column sortBy="#{item.funFvEvaluacion}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.funFvEvaluacion}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.funFvEvaluacion}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                                    </h:outputText>
+                                </p:column>
+
+
+                            </p:dataTable>
+
+                            <h:outputText value="No se encontraron vencimientos próximos" rendered="#{vencimientosBBean.evaluacionesCnt==0}"/>
+                        </p:outputPanel>
+                        <p:outputPanel>
+                            <h:outputLabel value="#{msg.cursosVencer}" style="font-size: 14px; font-weight: bold"/>
+                            <br/>
+                            <h:outputText value="&lt;br/&gt;" escape="false" />
+                            <p:dataTable value="#{vencimientosBBean.cursos}" var="item" styleClass="tabla_lista"
+                                         paginator="true" paginatorPosition="bottom" rows="5"  
+                                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                         currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                         rowsPerPageTemplate="5,10,15,20" id="carTable2" draggableColumns="true"
+                                         style="height: 100% !important; width: 85% !important;"
+                                         rendered="#{vencimientosBBean.cursosCnt>0}">
+
+                                <p:column sortBy="#{item.funNombre}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.nombre}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.funNombre}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.funFvCurso}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.funFvCurso}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                                    </h:outputText>
+                                </p:column>
+
+
+                            </p:dataTable>
+
+                            <h:outputText value="No se encontraron vencimientos próximos" rendered="#{vencimientosBBean.cursosCnt==0}"/>
+
+
+                        </p:outputPanel> 
+                        
+                         <p:outputPanel>
+                            <h:outputText value="&lt;br/&gt;" escape="false" />
+                        </p:outputPanel>
+                         <p:outputPanel>
+                            <h:outputText value="&lt;br/&gt;" escape="false" />
+                        </p:outputPanel>
+                         <p:outputPanel>
+                            <h:outputText value="&lt;br/&gt;" escape="false" />
+                        </p:outputPanel>
+                         <p:outputPanel>
+                            <h:outputText value="&lt;br/&gt;" escape="false" />
+                        </p:outputPanel>
+                        
+                        
+                        
+                        <p:outputPanel>
+                            <h:outputLabel value="#{msg.certMedicosVencer}" style="font-size: 14px; font-weight: bold"/>
+                            <h:outputText value="&lt;br/&gt;" escape="false" />
+                            <h:outputText value="&lt;br/&gt;" escape="false" />
+                            <p:dataTable value="#{vencimientosBBean.certMedicos}" var="item" styleClass="tabla_lista"
+                                         paginator="true" paginatorPosition="bottom" rows="5"  
+                                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                         currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                         rowsPerPageTemplate="5,10,15,20" id="carTable3" draggableColumns="true"
+                                         style="height: 100% !important; width: 85% !important;"
+                                         rendered="#{vencimientosBBean.certMedicosCnt>0}">
+
+                                <p:column sortBy="#{item.funNombre}" style="width: 300px">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.nombre}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.funNombre}"/>
+                                </p:column>
+
+                                <p:column sortBy="#{item.funFvCertmedico}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.funFvCertmedico}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.funFvCertmedico}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                                    </h:outputText>
+                                </p:column>
+
+
+                            </p:dataTable>
+
+                            <h:outputText value="No se encontraron vencimientos próximos" rendered="#{vencimientosBBean.certMedicosCnt==0}"/>
+
+                        </p:outputPanel>
+
+                        <p:outputPanel>
+                            <h:outputLabel value="#{msg.posicionesVencer}" style="font-size: 14px; font-weight: bold"/>
+                            <h:outputText value="&lt;br/&gt;" escape="false" />
+                            <h:outputText value="&lt;br/&gt;" escape="false" />
+                            <p:dataTable value="#{vencimientosBBean.posiciones}" var="item" styleClass="tabla_lista"
+                                         paginator="true" paginatorPosition="bottom" rows="5"  
+                                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                         currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                         rowsPerPageTemplate="5,10,15,20" id="carTable4" draggableColumns="true"
+                                         style="height: 100% !important; width: 85% !important;"
+                                         rendered="#{vencimientosBBean.posicionesCnt>0}">
+
+                                <p:column sortBy="#{item.funcionario.funNombre}" style="width: 255px">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.nombre}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.funcionario.funNombre}"/>
+                                </p:column>
+
+                                <p:column sortBy="#{item.posicion.posicionNacional.pnAlias}" style="width: 35px;">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.pnAlias}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.posicion.posicionNacional.pnAlias}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Vencimiento"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.phFvencimiento}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+                                    </h:outputText>
+                                </p:column>
+
+
+                            </p:dataTable>
+
+                            <h:outputText value="No se encontraron vencimientos próximos" rendered="#{vencimientosBBean.posicionesCnt==0}"/>
+                        </p:outputPanel>             
+                    </h:panelGrid>
+                    <h:panelGrid columns="2" style="width:400px" styleClass="">
+
+                    </h:panelGrid>
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"      
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.editar} #{msg.jornada}" rendered="#{jornadaBBean.jornada.joId!=null}"/>
+                <h:outputText value="#{msg.crear} #{msg.jornada}" rendered="#{jornadaBBean.jornada.joId==null}"/>
+
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                <h:form>
+                    <h:panelGrid styleClass="tabla_formulario" >
+                        <h:panelGrid columns="2">                            
+                            <xf:inputText entity="#{jornadaBBean.jornada}" fieldName="joAlias" required="true" />
+                            <xf:timeSelector entity="#{jornadaBBean.jornada}" fieldName="joHoraInicio" minFieldName="joMinutoInicio" required="true" />
+                            <xf:timeSelector entity="#{jornadaBBean.jornada}" fieldName="joHoraFin" minFieldName="joMinutoFin" required="true" />
+                            <xf:selectOneMenu entity="#{jornadaBBean.jornada}" fieldName="joEstado" required="true">  
+                                <f:selectItem itemLabel="Activo" itemValue="Activo" />  
+                                <f:selectItem itemLabel="Inactivo" itemValue="Inactivo" /> 
+                            </xf:selectOneMenu>
+                        </h:panelGrid>
+
+                        <h:panelGroup id="datos">
+                            <h:panelGroup>
+                                <h:panelGrid cellpadding="0" cellspacing="0" columns="2" 
+                                             rendered="#{jornadaBBean.jornada.joId != null}">
+                                    <h:panelGrid columns="1" cellpadding="0" cellspacing="0" >
+                                        <h:outputLabel value="#{msg.jorOpAnterior}"/>  
+                                        <h:panelGroup>
+                                            <p:selectOneRadio id="jorOpAnterior" value="#{jornadaBBean.jorOpAnterior}" layout="responsive" columns="1">
+                                                <f:converter converterId="JornadaConverter" binding="#{JornadaConverter}"/>
+                                                <f:selectItem itemValue="#{null}" itemLabel="#{jornadaBBean.msgJornadaAnteriorRequerida}"/>
+                                                <f:selectItems value="#{jornadaBBean.jorDisponiblesObligatoriasTo}" var="item" 
+                                                               itemLabel="#{item.mensaje}" itemValue="#{item.jornada}"/>
+                                            </p:selectOneRadio>
+                                        </h:panelGroup>
+
+                                    </h:panelGrid>
+
+                                    <!--xf:inputText entity="{jornadaBBean.jornada}" fieldName="horaInicioStr" required="true" readonly="true"/>
+                                    <xf:inputText entity="{jornadaBBean.jornada}" fieldName="horaFinStr" required="true" readonly="true"/-->                                
+                                </h:panelGrid>
+                            </h:panelGroup>
+                            <h:panelGroup id="restricc" rendered="#{jornadaBBean.jornada.joId != null and jornadaBBean.jorDisponibles!=null}">
+                                <h:outputText value="#{msg.jornadasRestrictivas}"/>
+                                <xf:selectManyCheckbox value="#{jornadaBBean.jorRestricciones}">
+                                    <f:selectItems value="#{jornadaBBean.jorDisponibles}" var="item" 
+                                                   itemLabel="#{item.joAlias}" itemValue="#{item.joId}"/>
+                                </xf:selectManyCheckbox>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                    <br></br>
+
+                    <h:panelGrid styleClass="tabla_formulario" columns="2">
+
+                        <!--xf:radioButton entity="{jornadaBBean.jornada.}" >
+                       <xf:timeSelector entity="{jornadaBBean.jornada}" fieldName="joHoraInicio1" minFieldName="joMinutoInicio1" required="true"  />
+                       <xf:timeSelector entity="{jornadaBBean.jornada}" fieldName="joHoraFin1" minFieldName="joMinutoFin1" required="true"  />
+                       <xf:inputText entity="{jornadaBBean.jornada}" fieldName="joEstado1" readonly="true">  
+                       </xf:inputText-->
+                        <f:facet name="footer">
+                            <h:commandButton  action="#{jornadaBBean.guardar}" value="#{msg.guardar}"  />
+                            <h:commandButton  action="#{jornadaBBean.filtrar}" value="#{msg.cancelar}" immediate="true" />
+                        </f:facet>
+                    </h:panelGrid>
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

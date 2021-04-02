@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"      
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <head>
+        <style>
+            .ui-selectonemenu-label{
+                width: 300% !important;
+            }  
+            .ui-selectonemenu{
+                width: 300% !important;
+            }
+            .ui-button-icon-left .ui-icon ui-c .ui-icon-info{
+            background-image: url(/Control-T-war/faces/javax.faces.resource/images/ui-icons_0a82eb_256x240.png?ln=primefaces-excite-bike);
+            }
+            .ui-button-icon-left, .ui-icon ui-c, .ui-icon-info{
+            background-image: url(/Control-T-war/faces/javax.faces.resource/images/ui-icons_0a82eb_256x240.png?ln=primefaces-excite-bike);
+            }
+            
+        </style>
+    </head>
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+
+                <h:outputText value="#{msg.editar} #{msg.turnoEspecial}" rendered="#{turnoEspFuncionarioBBean.turnoEspFuncionario.tefId !=null}" ></h:outputText>
+                <h:outputText value="#{msg.asignar} #{msg.turnoEspecial}" rendered="#{turnoEspFuncionarioBBean.turnoEspFuncionario.tefId==null}" ></h:outputText>
+
+            </ui:define>
+
+            <ui:define name="contenido">
+                <h:form id="myForm">
+                    <p:growl id="messages" showDetail="true" /> 
+
+                    <h:panelGrid style="width: 100%">
+                        <h:panelGrid columns="4" style="width: 100%" id="basic">
+                            <h:outputText value="Usuario" />
+
+                            <h:panelGroup>
+                                <h:outputLabel value="#{turnoEspFuncionarioBBean.turnoEspFuncionario.funcionario.funNombre} (#{turnoEspFuncionarioBBean.turnoEspFuncionario.funcionario.funAlias})" rendered="#{turnoEspFuncionarioBBean.ver}" />
+                                <p:selectOneMenu required="true" value="#{turnoEspFuncionarioBBean.turnoEspFuncionario.funcionario.funId}" 
+                                                 style="width: 80%;" rendered="#{!turnoEspFuncionarioBBean.ver}" >
+                                    <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}" rendered="${renderNull}"/>
+                                    <f:selectItems value="#{turnoEspFuncionarioBBean.listaFuncionario}" var="te" itemValue="#{te.funId}" 
+                                                   itemLabel="#{te.funAlias} - #{te.funNombre}"/>
+                                    <p:ajax event="change" listener="#{turnoEspFuncionarioBBean.updateListaTurnos}" update="tefTable2 basic schedule"/>
+                                </p:selectOneMenu>
+                                <br/>
+                                <h:message id="${id}Message" 
+                                           styleClass="error" 
+                                           for="#{id}" />
+                            </h:panelGroup>
+
+                            <h:outputText value="Turno Especial" />
+
+                            <h:panelGroup>
+                                <h:outputLabel value="#{turnoEspFuncionarioBBean.turnoEspFuncionario.turnoEspecial.teNombre} - #{turnoEspFuncionarioBBean.turnoEspFuncionario.turnoEspecial.teSigla}" rendered="#{turnoEspFuncionarioBBean.ver}" />
+                                <p:selectOneMenu required="true" value="#{turnoEspFuncionarioBBean.turnoEspFuncionario.turnoEspecial.teId}" 
+                                                 style="width: 80%;" rendered="#{!turnoEspFuncionarioBBean.ver}" id="tefSelect" >
+                                    <p:ajax event="change" update="dependencia" 
+                                            listener="#{turnoEspFuncionarioBBean.activarDependencia}"/>
+                                    <f:selectItem value="#{null}"  itemLabel="#{msg.selectItemNull}" rendered="${renderNull}"/>
+                                    <f:selectItems value="#{turnoEspFuncionarioBBean.listTurnoEspecial}" var="te" itemValue="#{te.teId}" 
+                                                   itemLabel="#{te.teSigla} #{te.teHinicio}:#{te.teMinicio} - #{te.teHfin}:#{te.teMfin}"/>
+                                </p:selectOneMenu>
+                                <br/>
+
+                            </h:panelGroup>
+
+
+
+                            <xf:calendar required="true" entity="#{turnoEspFuncionarioBBean.turnoEspFuncionario}" 
+                                         fieldName="tefFini"
+                                         readonly="#{!turnoEspFuncionarioBBean.editable}"
+                                         rendered="false"
+                                         >
+                                <p:ajax update="tefFfin" event="dateSelect"
+                                        listener="#{turnoEspFuncionarioBBean.listenerFIni}" />  
+                            </xf:calendar>
+                            <xf:calendar required="true" entity="#{turnoEspFuncionarioBBean.turnoEspFuncionario}" 
+                                         rendered="false"
+                                         fieldName="tefFfin" readonly="#{!turnoEspFuncionarioBBean.editable}"/>
+
+                            <h:outputText value="Estado" rendered="#{turnoEspFuncionarioBBean.ver}"/>
+                            <h:panelGroup>
+                                <h:outputLabel value="#{turnoEspFuncionarioBBean.turnoEspFuncionario.tefEstado}" rendered="#{turnoEspFuncionarioBBean.ver}" />
+                                <p:selectOneMenu required="true" value="#{turnoEspFuncionarioBBean.turnoEspFuncionario.tefEstado}" 
+                                                 style="width: 80%;" rendered="#{turnoEspFuncionarioBBean.ver}" >
+                                    <f:selectItem itemLabel="Anulado" itemValue="Anulado" /> 
+                                    <!--f:selectItem itemLabel="Para Programar" itemValue="Para Programar" /-->  
+                                    <f:selectItem itemLabel="Programado" itemValue="Programado" /> 
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+                        <h:panelGrid id="dependencia" cellpadding="0" cellspacing="0">
+                            <h:panelGrid columns="2" border="0" 
+                                         styleClass="tabla_formulario"
+                                         rendered="#{turnoEspFuncionarioBBean.dependenciaVisible}" >
+                                <f:facet name="header">
+                                    <h:outputLabel value="#{msg.informacionAdicionalComision}"/>
+                                </f:facet>
+                                <xf:calendar entity="#{turnoEspFuncionarioBBean.comision}" 
+                                             fieldName="comFechaInicial" required="true" 
+                                             readonly="#{!turnoEspFuncionarioBBean.editable}"/>
+                                <xf:timeSelector entity="#{turnoEspFuncionarioBBean.comision}" fieldName="comHIni" minFieldName="comMIni" required="true" />
+                                <xf:calendar entity="#{turnoEspFuncionarioBBean.comision}" 
+                                             fieldName="comFechaFinal" required="true" 
+                                             readonly="#{!turnoEspFuncionarioBBean.editable}"/>
+
+                                <xf:timeSelector entity="#{turnoEspFuncionarioBBean.comision}" fieldName="comHFin" minFieldName="comMFin" required="true" />
+
+                                <xf:selectOneMenu entity="#{turnoEspFuncionarioBBean.comision.dependencia.aeropuerto.regional}" 
+                                                  fieldName="regId" readonly="#{!turnoEspFuncionarioBBean.editable}"
+                                                  label="regNombre"
+                                                  >  
+                                    <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
+                                    <p:ajax update="aeId,depId"  
+                                            listener="#{turnoEspFuncionarioBBean.cargarAeropuertoComision}" />  
+                                </xf:selectOneMenu> 
+
+
+                                <xf:selectOneMenu entity="#{turnoEspFuncionarioBBean.comision.dependencia.aeropuerto}" 
+                                                  fieldName="aeId" readonly="#{!turnoEspFuncionarioBBean.editable}"
+                                                  label="aeNombre">
+
+                                    <f:selectItems value="#{turnoEspFuncionarioBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
+                                    <p:ajax update="depId"  
+                                            listener="#{turnoEspFuncionarioBBean.cargarDependenciaComision}" /> 
+                                </xf:selectOneMenu> 
+
+                                <xf:selectOneMenu required="true" fieldName="depId" label="depNombre"
+                                                  entity="#{turnoEspFuncionarioBBean.comision.dependencia}"  
+                                                  readonly="#{!turnoEspFuncionarioBBean.editable}">
+                                    <f:selectItems value="#{turnoEspFuncionarioBBean.listDependencia}" var="res" itemValue="#{res.depId}" itemLabel="#{res.depNombre}"/>
+                                </xf:selectOneMenu>
+
+
+                            </h:panelGrid>
+                        </h:panelGrid>  
+
+                        <f:facet name="footer">
+
+                            <h:commandButton  action="#{turnoEspFuncionarioBBean.guardar}" value="#{msg.guardar}"
+                                              rendered="false" >
+<!--                                                  rendered="#{!turnoEspFuncionarioBBean.ver}" >-->
+
+                                <f:ajax execute="@form" render="tefTable2 basic " />
+                            </h:commandButton>
+
+
+
+                        </f:facet>
+                    </h:panelGrid>
+
+                    <p:separator style="background: transparent; border: 0px"/>
+
+                    <h:panelGrid style="width: 100%" columns="2">
+                        <h:panelGrid id="calendario" columns="1" style="width: 45%">
+                            <h:panelGrid columns="2">
+                                <h:commandLink value="Anterior | " action="#{turnoEspFuncionarioBBean.nextPreviousFull}" immediate="true" rendered="#{turnoEspFuncionarioBBean.showPrev}">
+                                    <f:setPropertyActionListener target="#{turnoEspFuncionarioBBean.moveValue}" value="-1"/>
+                                </h:commandLink>
+                                <h:commandLink  value="Siguiente" action="#{turnoEspFuncionarioBBean.nextPreviousFull}" immediate="true" >
+                                    <f:setPropertyActionListener target="#{turnoEspFuncionarioBBean.moveValue}" value="1"/>
+                                </h:commandLink>
+                            </h:panelGrid>
+                            <p:schedule id="schedule" value="#{turnoEspFuncionarioBBean.eventModel}"  
+                                        widgetVar="myschedule" 
+                                        resizable="true" draggable="false" leftHeaderTemplate=""
+                                        showWeekends="true"
+                                        rightHeaderTemplate="" transient="true" 
+                                        initialDate="#{turnoEspFuncionarioBBean.iniDate}" style="width: 450px">
+                                <p:ajax event="dateSelect" listener="#{turnoEspFuncionarioBBean.onDateSelectFull}" 
+                                        update="tefTable2, messages, calendario, tefSelect" oncomplete="PF('myschedule').update();" />
+                            </p:schedule> 
+                            <h:commandButton value="Asignar Trops" action="#{turnoEspFuncionarioBBean.generateTrops}" immediate="true" rendered="#{loginBBean.funcionarioTO.funcionario.dependencia.depcategoria.dcId == 1}"></h:commandButton>
+                        </h:panelGrid>
+                        <h:panelGrid style="width: 100%">
+                            <p:separator style="background: transparent; border: 0px"/>
+                            <p:separator style="background: transparent; border: 0px"/>
+                            <p:separator style="background: transparent; border: 0px"/>
+                            <p:separator style="background: transparent; border: 0px"/>
+                            <p:dataTable value="#{turnoEspFuncionarioBBean.turnos}" var="item" styleClass="tabla_lista"
+                                         paginator="true" paginatorPosition="bottom" rows="5"   style="margin-left: 20px"
+                                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                         currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                         rowsPerPageTemplate="5,10,15,20" id="tefTable2" draggableColumns="true"
+                                         emptyMessage="#{msg.emptyList}" paginatorAlwaysVisible="false" 
+                                         rendered="#{!turnoEspFuncionarioBBean.ver}">
+
+                                <p:column sortBy="#{item.turnoEspecial.teSigla}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.sigla}" />
+                                    </f:facet>
+                                    <h:outputText value="#{item.turnoEspecial.teSigla}"/>
+                                </p:column>
+
+                                <p:column sortBy="#{item.turnoEspecial.teNombre}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.nombre}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.turnoEspecial.teNombre}"/>
+                                </p:column>
+                                <p:column sortBy="#{item.tefFini}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Fecha inicio"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.tefFini}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-5"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column sortBy="#{item.tefFfin}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Fecha fin"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.tefFfin}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-5"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header" >
+                                        <h:outputText value="#{msg.eliminar}" />
+                                    </f:facet>
+
+                                    <p:commandButton icon="ui-icon-trash" title="#{msg.eliminar}" action="#{turnoEspFuncionarioBBean.eliminar}" immediate="true" rendered="#{item.editable and item.tefEstado!='Anulado'}" update="@form" process="@form">
+                                        <f:setPropertyActionListener value="#{item}" target="#{turnoEspFuncionarioBBean.turnoEspFuncionario}"/>
+                                    </p:commandButton>
+                                    <p:commandButton icon="ui-icon-info" title="Turno programado" rendered="#{!item.editable or item.tefEstado=='Anulado'}" disabled="disabled" />
+                                </p:column>
+
+                            </p:dataTable>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </h:form>
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

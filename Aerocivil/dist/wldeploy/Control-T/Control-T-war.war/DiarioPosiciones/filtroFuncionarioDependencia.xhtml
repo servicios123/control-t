@@ -1,0 +1,72 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"                
+                xmlns:xf="http://www.xfaces.com/jsf">
+        <h:panelGrid styleClass="tabla_filtros" columns="4" cellpadding="5" cellspacing="0">
+            <f:facet name="header" >
+                <h:outputText value="#{msg.filtros}" />
+            </f:facet>
+
+            <xf:inputText entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="funNombre" 
+                          rendered="#{false and funFiltroVisible}"/>
+            <xf:inputText entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="funId" 
+                          rendered="#{funFiltroVisible}" />
+            <xf:inputText entity="#{funcionarioBBean.funcionarioFiltro}" fieldName="funAlias" 
+                          rendered="#{funFiltroVisible}"/>
+            
+            <xf:selectOneMenu entity="#{controlDiarioPosicionesBBean}" fieldName="mes" 
+                              rendered="#{funFiltroVisible}">
+                <f:selectItems value="#{listadosBBean.meses}" var="item" 
+                               itemLabel="#{item.label}" itemValue="#{item.month}"/>
+            </xf:selectOneMenu>
+            <xf:inputText entity="#{controlDiarioPosicionesBBean}" fieldName="anio" 
+                          rendered="#{funFiltroVisible}"/>
+            <xf:selectOneMenu rendered="#{2>=loginBBean.funcionarioTO.funcionario.fuNivel}"
+                              required="#{filtro2}"
+                              entity="#{funcionarioBBean.funcionarioFiltro.dependencia.aeropuerto.regional}" fieldName="regId">  
+
+                <f:selectItems value="#{listadosBBean.listaRegionales}" var="regi" itemValue="#{regi.regId}" itemLabel="#{regi.regNombre}" />  
+                <p:ajax update="aeId,depId"  
+                        listener="#{funcionarioBBean.cargarAeropuertoListado}" />  
+            </xf:selectOneMenu> 
+            
+
+            <xf:selectOneMenu rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}"
+                              required="#{filtro2}"
+                              entity="#{funcionarioBBean.funcionarioFiltro.dependencia.aeropuerto}" fieldName="aeId">  
+
+                <f:selectItems value="#{funcionarioBBean.listAeropuerto}" var="aero" itemValue="#{aero.aeId}" itemLabel="#{aero.aeNombre}"/>  
+                <p:ajax update="depId"  
+                        listener="#{funcionarioBBean.cargarDependenciaListado}" /> 
+            </xf:selectOneMenu> 
+
+            <xf:selectOneMenu rendered="#{3>=loginBBean.funcionarioTO.funcionario.fuNivel}" 
+                              required="#{filtro2}"
+                              entity="#{funcionarioBBean.funcionarioFiltro.dependencia}"  fieldName="depId" >                            
+                <f:selectItems value="#{funcionarioBBean.listDependencia}" var="res" itemValue="#{res.depId}" itemLabel="#{res.depNombre}"/>
+            </xf:selectOneMenu>
+            
+            <xf:calendar entity="#{controlDiarioPosicionesBBean.diarioFiltro.turno}" required="true" 
+                         fieldName="turFecha" rendered="#{!funFiltroVisible}" />
+            <xf:selectOneMenu entity="#{controlDiarioPosicionesBBean.jornadaFiltro}" fieldName="joId"
+                              required="true" 
+                              rendered="#{controlDiarioPosicionesBBean.jornadaFiltro != null}">
+                <f:selectItems value="#{controlDiarioPosicionesBBean.jornadas}" var="jor"
+                               itemLabel="#{jor.joAlias}" itemValue="#{jor.joId}"/>
+            </xf:selectOneMenu>
+
+            <f:facet name="footer" >
+                <h:commandButton action="#{controlDiarioPosicionesBBean.filtrar}" value="#{msg.consultar}"  
+                                 rendered="#{!funFiltroVisible}"/>
+                <h:commandButton action="#{controlDiarioPosicionesBBean.filtrarDiarioIndividual}" value="#{msg.consultar}" 
+                                 rendered="#{funFiltroVisible}"/>
+            </f:facet>
+
+
+
+        </h:panelGrid>    
+    
+</ui:composition>

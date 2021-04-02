@@ -31,4 +31,6 @@ public interface ProgramacionTurnosSession {
      public boolean existeProgramacion(Dependencia dependecia, Date fecha);
          
     public Long getCount();
+
+    public boolean existeProgramacionAprobada(co.gov.aerocivil.controlt.entities.Dependencia dependencia, java.util.Date fecha);
 }

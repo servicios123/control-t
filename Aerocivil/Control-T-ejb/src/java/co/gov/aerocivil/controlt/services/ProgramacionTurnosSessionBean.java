@@ -312,4 +312,27 @@ public class ProgramacionTurnosSessionBean implements ProgramacionTurnosSession 
         }        
         
     }
+    
+    @Override
+    public boolean existeProgramacionAprobada(Dependencia dependencia, Date fecha) {
+        try {
+            
+            
+            Query query = em.createQuery("Select p From Programacion p Where p.proEstado = 1 and p.dependencia.depId = :depId and :fecha between p.proFechaInicio and p.proFechaFin ");            
+            query.setParameter("depId", dependencia.getDepId());            
+            query.setParameter("fecha", fecha, TemporalType.DATE);
+            query.setMaxResults(1);
+            Programacion programacion = (Programacion) query.getSingleResult();
+            if (programacion.getProId() != null) {
+                return true;
+            } else {
+                return false;
+            }            
+            
+            
+        } catch (NoResultException nre) {
+            return false;
+        }        
+        
+    }
 }

@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:xf="http://www.xfaces.com/jsf">
+    <body>
+        <ui:composition template="../template_interior.xhtml">
+
+            <ui:define name="titulo">
+                <h:outputText value="#{msg.consultarDiarioPosiciones}" ></h:outputText>
+            </ui:define>
+
+            <ui:define name="contenido">
+
+                <br></br>
+                <h:form>
+                    <ui:include src="filtroFuncionarioDependencia.xhtml">
+                        <ui:param name="funFiltroVisible" value="false"/>
+                    </ui:include>
+                    <p:dataTable value="#{controlDiarioPosicionesBBean.lazyList}" var="item" styleClass="tabla_lista"
+                                 paginator="true" paginatorPosition="bottom" rows="15"  lazy="true"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"  
+                                 currentPageReportTemplate="#{msg.currentPageReportTemplate}"
+                                 rowsPerPageTemplate="10,15,20" id="carTable" draggableColumns="true"
+                                 emptyMessage="#{msg.emptyList}" paginatorAlwaysVisible="false">
+                        <p:column sortBy="#{item.turno.pjAlias}" headerText="#{msg.posId}">
+                            <h:outputText value="#{item.turno.pjAlias}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.turno.funAlias}" headerText="FP">
+                            <h:outputText value="#{item.turno.funAlias}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.funcionario.funAlias}" headerText="FA">
+                            <h:outputText value="#{item.funcionario.funAlias}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.dposTipoRealizacion}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dposTipoRealizacion}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dposTipoRealizacion}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.horaInicioStr}" headerText="#{msg.horaLlegada}">
+                            <h:outputText value="#{item.horaInicioStr}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.horaFinStr}" headerText="#{msg.horaSalida}">
+                            <h:outputText value="#{item.horaFinStr}"/>
+                        </p:column>
+                        <p:column >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dposObservaciones}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dposObservaciones}"/>
+                        </p:column>
+                        <p:column >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.dposNotificacion}"/>
+                            </f:facet>
+                            <h:outputText value="Incumplimiento" rendered="#{item.dposNotificacion=='I'}"/>
+                            <h:outputText value="Retardo" rendered="#{item.dposNotificacion=='R'}"/>
+                            <h:outputText value="No se presento" rendered="#{item.dposNotificacion=='N'}"/>
+                        </p:column>
+                    </p:dataTable>
+                    <h:commandButton action="#{controlDiarioPosicionesBBean.generarReporteDiarioGeneral}"
+                                     value="#{msg.generarReporte}"
+                                     rendered="#{not empty controlDiarioPosicionesBBean.lazyList and controlDiarioPosicionesBBean.lazyList.rowCount>0}"/>
+
+                </h:form>
+
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>
