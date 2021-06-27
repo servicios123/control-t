@@ -120,7 +120,7 @@
                                               rendered="#{funcionarioBBean.editando}"/>
 
                                 <xf:selectOneMenu entity="#{funcionarioBBean.funcionario}" fieldName="funEstado" 
-                                                  readonly="#{loginBBean.funNivel!=1}"
+                                                  readonly="#{loginBBean.funNivel>1}"
                                                   rendered="#{funcionarioBBean.editando}"
                                                   width="200px">  
                                     <f:selectItem itemLabel="Activo" itemValue="Activo" />  

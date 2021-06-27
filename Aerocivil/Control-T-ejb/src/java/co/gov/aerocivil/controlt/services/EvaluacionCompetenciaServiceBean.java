@@ -35,16 +35,20 @@ public class EvaluacionCompetenciaServiceBean implements EvaluacionCompetenciaSe
     @Override
     public EvaluacionCompetencia consultarEvaluacion(Funcionario f) {
         if (f.getFunFvEvaluacion() != null) {
-            Query q = em.createQuery("select max(e.evId) from EvaluacionCompetencia e where e.funcionario.funId = :funId");
-            q.setParameter("funId", f.getFunId());
-            Long maxEvId = (Long) q.getSingleResult();
+            try {
+                Query q = em.createQuery("select max(e.evId) from EvaluacionCompetencia e where e.funcionario.funId = :funId");
+                q.setParameter("funId", f.getFunId());
+                Long maxEvId = (Long) q.getSingleResult();
 
-            Query q2 = em.createQuery("Select e from EvaluacionCompetencia e where e.evId = :evId");
-            q2.setParameter("evId", maxEvId);
+                Query q2 = em.createQuery("Select e from EvaluacionCompetencia e where e.evId = :evId");
+                q2.setParameter("evId", maxEvId);
 
-            EvaluacionCompetencia competencia = (EvaluacionCompetencia) q2.getSingleResult();
+                EvaluacionCompetencia competencia = (EvaluacionCompetencia) q2.getSingleResult();
 
-            return competencia;
+                return competencia;
+            } catch (Exception e) {
+                return null;
+            }
         }
         return null;
     }

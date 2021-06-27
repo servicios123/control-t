@@ -10,6 +10,7 @@ import co.gov.aerocivil.controlt.entities.JornadaRestriccion;
 import co.gov.aerocivil.controlt.entities.PosNoAsig;
 import co.gov.aerocivil.controlt.entities.PosicionHabilitada;
 import co.gov.aerocivil.controlt.entities.Programacion;
+import co.gov.aerocivil.controlt.entities.RestriccionDependencia;
 import co.gov.aerocivil.controlt.entities.Turno;
 import co.gov.aerocivil.controlt.entities.TurnoEspFuncionario;
 import co.gov.aerocivil.controlt.entities.TurnoEspecial;
@@ -52,7 +53,50 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
     private List<PosicionHabilitada> enabledPositions;
     private List<JornadaRestriccion> restrictivePeriod;
     private Setting setting;
-    private Programacion programming;
+
+    private void getSetting(Long depId) {
+        this.setting = new Setting();
+        List<RestriccionDependencia> restricciones = getRestrictions(depId);
+        for (RestriccionDependencia rd : restricciones) {
+            if (rd.getRdValor() != null) {
+                if (rd.getRestriccionProgramacion().getRpId().longValue() == 4L) {
+                    this.setting.setPeriodId(rd.getRdValor().longValue());
+                }
+                if (rd.getRestriccionProgramacion().getRpId().longValue() == 10L) {
+                    boolean max = false;
+                    if (rd.getRdValor().longValue() > 0L) {
+                        max = true;
+                    }
+                    this.setting.setMaxHoursExtra(max);
+                }
+                if (rd.getRestriccionProgramacion().getRpId().longValue() == 5L) {
+                    this.setting.setTimeRecess(rd.getRdValor().intValue());
+                }
+                if (rd.getRestriccionProgramacion().getRpId().longValue() == 1L) {
+                    this.setting.setMaxWorkedHoursByDay(rd.getRdValor().intValue());
+                }
+                if (rd.getRestriccionProgramacion().getRpId().longValue() == 2L) {
+                    this.setting.setMaxContinuosDaysExtra(rd.getRdValor().intValue());
+                }
+                if (rd.getRestriccionProgramacion().getRpId().longValue() == 7L) {
+                    this.setting.setMaxContinuosPeriod(rd.getRdValor().intValue());
+                }
+                if (rd.getRestriccionProgramacion().getRpId().longValue() == 9L) {
+                    this.setting.setMaxContinuosDaysExtraModification(rd.getRdValor().intValue());
+                }
+            }
+        }
+    }
+
+    private List<RestriccionDependencia> getRestrictions(Long depId) {
+        try {
+            Query query = this.em.createQuery("SELECT r FROM RestriccionDependencia r WHERE r.dependencia.depId = :depId");
+            query.setParameter("depId", depId);
+            return query.getResultList();
+        } catch (NoResultException nre) {
+        }
+        return null;
+    }
 
     @Override
     public List<Funcionario> getFuncionarioTurnoPorFecha(Date date, long dep) {
@@ -248,6 +292,8 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
             return "No existe programación para esa fecha";
         }
 
+        getSetting(p.getDependencia().getDepId());
+
         List<Vistaprogramacion> turnos = this.getTurnosByDayAndFun(f.getFunId(), date);
         long horafin = (long) tes.getTeHfin();
         long horainicio = (long) tes.getTeHinicio();
@@ -255,15 +301,15 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
         long minfin = (long) tes.getTeMfin();
         String hIniNew = horainicio + ":" + mininicio + ":00";
         String hFinNew = horafin + ":" + minfin + ":00";
-        long totalTes = horasTurno(hIniNew, hFinNew);
+        Double totalTes = horasTurno(hIniNew, hFinNew);
 
         if (turnos != null) {
             long horafin_1 = horafin;
             for (Vistaprogramacion turno : turnos) {
                 String turIni = turno.getTurHInicio() + ":" + turno.getTurMInicio() + ":00";
                 String turFin = turno.getTurHFin() + ":" + turno.getTurMFin() + ":00";
-                long totalTur = horasTurno(turIni, turFin);
-                if (totalTur + totalTes > 12) {
+                Double totalTur = horasTurno(turIni, turFin);
+                if (totalTur + totalTes > this.setting.getMaxWorkedHoursByDay()) {
                     return "Las horas totales maximas permitidas han sido exedidas por el turno " + turno.getPjAlias();
                 }
                 if ((horafin_1 >= turno.getTurHInicio() && horafin_1 <= turno.getTurHFin()) || (horainicio >= turno.getTurHInicio() && horainicio <= turno.getTurHFin())) {
@@ -316,15 +362,15 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
         return null;
     }
 
-    private long horasTurno(String inicio, String fin) {
+    private Double horasTurno(String inicio, String fin) {
         try {
             SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-
+            Double result = null;
             Date date1 = format.parse(inicio);
             Date date2 = format.parse(fin);
-            int horas = 0;
-            int minutos = 0;
-            int diferencia = (int) ((date2.getTime() - date1.getTime()) / 1000);
+            double horas = 0;
+            double minutos = 0;
+            double diferencia = (int) ((date2.getTime() - date1.getTime()) / 1000);
             if (diferencia > 3600) {
                 horas = (int) Math.floor(diferencia / 3600);
                 diferencia = diferencia - (horas * 3600);
@@ -335,12 +381,16 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
             }
             if (minutos >= 59) {
                 horas = horas + 1;
+                result = new Double(String.valueOf(horas));
+            } else {
+                double time = horas + (minutos / 60);
+                result = new Double(time);
             }
-            return new Long(horas).longValue();
+            return result;
         } catch (ParseException ex) {
             Logger.getLogger(ModificarTurnoServiceBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return 0;
+        return 0D;
     }
 
     private Long obtenerGrupoId() {
@@ -377,10 +427,18 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
     }
 
     private String printResult(String[] razon) {
+        String log = "";
+        int i = 0;
+        for (String s : razon) {
+            log += "[" + i + "] => " + s + "-->";
+            i++;
+        }
+        Logger.getLogger(ModificarTurnoServiceBean.class.getName()).log(Level.WARNING, log, new Exception("Info"));
         String rta = "Func " + razon[2] + " \t " + razon[1] + " [" + razon[3] + " " + razon[4] + "]: " + razon[5];
         if (razon.length >= 7) {
             rta += " (" + razon[6] + ")";
         }
+
 
         //System.out.println(rta);
 
@@ -389,7 +447,7 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
 
     @Override
     public String cambiarTurnos(Date date1, Funcionario f1, Vistaprogramacion vp1, Date date2, Funcionario f2, Vistaprogramacion vp2, Funcionario mod) {
-
+        String turnFromPositionDiaryMessage = null;
         if (vp1 == null) {
             Calendar c = Calendar.getInstance();
             c.setTime(date1);
@@ -411,15 +469,23 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
                 String error = "El Func " + f2.getFunAlias() + " Tiene más de 2 turnos el " + c.get(Calendar.DATE) + "/" + (c.get(Calendar.MONTH) + 1) + " [";
                 for (Vistaprogramacion vp : turnos) {
                     error += " " + vp.getPjAlias() + " ";
+                    if(vp.getTurTipo().equals(10L)){
+                        turnFromPositionDiaryMessage = "  El usuario "+vp.getFunAlias()+" está ejecutando el turno "+vp.getPjAlias()+" en registro del Diario de Posiciones y no puede ejecutar más turnos ese día";
+                    }
                 }
                 error += "]";
-
+                if (turnFromPositionDiaryMessage != null){
+                    error += turnFromPositionDiaryMessage;
+                }
                 return error;
             }
 
 
+            if (programacionTotalServiceBean == null) {
+                Logger.getLogger(ModificarTurnoServiceBean.class.getName()).log(Level.WARNING, "programacionTotalServiceBean Nulo ", new Exception("programacionTotalServiceBean Nulo "));
 
-            String resultado = "-;-;-;-;-;OK;-;";;
+            }
+            String resultado = "-;-;-;-;-;OK;-;";
             if (turno1.getTurTipo() == 1L || turno1.getTurTipo() == 2) {
                 resultado = programacionTotalServiceBean.validateTurn(turno1, null);
             }

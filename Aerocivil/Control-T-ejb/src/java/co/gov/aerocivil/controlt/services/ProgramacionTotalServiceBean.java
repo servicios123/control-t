@@ -165,6 +165,7 @@ public class ProgramacionTotalServiceBean
             this.weeks.add(week);
         }
         int tipo = 0;
+        
         for (Day day : this.days) {
             if (day.getDate().compareTo(turno.getTurFecha()) == 0) {
                 for (Turn turn : day.getTurns()) {
@@ -177,7 +178,6 @@ public class ProgramacionTotalServiceBean
                             validateOrdinaryTurn(fun, turn, day.getDate());
                             tipo = 1;
                         } else if ((turn.getPeriod().getStart() < ordinary.getPeriod().getEnd()) && (ordinary.getPeriod().getTotal() + turn.getPeriod().getTotal() < 24)) {
-
                             turn.setFunctionary(fun);
                             validateExtraordinaryTurn(turn, ordinary, day.getDate(), ordinary.getFunctionary().getMaxHoursExtra(), true);
                             tipo = 2;
@@ -1945,8 +1945,8 @@ public class ProgramacionTotalServiceBean
                     }
                 }
                 Turn previous = getTurnOfFunctionary(turn.getFunctionary(), current, -1, Type.EXTRAORDINARY);
-                
-                if(previous==null){
+
+                if (previous == null) {
                     previous = getTurnOfFunctionary(turn.getFunctionary(), current, -1, Type.ANY);
                 }
                 if (previous != null && turn != null) {
@@ -1957,7 +1957,7 @@ public class ProgramacionTotalServiceBean
                 }
                 if (satisfiesMaxContinuosPeriod(turn, extra, next, current).booleanValue()) {
                     if ((satisfiesRequiredPeriod(turn, extra).booleanValue()) && (satisfiesRequiredPeriod(extra, next).booleanValue())) {
-                        if ((satisfiesRestrictionPreviousPeriod(turn, extra, true).booleanValue()) && (satisfiesRestrictionPreviousPeriod(extra, next, true).booleanValue()) && ((satisfiesRestrictionPreviousPeriod(turn, next, true).booleanValue()))) {
+                        if ((satisfiesRestrictionPreviousPeriod(turn, extra, true).booleanValue()) && (satisfiesRestrictionPreviousPeriod(extra, next, true).booleanValue()) && ((satisfiesRestrictionPreviousPeriod(turn, next, false).booleanValue()))) {
                             if ((satisfiesRecessPeriod(turn, extra, Boolean.valueOf(true)).booleanValue()) && (satisfiesRecessPeriod(extra, next, Boolean.valueOf(false)).booleanValue())) {
                                 if ((satisfiesSequence(turn, extra).booleanValue()) && (satisfiesSequence(extra, next).booleanValue())) {
                                     if (!satisfiesInactivePosition(extra, current)) {
@@ -2003,10 +2003,8 @@ public class ProgramacionTotalServiceBean
                 } else {
                     write(s + "No cumple con la regla de maximo numero de jornadas continuas (" + this.setting.getMaxContinuosPeriod() + ");" + turn.getPeriod().getAlias() + turn.getPosition().getAlias() + " - " + extra.getPeriod().getAlias() + extra.getPosition().getAlias() + ";");
                 }
-            } else if (!satisfiesEnabledPosition(turn.getFunctionary().getId(), extra.getPosition().getId()).booleanValue()) {
-                write(s + "Funcionario No Tiene Posicion Habilitada;" + extra.getPosition().getAlias() + ";");
-            } else {
-                write(s + "Funcionario No Tiene Posicion Habilitada;" + turn.getPosition().getAlias() + ";");
+            }  else {
+                write(s + "Funcionario No Tiene Posicion Habilitada extra.getPosition().getId() validateExtraordinaryTurn 2;" + turn.getPosition().getAlias() + ";");
             }
         }
         return Boolean.valueOf(false);
@@ -2317,7 +2315,7 @@ public class ProgramacionTotalServiceBean
             }
             JornadaRestriccion result = getRestrictivePeriod(previous.getPeriod().getId(), current.getPeriod().getId());
 //          
-            if (previous.getPeriod().getAlias().equalsIgnoreCase("N") && current.getPeriod().getAlias().equalsIgnoreCase("M") && result!=null) {
+            if (previous.getPeriod().getAlias().equalsIgnoreCase("N") && current.getPeriod().getAlias().equalsIgnoreCase("M") && result != null) {
                 return false;
             }
             int diffHrs = current.getPeriod().getStart() - (previous.getPeriod().getEnd() - 1);
@@ -2437,6 +2435,9 @@ public class ProgramacionTotalServiceBean
 
     private boolean isJornadaNoLaboral(Turn turn, Functionary fun) {
         List<Long> ids = this.jornadasNoLaboralesPorUsuario.get(fun.getId());
+        if (this.jornadasDependencia == null) {
+            this.jornadasDependencia = listasService.obtenerJornadaXDependencia(this.programming.getDependencia().getDepId());
+        }
         if (ids != null && ids.size() == this.jornadasDependencia.size()) {
             return true;
         }
