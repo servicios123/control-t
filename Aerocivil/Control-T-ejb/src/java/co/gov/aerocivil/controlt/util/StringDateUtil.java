@@ -141,4 +141,14 @@ public class StringDateUtil {
         c.add(Calendar.DATE, amount);
         return c.get(Calendar.DAY_OF_MONTH);
     }
+    
+    public static long diferenciaHorasDias(Calendar fechaInicial, Calendar fechaFinal) {
+        long diferenciaHoras = 0;
+        long milisegundos_dia = 24 * 60 * 60 * 1000;
+        diferenciaHoras = (fechaFinal.getTimeInMillis() - fechaInicial.getTimeInMillis()) / milisegundos_dia;
+        if (diferenciaHoras > 0) { // Lo Multiplicaos por 24 por que estamos utilizando el formato militar 
+            diferenciaHoras *= 24;
+        }
+        return diferenciaHoras;
+    }
 }

@@ -2373,7 +2373,7 @@ public class ProgramacionTotalServiceBean
                     yesterday.set(Calendar.HOUR_OF_DAY, previous.getPeriod().getEnd());
                     yesterday.set(Calendar.MINUTE, 0);
 
-                    long resultado = diferenciaHorasDias(yesterday, today);
+                    long resultado = StringDateUtil.diferenciaHorasDias(yesterday, today);
                     if (resultado < start) {
                         return Boolean.valueOf(false);
                     }
@@ -2381,16 +2381,6 @@ public class ProgramacionTotalServiceBean
             }
         }
         return Boolean.valueOf(true);
-    }
-
-    private long diferenciaHorasDias(Calendar fechaInicial, Calendar fechaFinal) {
-        long diferenciaHoras = 0;
-        long milisegundos_dia = 24 * 60 * 60 * 1000;
-        diferenciaHoras = (fechaFinal.getTimeInMillis() - fechaInicial.getTimeInMillis()) / milisegundos_dia;
-        if (diferenciaHoras > 0) { // Lo Multiplicaos por 24 por que estamos utilizando el formato militar 
-            diferenciaHoras *= 24;
-        }
-        return diferenciaHoras;
     }
 
     private Boolean satisfiesSequence(Turn previous, Turn current) {
@@ -2416,9 +2406,6 @@ public class ProgramacionTotalServiceBean
         if ((current != null)) {
             Calendar c = Calendar.getInstance();
             c.setTime(fecha);
-
-            //System.out.println("pj -> " + current.getPositionPeriod());
-            //System.out.println("new SimpleDateFormat() = " + new SimpleDateFormat("dd/MM/yyyy").format(fecha));
             List<PosicionInactiva> inactive = getInactivePositions(current.getPositionPeriod(), fecha);
             if (inactive != null) {
                 for (PosicionInactiva inactiva : inactive) {
@@ -2453,10 +2440,6 @@ public class ProgramacionTotalServiceBean
     }
 
     private Boolean satisfiesPetitions(Turn current, Date fecha, Functionary fun) {
-
-        /*if (fun.getAlias().equalsIgnoreCase("ICG") && current != null && current.getPeriod().getId() == 427) {
-         System.out.println("poscision");
-         }*/
         if ((current != null)) {
             Calendar c = Calendar.getInstance();
             c.setTime(fecha);
