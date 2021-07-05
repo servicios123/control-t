@@ -56,6 +56,8 @@ import javax.persistence.TemporalType;
 @Stateless
 public class ModificarTurnoServiceBean implements ModificarTurnoService {
 
+    @PersistenceContext(unitName = "ControlT-ejbPU")
+    private EntityManager em;
     @EJB
     private ProgramacionTotalService programacionTotalServiceBean;
     @EJB
@@ -65,9 +67,7 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
     @EJB
     private JornadaNoLaboralService jornadaNoLaboralService;
     @EJB
-    private ListasService listasService;
-    @PersistenceContext(unitName = "ControlT-ejbPU")
-    private EntityManager em;
+    private JornadaService jornadaService;
     private ArrayList<Day> days;
     private List<PosicionHabilitada> enabledPositions;
     private List<JornadaRestriccion> restrictivePeriod;
@@ -78,7 +78,7 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
     private List<Jornada> jornadas;
     private ArrayList<Week> weeks;
     private ArrayList<String> log;
-    private List<Jornada> jornadasDependencia;
+    private Long jornadasQty;
     private Boolean debug;
     private Day lastDay;
 
@@ -472,6 +472,12 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
 
         return rta + "\n";
     }
+    
+    @Override
+    public String cambiarTurnos(Date date1, Funcionario f1, Vistaprogramacion vp1, Date date2, Funcionario f2, Vistaprogramacion vp2, Funcionario mod, Long countByDep) {
+        jornadasQty = countByDep;
+        return cambiarTurnos(date1, f1, vp1, date2, f2, vp2, mod);
+    }
 
     @Override
     public String cambiarTurnos(Date date1, Funcionario f1, Vistaprogramacion vp1, Date date2, Funcionario f2, Vistaprogramacion vp2, Funcionario mod) {
@@ -686,7 +692,6 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
         this.log = new ArrayList();
         this.debug = Boolean.valueOf(true);
         this.programming = turno.getProgramacion();
-        this.jornadasDependencia = listasService.obtenerJornadaXDependencia(this.programming.getDependencia().getDepId());
         List<Turno> turnos = getTurnosFunPro(turno.getFuncionario().getFunId().longValue(), turno.getProgramacion().getProId().longValue());
         this.days = new ArrayList();
 
@@ -1163,13 +1168,10 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
 
     private boolean isJornadaNoLaboral(Turn turn, Functionary fun) {
         List<JornadaNoLaborable> jornadaNoLaborables = this.jornadaNoLaboralService.getListaJornadasFuncionario(fun.getId());
-        if (this.jornadasDependencia == null) {
-            this.jornadasDependencia = listasService.obtenerJornadaXDependencia(this.programming.getDependencia().getDepId());
-        }
-        if (jornadaNoLaborables != null && jornadaNoLaborables.size() == this.jornadasDependencia.size()) {
+        if (jornadaNoLaborables != null && jornadaNoLaborables.size() == this.jornadasQty.longValue()) {
             return true;
         }
-        if (jornadaNoLaborables != null && jornadaNoLaborables.size() < this.jornadasDependencia.size()) {
+        if (jornadaNoLaborables != null && jornadaNoLaborables.size() < this.jornadasQty.longValue()) {
             for (JornadaNoLaborable jornadaNoLaborable : jornadaNoLaborables) {
                 long currentJoId = turn.getPeriod().getId();
                 if (currentJoId == jornadaNoLaborable.getId()) {
@@ -1188,10 +1190,10 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
                 List<PermisoEspecial> petitions = getPetitions(fun.getId(), fecha);
                 for (PermisoEspecial especial : petitions) {
                     List<Jornada> listaJornadas = especial.getListaJornadas();
-                    if (listaJornadas.size() == this.jornadasDependencia.size()) {
+                    if (listaJornadas.size() == this.jornadasQty.longValue()) {
                         return false;
                     }
-                    if (listaJornadas.size() < this.jornadasDependencia.size()) {
+                    if (listaJornadas.size() < this.jornadasQty.longValue()) {
                         for (Jornada j : listaJornadas) {
                             if (current.getPeriod().getId() == j.getJoId()) {
                                 return false;
@@ -1545,6 +1547,12 @@ public class ModificarTurnoServiceBean implements ModificarTurnoService {
             }
         }
         return Boolean.valueOf(true);
+    }
+
+    private Long totalDependenciasXJornada(Long dependencia) {
+        String queryString = "SELECT Count(*) FROM JORNADA_OP WHERE JO_DEPENDENCIA = " + dependencia;
+        Query query = em.createNativeQuery(queryString);
+        return (Long) query.getSingleResult();
     }
 
     private void write(String s) {

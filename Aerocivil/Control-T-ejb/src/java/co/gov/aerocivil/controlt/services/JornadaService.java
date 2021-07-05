@@ -33,4 +33,6 @@ public interface JornadaService{
     public List<Jornada> getListaJornadasDisponibles(Dependencia dep, Long jorId);
     
      public Jornada getPorId(long id);
+     
+     public Long getCountByDep(Long dep);
 }

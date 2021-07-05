@@ -121,6 +121,12 @@ public class JornadaServiceBean implements JornadaService {
     public Long getCount() {
         return count;
     }
+    
+    @Override
+    public Long getCountByDep(Long dep) {
+        Query query = em.createQuery("Select count(j) from Jornada j where j.dependencia.depId = :dep").setParameter("dep", dep);
+        return (Long) query.getSingleResult();
+    }
 
     @Override
     public Jornada getJornadaAnterior(Jornada jornada) {

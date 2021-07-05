@@ -34,6 +34,8 @@ public interface ModificarTurnoService {
     public String asignarEspecial(Date date, Funcionario f, TurnoEspecial t, Funcionario mod);
 
     public String cambiarTurnos(Date date1, Funcionario f1, Vistaprogramacion turno1, Date date2, Funcionario f2, Vistaprogramacion turno2, Funcionario mod);
+    
+    public String cambiarTurnos(Date date1, Funcionario f1, Vistaprogramacion turno1, Date date2, Funcionario f2, Vistaprogramacion turno2, Funcionario mod, Long countByDep);
 
     public String asignarPosNoAsig(PosNoAsig pn, Date date, Funcionario fun, Funcionario mod);
 

@@ -8,6 +8,7 @@ import co.gov.aerocivil.controlt.entities.Funcionario;
 import co.gov.aerocivil.controlt.entities.PosNoAsig;
 import co.gov.aerocivil.controlt.entities.TurnoEspecial;
 import co.gov.aerocivil.controlt.entities.Vistaprogramacion;
+import co.gov.aerocivil.controlt.services.JornadaService;
 import co.gov.aerocivil.controlt.services.ModificarTurnoService;
 import co.gov.aerocivil.controlt.services.PosicionInactivaService;
 import co.gov.aerocivil.controlt.services.PosicionService;
@@ -34,6 +35,8 @@ import org.primefaces.event.SelectEvent;
 @SessionScoped
 public class VistaProgramacionBBean {
 
+    @EJB
+    private JornadaService jornadaService;
     @EJB
     private ModificarTurnoService modificarTurnoServiceBean;
     @EJB
@@ -110,7 +113,9 @@ public class VistaProgramacionBBean {
     }
 
     public String cambiar() {
-        String resultado = modificarTurnoServiceBean.cambiarTurnos(date_cambio_1, fun_cambio_1, turn_cambio_1, date_cambio_1, fun_cambio_2, turn_cambio_2, JsfUtil.getFuncionarioSesion());
+        LoginBBean logbbean = (LoginBBean) JsfUtil.getManagedBean(LoginBBean.class);
+        Long countByDep = jornadaService.getCountByDep(logbbean.getFuncionarioTO().getFuncionario().getDependencia().getDepId());
+        String resultado = modificarTurnoServiceBean.cambiarTurnos(date_cambio_1, fun_cambio_1, turn_cambio_1, date_cambio_1, fun_cambio_2, turn_cambio_2, JsfUtil.getFuncionarioSesion(), countByDep);
 
         if (resultado == null) {
             JsfUtil.addSuccessMessage("turnosCambiadosExitosamente");
